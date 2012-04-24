@@ -1,7 +1,7 @@
 /*
- *   ngs View
- *   http://casmi.github.com/
- *   Copyright (C) 2011-2012, Xcoo, Inc.
+ *   ngsv
+ *   https://github.com/xcoo/ngsv
+ *   Copyright (C) 2012, Xcoo, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
