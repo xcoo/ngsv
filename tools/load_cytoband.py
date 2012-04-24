@@ -1,3 +1,21 @@
+#
+#   ngsv
+#   http://github.com/xcoo/ngsv
+#   Copyright (C) 2012, Xcoo, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
@@ -26,7 +44,7 @@ def load(filepath, db):
 
     # load cytoband data
     for line in open(filepath, 'r'):
-        cyto_chr, cyto_start, cyto_end, cyto_name, cyto_gie = line[:-1].split('\t')
+        cyto_chr, cyto_start, cyto_end, cyto_name, cyto_gie = line[:-1].split('¥t')
 
         c_name = cyto_chr
         c_name = c_name.replace('Chr', '')
@@ -47,7 +65,7 @@ def load(filepath, db):
  
         count += 1
 
-        print "loaded %d bands\r" % count,
+        print "loaded %d bands¥r" % count,
 
     print "loaded %d bands" % count
 
