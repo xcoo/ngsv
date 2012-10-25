@@ -58,7 +58,7 @@ public class RulerGroup extends Group {
 
         int numScales = (int)(length / step) + 1;
 
-        for (int i = 0; i < numScales; i++) {
+        for (int i = 0; i < numScales; ++i) {
             double x = i * step + start;
 
             RulerElement e = new RulerElement(x, 0, scale);

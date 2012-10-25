@@ -54,7 +54,7 @@ public final class Indicator extends Group {
             roundRect.setStrokeColor(new GrayColor(0.25));
             roundRect.setX(14.0 * Math.cos(Math.toRadians((90.0 - i * 30.0))));
             roundRect.setY(14.0 * Math.sin(Math.toRadians((90.0 - i * 30.0))));
-            roundRect.setRotate(90.0 - i * 30.0);
+            roundRect.setRotation(90.0 - i * 30.0);
             
             roundRects[i] = roundRect;
             

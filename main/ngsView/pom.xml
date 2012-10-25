@@ -4,7 +4,7 @@
 
 	<groupId>ngsView</groupId>
 	<artifactId>ngsVIew</artifactId>
-	<version>0.1.2-SNAPSHOT</version>
+	<version>0.2.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<url>http://xcoo.jp/</url>
@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>casmi</groupId>
 			<artifactId>casmi</artifactId>
-			<version>0.1.2-SNAPSHOT</version>
+			<version>0.2.1-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>

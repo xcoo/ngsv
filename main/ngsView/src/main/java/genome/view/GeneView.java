@@ -59,11 +59,10 @@ import casmi.AppletRunner;
 import casmi.KeyEvent;
 import casmi.MouseButton;
 import casmi.MouseEvent;
-import casmi.extension.trackball.Trackball;
+import casmi.Trackball;
 import casmi.graphics.color.ColorSet;
 import casmi.graphics.color.GrayColor;
 import casmi.graphics.element.Line;
-import casmi.graphics.element.Rect;
 import casmi.graphics.element.Text;
 import casmi.graphics.font.Font;
 import casmi.graphics.font.FontStyle;
@@ -117,7 +116,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
     private long start = 0, end = 0;
 
     // Graphics objects
-    private GraphicsObject rootObject = new GraphicsObject();
+    private GraphicsObject baseObject = new GraphicsObject();
 
     private GeneGroup               geneGroup;
     private List<ShortReadGroup>    shortReadGroupList    = new ArrayList<ShortReadGroup>();
@@ -167,6 +166,11 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
     @Override
     public void setup() {
         
+        // initialize global settings
+        setFPS(FPS);
+        setSize(1024, 768);
+        setBackGroundColor(ColorSet.BLACK);
+        
         // load data
         // -----------------------------------------
 
@@ -197,32 +201,15 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
         
         // set dialog box for sam
         dbox = new SamSelectionDialogBox(samFiles, bedFiles, chrLengthMap, sqlLoader, this);
-
-        // wait for push "OK"
-        while (!isFinishedInitialSelection) {
-
-            try {
-                Thread.sleep(100);
-            } catch (Exception e) {
-                // do nothing
-            }
-
-        }
-
+    }
+    
+    public void initViews() {        
         // initialize view scale (region)
         viewScale = new ViewScale(dbox.getChrName(), dbox.getStart(), dbox.getEnd());
 
         // load data for view related to viewScale.getChr()
         reloadViewData(viewScale.getChr(), viewScale.getStart(), viewScale.getEnd());
-
-        // initialize view
-        // -----------------------------------------
-
-        // initialize global settings
-        setFPS(FPS);
-        setSize(1024, 768);
-        setBackGroundColor(ColorSet.BLACK);
-
+        
         trackball = new Trackball(getWidth(), getHeight());
         
         Font f = new Font("Sans-Serif", FontStyle.PLAIN, 12.0);
@@ -238,7 +225,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
         
         rebuildViewData(viewScale.getChr(), viewScale.getStart(), viewScale.getEnd());
 
-        addObject(rootObject);
+        addObject(baseObject);
         setupExplanationText();
         addObject(annotationText);
         addObject(indicator);
@@ -321,7 +308,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
 
     private void rebuildViewData(String chr, long start, long end) {
         
-        rootObject.clear();
+        baseObject.clear();
         
         shortReadGroupList.clear();
         histogramBinGroupList.clear();
@@ -365,7 +352,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
 
     private void setupRuler(long start, long end) {
         rulerGroup = new RulerGroup(start, end, scale);
-        rootObject.add(rulerGroup);
+        baseObject.add(rulerGroup);
     }
 
     private void setupShortRead(Sam sam) {
@@ -378,8 +365,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
         }
         
         shortReadGroupList.add(g);
-        rootObject.add(g);
-        
+        baseObject.add(g);   
     }
 
     private void setupHistogramBin(Sam sam) {
@@ -388,7 +374,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
         g.setY(HISTOGRAM_BIN_POS_Y);
         
         histogramBinGroupList.add(g);
-        rootObject.add(g);
+        baseObject.add(g);
         
     }
 
@@ -398,7 +384,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
         g.setY(BED_FRAGMENT_POS_Y);
         
         bedFragmentGroupList.add(g);
-        rootObject.add(g);
+        baseObject.add(g);
         
     }
 
@@ -410,15 +396,14 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
             e.addMouseEventCallback(new AnnotationMouseOverCallback(e.getName(), annotationText, getMouse()));            
         }
         
-        rootObject.add(cytobandGroup);
-        
+        baseObject.add(cytobandGroup);        
     }
     
     private void setupGene() {
         
         geneGroup = new GeneGroup(scale);
         
-        rootObject.add(geneGroup);
+        baseObject.add(geneGroup);
         
     }
 
@@ -465,6 +450,9 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
 
     @Override
     public void update() {
+        if (!isFinishedInitialSelection)
+            return;
+        
         // Update horizontal scroll.
         updateScroll();
         
@@ -681,7 +669,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
     @Override
     public void keyEvent(KeyEvent e) {
         if (e == KeyEvent.PRESSED) {
-            int keycode = getKeycode();
+            int keycode = getKeyCode();
             char key = getKey();
             
             // ESC to quit the application.
@@ -694,7 +682,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
                 dbox.setVisible(true);
             } else if (key == 'r') {
                 trackball.reset();
-                trackball.rotate(rootObject);
+                trackball.rotate(baseObject);
             }
         }
     }
@@ -711,13 +699,13 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
             switch (b) {
             case LEFT:
             {
-                if (getKeycode() == java.awt.event.KeyEvent.VK_SPACE) {
+                if (getKeyCode() == java.awt.event.KeyEvent.VK_SPACE) {
                     int mouseX = getMouseX();
                     int mouseY = getMouseY();
 
                     trackball.update(mouseX, mouseY, prvMouseX, prvMouseY);
 
-                    trackball.rotate(rootObject, getWidth() / 2.0, getHeight() / 2.0, 0.0);
+                    trackball.rotate(baseObject, getWidth() / 2.0, getHeight() / 2.0, 0.0);
 
                     prvMouseX = mouseX;
                     prvMouseY = mouseY;
@@ -736,7 +724,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
 
                 trackball.update(mouseX, mouseY, prvMouseX, prvMouseY);
 
-                trackball.rotate(rootObject, getWidth() / 2.0, getHeight() / 2.0, 0.0);
+                trackball.rotate(baseObject, getWidth() / 2.0, getHeight() / 2.0, 0.0);
 
                 prvMouseX = mouseX;
                 prvMouseY = mouseY;
@@ -769,6 +757,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
         dbox.setVisible(false);
         
         if (!isFinishedInitialSelection) {
+            initViews();
             isFinishedInitialSelection = true;
         } else {
             // initialize view scale (region)
