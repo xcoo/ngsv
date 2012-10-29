@@ -11,7 +11,7 @@ Requirements
 ==============
 
 * Java (later than 1.6SE)
-    * casmi (ver. 0.1.2-SNAPSHOT in dev branch)
+    * casmi (ver. 0.2.1-SNAPSHOT in dev branch)
     * logback
 * MySQL
 * Python
@@ -67,6 +67,21 @@ Usage
 5. 'Space + drag' to display 3-D view. 'r' to reset the view.
 6. 'c' to re-select dataset.
 
+Package
+-----------------
+
+Build main project and package as executable file (.app/.exe).
+
+Mac
+
+    $ cd main/ngsView
+    $ mvn -P production-mac -Dmaven.test.skip=true package
+    
+Win
+
+    $ cd main/ngsView
+    $ mvn -P production-win -Dmaven.test.skip=true package
+    
 License
 -----------------
 
