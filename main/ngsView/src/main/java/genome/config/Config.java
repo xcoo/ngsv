@@ -18,6 +18,7 @@
 
 package genome.config;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -42,23 +43,28 @@ public class Config {
 
     static Logger logger = LoggerFactory.getLogger(Config.class);
     
-    private static final String CONFIG_FILENAME = "config.properties";
-    
     private static final String DB_HOST_KEY     = "db.host";
     private static final String DB_DATABASE_KEY = "db.database";
     private static final String DB_USER_KEY     = "db.user";
     private static final String DB_PASSWORD_KEY = "db.password";
   
     private static final String CYTOBAND_DATA_URL_KEY = "cytoband.data_url";
-    private static final String GENE_DATA_URL_KEY = "gene.data_url";
+    private static final String GENE_DATA_URL_KEY     = "gene.data_url";
       
     private static Config instance = new Config();
     
     private Properties properties = new Properties();
     
-    private Config() {
-        InputStream is = Config.class.getResourceAsStream(CONFIG_FILENAME);
+    private Config() {}
+    
+    public static Config getInstance() {
+        return instance;
+    }
+    
+    public void load(String path) {
+        InputStream is = null;
         try {
+            is = new FileInputStream(path);
             properties.load(is);
         } catch (IOException e) {
             e.printStackTrace();
@@ -69,11 +75,7 @@ public class Config {
             } catch (IOException e) {
                 // ignore
             }
-        }
-    }
-    
-    public static Config getInstance() {
-        return instance;
+        }        
     }
     
     public String getHost() {

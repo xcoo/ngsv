@@ -18,6 +18,7 @@
 
 package genome.view;
 
+import genome.config.Config;
 import genome.data.Bed;
 import genome.data.BedFragment;
 import genome.data.Chromosome;
@@ -79,7 +80,10 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
     private static final long serialVersionUID = 1L;
 
     static Logger logger = LoggerFactory.getLogger(GeneView.class);
-
+    static String[] args;
+    
+    private static final String DEFAULT_CONFIG_PATH = "./config/config.properties";
+    
     // position of elements
     // origin is left-bottom corner
     private static final double CYTOBAND_POS_Y      = 100.0;
@@ -139,13 +143,16 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
     private ViewScale viewScale;
 
     // sam, shortRead, histogram, bed, and chromosome data
-    private Sam[]                samFiles;
-    private List<Sam>            selectedSamList = new ArrayList<Sam>();
-    private Bed[]                bedFiles;
-    private List<Bed>            selectedBedList = new ArrayList<Bed>();  
-    private Chromosome[]         chromosomes;
-    private Chromosome           selectedChromosome;
-    private CytoBand[]           cytobands;
+    private Sam[]     samFiles;
+    private List<Sam> selectedSamList = new ArrayList<Sam>();
+
+    private Bed[]     bedFiles;
+    private List<Bed> selectedBedList = new ArrayList<Bed>();  
+
+    private Chromosome[] chromosomes;
+    private Chromosome   selectedChromosome;
+
+    private CytoBand[] cytobands;
 
     private SQLLoader sqlLoader;
 
@@ -170,6 +177,12 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
         setFPS(FPS);
         setSize(1024, 768);
         setBackGroundColor(ColorSet.BLACK);
+        
+        // Load configuration
+        if (args.length > 0)
+            Config.getInstance().load(args[0]);
+        else
+            Config.getInstance().load(DEFAULT_CONFIG_PATH);
         
         // load data
         // -----------------------------------------
@@ -772,11 +785,10 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
         }
     }
     
-    public static void main(String[] args) {
-        
+    public static void main(String[] args) {        
         logger.info("Start ngsView (Next Generation Sequencer View).");
         
-        AppletRunner.run("genome.view.GeneView", "ngs View");
-        
+        GeneView.args = args;
+        AppletRunner.run("genome.view.GeneView", "ngs View");        
     }
 }
