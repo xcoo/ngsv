@@ -1,13 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ngsView</groupId>
+    <groupId>xcoo</groupId>
     <artifactId>ngsView</artifactId>
-    <version>0.2.1-SNAPSHOT</version>
+    <version>0.3.0</version>
     <packaging>jar</packaging>
 
-    <name>ngsView</name>
-    <url>http://xcoo.jp/</url>
+    <name>ngsv</name>
+    <url>https://github.com/xcoo/ngsv</url>
+    <description>ngsv is a novel viewer for data of Next-generation DNA sequencing (NGS). It visualizes them 3-dimentionally and provides us seamless zooming and moving for browsing the data. It has a database inside the system and uses OpenGL for rendering.</description>
+    
+    <organization>
+        <name>Xcoo, Inc.</name>
+        <url>http://www.xcoo.jp/</url>
+    </organization>
     
     <profiles>
         <profile>
@@ -148,12 +154,12 @@
         <dependency>
             <groupId>casmi</groupId>
             <artifactId>casmi</artifactId>
-            <version>0.2.1-SNAPSHOT</version>
+            <version>0.3.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>4.10</version>
             <scope>test</scope>
         </dependency>
         <dependency>

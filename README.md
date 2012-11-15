@@ -72,15 +72,20 @@ Package
 
 Build main project and package as executable file (.app/.exe).
 
-Mac
+### Mac
 
     $ cd main/ngsView
     $ mvn -P production-mac -Dmaven.test.skip=true package
     
-Win
+### Win
 
     $ cd main/ngsView
     $ mvn -P production-win -Dmaven.test.skip=true package
+    
+ Copy native jar files to the exe directory.
+ 
+     $ cp [jogl-all-2.0-rc9-natives-windows-i586.jar] [exe directory]
+     $ cp [gluegen-all-2.0-rc9-natives-windows-i586.jar] [exe directory]
     
 License
 -----------------
