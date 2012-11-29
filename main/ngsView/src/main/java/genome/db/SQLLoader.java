@@ -27,8 +27,6 @@ import genome.data.HistogramBin;
 import genome.data.RefGene;
 import genome.data.Sam;
 import genome.data.SamHistogram;
-import genome.data.ShortRead;
-import genome.data.type.SamFlag;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -106,23 +104,6 @@ public class SQLLoader {
         } 
 
         return null;
-    }
-
-    public ShortRead[] loadShortRead(long samId, Chromosome c, long start, long end) {		
-        ShortRead[] srs = null;
-        try {
-            String whereStatement = "chrId = " + c.getChrId() + " and refEnd >= " + start + " and refStart <= " + end + " and samId = " + samId;
-            srs = mysql.all(ShortRead.class, new Query().select("shortReadId", "refStart", "refEnd", "name", "chrId", "refLength", "queryFlag").where(whereStatement));
-        } catch (SQLException e) {
-            logger.error("Failed to load shortRead.");
-            e.printStackTrace();
-        }
-
-        for (ShortRead sr: srs) {
-            sr.setSamFlag(new SamFlag(sr.getQueryFlag()));
-        }
-
-        return srs;
     }
 
     public HistogramBin[] loadHistgramBin(long samHistgramId, Chromosome c, long start, long end) {

@@ -45,7 +45,6 @@ import genome.view.group.ShortReadGroup;
 import genome.view.thread.BedUpdater;
 import genome.view.thread.GeneUpdater;
 import genome.view.thread.HistogramUpdater;
-import genome.view.thread.ShortReadUpdater;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -165,7 +164,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
     private Trackball trackball;
     private int prvMouseX = 0, prvMouseY = 0;
     
-    private ShortReadUpdater shortReadUpdater;
+//    private ShortReadUpdater shortReadUpdater;
     private HistogramUpdater histogramUpdater;
     private BedUpdater       bedUpdater;
     private GeneUpdater      geneUpdater;
@@ -231,7 +230,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
 
         indicator = new Indicator(getWidth() - 40, getHeight() - 40);
         
-        shortReadUpdater = new ShortReadUpdater(sqlLoader, annotationText, getMouse());
+//        shortReadUpdater = new ShortReadUpdater(sqlLoader, annotationText, getMouse());
         histogramUpdater = new HistogramUpdater(sqlLoader, annotationText, getMouse());
         bedUpdater       = new BedUpdater(sqlLoader, annotationText, getMouse());
         geneUpdater      = new GeneUpdater(sqlLoader, annotationText, getMouse());
@@ -292,14 +291,9 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
             return;
         }
 
-        // load short reads and histogram
+        // load histogram
         for (Sam sam : samFiles) {
             if (sam.isSelected()) {
-                // load short read for the selected sam files
-                sam.setShortReads(sqlLoader.loadShortRead(sam.getSamId(), selectedChromosome, start, end));
-
-                logger.info("load " + sam.getFileName() + " " + sam.getShortReads().length + " reads ");
-
                 // Load histograms
                 SamHistogram[] shs = sqlLoader.loadSamHistogram(sam.getSamId());
                 sam.setSamHistograms(shs);
@@ -449,7 +443,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
         ExplanationTextData[] explanationTextData = {
             new ExplanationTextData(TEXT_OFFSET_POS_X, CYTOBAND_POS_Y      + TEXT_OFFSET_POS_Y, "chromosome"),
             new ExplanationTextData(TEXT_OFFSET_POS_X, BED_FRAGMENT_POS_Y  + TEXT_OFFSET_POS_Y, "bed"),
-            new ExplanationTextData(TEXT_OFFSET_POS_X, SHORTREAD_POS_Y     + TEXT_OFFSET_POS_Y, "short read"),
+//            new ExplanationTextData(TEXT_OFFSET_POS_X, SHORTREAD_POS_Y     + TEXT_OFFSET_POS_Y, "short read"),
             new ExplanationTextData(TEXT_OFFSET_POS_X, RULER_POS_Y         + TEXT_OFFSET_POS_Y, "known gene"),
             new ExplanationTextData(TEXT_OFFSET_POS_X, HISTOGRAM_BIN_POS_Y + TEXT_OFFSET_POS_Y, "histogram")                
         };
@@ -509,7 +503,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
         
         if (leftValue < start + (long)(500.0 / scale) || end - (long)(500.0 / scale) < rightValue) {
             // Update shortRead data.
-            updateShortRead(newStart, newEnd);
+//            updateShortRead(newStart, newEnd);
 
             // Update histogram data.
             updateHistogram(newBinSize, newStart, newEnd);
@@ -532,16 +526,16 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
         }
     }
     
-    private void updateShortRead(long newStart, long newEnd) {
-        for (Sam sam : selectedSamList) {
-            for (ShortReadGroup srg : shortReadGroupList) {
-                if (srg.getSam().getSamId() == sam.getSamId()) {
-                    shortReadUpdater.start(sam, selectedChromosome, newStart, newEnd, srg, scale);
-                    break;
-                }
-            }
-        }
-    }
+//    private void updateShortRead(long newStart, long newEnd) {
+//        for (Sam sam : selectedSamList) {
+//            for (ShortReadGroup srg : shortReadGroupList) {
+//                if (srg.getSam().getSamId() == sam.getSamId()) {
+//                    shortReadUpdater.start(sam, selectedChromosome, newStart, newEnd, srg, scale);
+//                    break;
+//                }
+//            }
+//        }
+//    }
     
     private void updateHistogram(long newBinSize, long newStart, long newEnd) {
 

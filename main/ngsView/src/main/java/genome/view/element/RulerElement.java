@@ -52,7 +52,7 @@ public class RulerElement implements ScalableElement {
 		this.initialBaseX = baseX;
 		this.baseX = baseX;
 		
-		this.l = new Line( 0, baseY - HALF_RULER_HEIGHT, 0, baseY + HALF_RULER_HEIGHT);
+		this.l = new Line(0, baseY - HALF_RULER_HEIGHT, 0, baseY + HALF_RULER_HEIGHT);
 		this.l.setStrokeColor(ColorSet.WHITE);
 		
 		this.t = new Text(Long.toString((long)baseX), DEFAULT_FONT, baseX * scale, baseY);

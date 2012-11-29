@@ -57,7 +57,8 @@ public class ShortReadUpdater {
         public void run() {
             // Load ShortRead.
             // ---------------------------------------------------------------------
-            ShortRead[] srs = sqlLoader.loadShortRead(sam.getSamId(), chromosome, start, end);
+//            ShortRead[] srs = sqlLoader.loadShortRead(sam.getSamId(), chromosome, start, end);
+            ShortRead[] srs = null;
 
             if (srs == null || srs.length == 0) return;
             

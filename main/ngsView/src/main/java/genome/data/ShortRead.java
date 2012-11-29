@@ -19,58 +19,37 @@
 package genome.data;
 
 import genome.data.type.SamFlag;
-import casmi.sql.Entity;
-import casmi.sql.annotation.Fieldname;
-import casmi.sql.annotation.Ignore;
-import casmi.sql.annotation.PrimaryKey;
-import casmi.sql.annotation.Tablename;
 
-@Tablename("shortRead")
-public class ShortRead extends Entity {
+public class ShortRead {
 	
-	@PrimaryKey
 	private long shortReadId;
 
-	@Fieldname("refStart")
 	private long refStart;
 	
-	@Fieldname("refEnd")
 	private long refEnd;
 	
-	@Fieldname("name")
 	private String name;
 	
-	@Fieldname("chrId")
 	private long chrId;
 	
-	@Fieldname("refLength")
 	private long refLength;
 	
-	@Ignore
 	private long queryStart;
 	
-	@Ignore
 	private long queryEnd;
 	
-	@Ignore
 	private long queryLength;
 	
-	@Ignore
 	private long queryBin;
 	
-	@Fieldname("queryFlag")
 	private int queryFlag;
 	
-	@Ignore
 	private long queryTags;
 	
-	@Fieldname("sequence")
 	private String sequence;
 
-	@Fieldname("samId")
 	private long samId;
 	
-	@Ignore
 	private SamFlag samFlag;
 
 	public long getShortReadId() {
