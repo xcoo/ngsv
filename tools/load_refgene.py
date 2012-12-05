@@ -24,7 +24,7 @@ import os.path
 
 from sam.data.sql import SQLDB
 from sam.data.chromosome import Chromosome
-from sam.data.refGene import RefGene
+from sam.data.refgene import RefGene
 
 
 from config import *
