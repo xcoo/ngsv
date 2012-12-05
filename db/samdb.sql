@@ -42,35 +42,6 @@ ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
--- Table `samdb`.`shortRead`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `samdb`.`shortRead` ;
-
-CREATE  TABLE IF NOT EXISTS `samdb`.`shortRead` (
-  `shortReadId` BIGINT NOT NULL AUTO_INCREMENT ,
-  `refStart` BIGINT NOT NULL ,
-  `refEnd` BIGINT NOT NULL ,
-  `name` VARCHAR(1024) NOT NULL ,
-  `chrId` BIGINT NOT NULL ,
-  `refLength` BIGINT NOT NULL ,
-  `queryStart` BIGINT NOT NULL ,
-  `queryEnd` BIGINT NOT NULL ,
-  `queryLength` BIGINT NOT NULL ,
-  `queryBin` BIGINT NOT NULL ,
-  `queryFlag` INT NOT NULL ,
-  `queryTags` TEXT NOT NULL ,
-  `sequence` TEXT NOT NULL ,
-  `samId` BIGINT NOT NULL ,
-  PRIMARY KEY (`shortReadId`) ,
-  INDEX `fk_shortread_sam` (`samId` ASC) ,
-  INDEX `REFSTARTENDINDEX` (`refStart` ASC, `refEnd` ASC) ,
-  INDEX `fk_shortRead_chromosome1` (`chrId` ASC) )
-ENGINE = MyISAM
-DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_general_ci;
-
-
--- -----------------------------------------------------
 -- Table `samdb`.`samHistogram`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `samdb`.`samHistogram` ;
