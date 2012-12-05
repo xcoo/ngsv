@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 #
 #   ngsv
 #   http://github.com/xcoo/ngsv
@@ -15,9 +18,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import sys
 import os.path
@@ -41,7 +41,7 @@ def load(filepath, db):
     bed_fragment_data = BedFragment(db)
 
     if bed_data.get_by_filename(filename) is not None:
-        print "Error : already loaded ¥"%s¥"" % filename
+        print 'Error : already loaded "%s"' % filename
         return
 
     print "begin to load", filename

@@ -26,13 +26,15 @@ import casmi.sql.annotation.Tablename;
 
 @Tablename("bed")
 public class Bed extends Entity {
-	@PrimaryKey
+
+    @PrimaryKey
+    @Fieldname("bed_id")
 	private long bedId;
 
-	@Fieldname("fileName")
+	@Fieldname("file_name")
 	private String fileName;
 
-	@Fieldname("createdDate")
+	@Fieldname("created_date")
 	private long createdDate;
 
 	@Ignore

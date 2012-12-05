@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #
 #   ngsv
 #   http://github.com/xcoo/ngsv
@@ -16,8 +18,6 @@
 # limitations under the License.
 #
 
-# -*- coding: utf-8 -*-
-
 from sql import *
 
 import json
@@ -30,7 +30,7 @@ class Chromosome:
 
 	def get_by_name(self, name):
 
-		sql = u"SELECT chrId, chromosome from chromosome where chromosome = '%s'" % name
+		sql = u"SELECT chr_id, chromosome FROM chromosome WHERE chromosome = '%s'" % name
 
 		result = self.db.execute(sql)
 
@@ -42,7 +42,7 @@ class Chromosome:
 
 	def get_all(self):
 
-		sql = u"SELECT chrId, chromosome FROM chromosome"
+		sql = u"SELECT chr_id, chromosome FROM chromosome"
 
 		result = self.db.execute(sql)
 

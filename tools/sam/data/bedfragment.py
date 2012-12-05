@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #
 #   ngsv
 #   http://github.com/xcoo/ngsv
@@ -16,8 +18,6 @@
 # limitations under the License.
 #
 
-# -*- coding: utf-8 -*-
-
 from sql import *
 
 import json
@@ -34,7 +34,7 @@ class BedFragment:
                itemR, itemG, itemB,
                blockCount, blockSizes, blockStarts):
 
-        SQL_TEMPLATE = u"INSERT INTO bedFragment (bedId, chrId, chrStart, chrEnd, name, score, strand, thickStart, thickEnd, itemR, itemG, itemB, blockCount, blockSizes, blockStarts) VALUES (%d, %d, %d, %d, '%s', %d, %d, %d, %d, %d, %d, %d, %d, '%s', '%s')"
+        SQL_TEMPLATE = u"INSERT INTO bed_fragment (bed_id, chr_id, chr_start, chr_end, name, score, strand, thick_start, thick_end, item_r, item_g, item_b, block_count, block_sizes, block_starts) VALUES (%d, %d, %d, %d, '%s', %d, %d, %d, %d, %d, %d, %d, %d, '%s', '%s')"
 
         sql = SQL_TEMPLATE % (bedId,
                               chrId,

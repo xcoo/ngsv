@@ -24,18 +24,20 @@ import casmi.sql.annotation.Ignore;
 import casmi.sql.annotation.PrimaryKey;
 import casmi.sql.annotation.Tablename;
 
-@Tablename("bedFragment")
+@Tablename("bed_fragment")
 public class BedFragment extends Entity {
-	@PrimaryKey
+	
+    @PrimaryKey
+    @Fieldname("bed_fragment_id")
 	private long bedFragmentId;
 
-	@Fieldname("chrId")
+	@Fieldname("chr_id")
 	private long chrId;
 	
-	@Fieldname("chrStart")
+	@Fieldname("chr_start")
 	private long chrStart;
 
-	@Fieldname("chrEnd")
+	@Fieldname("chr_end")
 	private long chrEnd;
 
 	@Fieldname("name")
@@ -47,19 +49,19 @@ public class BedFragment extends Entity {
 	@Fieldname("strand")
 	private int strand;
 	
-	@Fieldname("thickStart")
+	@Fieldname("thick_start")
 	private long thickStart;
 
-	@Fieldname("thickEnd")
+	@Fieldname("thick_end")
 	private long thickEnd;
 	
-	@Fieldname("itemR")
+	@Fieldname("item_r")
 	private int itemR;
 	
-	@Fieldname("itemG")
+	@Fieldname("item_g")
 	private int itemG;
 
-	@Fieldname("itemB")
+	@Fieldname("item_b")
 	private int itemB;
 
 	@Ignore

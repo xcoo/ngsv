@@ -24,20 +24,20 @@ import casmi.sql.annotation.Ignore;
 import casmi.sql.annotation.PrimaryKey;
 import casmi.sql.annotation.Tablename;
 
-@Tablename("samHistogram")
+@Tablename("sam_histogram")
 public class SamHistogram extends Entity {
 
 	@PrimaryKey
-	@Fieldname("samId")
+	@Fieldname("sam_id")
 	private long samId;
 
-	@Fieldname("binSize")
+	@Fieldname("binsize")
 	private long binSize;
 
-	@Fieldname("createdDate")
+	@Fieldname("created_date")
 	private long createdDate;
 	
-	@Fieldname("samHistogramId")
+	@Fieldname("sam_histogram_id")
 	private long samHistogramId;
 
 	@Ignore

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #
 #   ngsv
 #   http://github.com/xcoo/ngsv
@@ -16,8 +18,6 @@
 # limitations under the License.
 #
 
-# -*- coding: utf-8 -*-
-
 from sql import *
 
 import json
@@ -32,7 +32,7 @@ class RefGene:
                cdsStart, cdsEnd, exonCount, exonStarts, exonEnds, score,
                geneName, cdsStartStat, cdsEndStat, exonFrames):
 
-        SQL_TEMPLATE = u"INSERT INTO refGene (bin, name, chrId, strand, txStart, txEnd, cdsStart, cdsEnd, exonCount, exonStarts, exonEnds, score, geneName, cdsStartStat, cdsEndStat, exonFrames) VALUES (%d, '%s', %d, %d, %d, %d, %d, %d, %d, '%s', '%s', %d, '%s', %d, %d, '%s')"
+        SQL_TEMPLATE = u"INSERT INTO ref_gene (bin, name, chr_id, strand, tx_start, tx_end, cds_start, cds_end, exon_count, exon_starts, exon_ends, score, gene_name, cds_start_stat, cds_end_stat, exon_frames) VALUES (%d, '%s', %d, %d, %d, %d, %d, %d, %d, '%s', '%s', %d, '%s', %d, %d, '%s')"
 
         sql = SQL_TEMPLATE % (bin, 
                               escape(name), 

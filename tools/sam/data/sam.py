@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #
 #   ngsv
 #   http://github.com/xcoo/ngsv
@@ -16,8 +18,6 @@
 # limitations under the License.
 #
 
-# -*- coding: utf-8 -*-
-
 from sql import *
 
 import json
@@ -30,7 +30,7 @@ class Sam:
 
     def get_by_filename(self, filename):
 
-        sql = u"SELECT samId, fileName, createdDate from sam where fileName = '%s'" % escape(filename)
+        sql = u"SELECT sam_id, file_name, created_date FROM sam WHERE file_name = '%s'" % escape(filename)
 
         result = self.db.execute(sql)
 
@@ -43,7 +43,7 @@ class Sam:
 
     def get_all(self):
         
-        sql = u"SELECT samId FROM sam"
+        sql = u"SELECT sam_id FROM sam"
         result = self.db.execute(sql)
         if len(result) > 0:
             return result
@@ -54,7 +54,7 @@ class Sam:
     def append(self, filename,
                header, lengths, mapped, nreferences, references):
 
-        SQL_TEMPLATE = u"INSERT INTO sam (fileName, createdDate, header, lengths, mapped, numberOfChromosomes, chromosomes) VALUES ('%s', %d, '%s', '%s', '%s', %d, '%s')"
+        SQL_TEMPLATE = u"INSERT INTO sam (file_name, created_date, header, lengths, mapped, number_of_chromosomes, chromosomes) VALUES ('%s', %d, '%s', '%s', '%s', %d, '%s')"
 
         sql = SQL_TEMPLATE % (escape(filename),
                               get_time(),

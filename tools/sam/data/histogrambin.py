@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #
 #   ngsv
 #   http://github.com/xcoo/ngsv
@@ -16,8 +18,6 @@
 # limitations under the License.
 #
 
-# -*- coding: utf-8 -*-
-
 from sql import *
 
 
@@ -30,7 +30,7 @@ class HistogramBin:
 
     def append(self, samHistogramId, count, position, chrId):
 
-        SQL_TEMPLATE = u"INSERT INTO histogramBin (samHistogramId, value, position, chrId) VALUES (%d, %d, %d, %d)"
+        SQL_TEMPLATE = u"INSERT INTO histogram_bin (sam_histogram_id, value, position, chr_id) VALUES (%d, %d, %d, %d)"
 
         sql = SQL_TEMPLATE % (samHistogramId,
                               count, 

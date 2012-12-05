@@ -96,7 +96,7 @@ public class SQLLoader {
 
     public SamHistogram[] loadSamHistogram(long samId) {
         try {
-            String whereStatement = "samId = " + samId;
+            String whereStatement = "sam_id = " + samId;
             return mysql.all(SamHistogram.class, new Query().where(whereStatement));
         } catch (SQLException e) {
             logger.error("Failed to load samHistogram.");
@@ -109,8 +109,8 @@ public class SQLLoader {
     public HistogramBin[] loadHistgramBin(long samHistgramId, Chromosome c, long start, long end) {
         HistogramBin[] hb = null;
         try{
-            String whereStatement = " samHistogramId = " + samHistgramId + " and chrId = " + c.getChrId() + " and position >= " + start + " and position <= " + end;
-            hb = mysql.all(HistogramBin.class, new Query().select("chrId", "position", "value").where(whereStatement));
+            String whereStatement = " sam_histogram_id = " + samHistgramId + " and chr_id = " + c.getChrId() + " and position >= " + start + " and position <= " + end;
+            hb = mysql.all(HistogramBin.class, new Query().select("chr_id", "position", "value").where(whereStatement));
         } catch (SQLException e) {
             logger.error("Failed to load histogramBin");
             e.printStackTrace();
@@ -122,7 +122,7 @@ public class SQLLoader {
         try {
             Query query = new Query();
             query.select("value");
-            query.where("samHistogramId=" + samHistogramId);
+            query.where("sam_histogram_id=" + samHistogramId);
             query.order("value");
             query.desc(true);
 
@@ -143,7 +143,7 @@ public class SQLLoader {
         try {
             Query query = new Query();
             query.select("value");
-            query.where("samHistogramId=" + samHistogramId + " AND chrId=" + chrId);
+            query.where("sam_histogram_id=" + samHistogramId + " AND chr_id=" + chrId);
             query.order("value");
             query.desc(true);
             HistogramBin hb = mysql.first(HistogramBin.class, query);
@@ -160,7 +160,7 @@ public class SQLLoader {
         try {
             Query query = new Query();
             query.select("chromosome");
-            query.where(" chrId=" + chrId);
+            query.where(" chr_id=" + chrId);
             Chromosome c = mysql.first(Chromosome.class, query);
             return c.getChromosome();
         } catch (SQLException e) {
@@ -174,8 +174,8 @@ public class SQLLoader {
     public Position getGenePosition(String geneName) {
         try {
             Query query = new Query();
-            query.select("chrId", "txStart", "txEnd");
-            query.where(" geneName = '" + geneName + "'");
+            query.select("chr_id", "tx_start", "tx_end");
+            query.where(" gene_name = '" + geneName + "'");
             RefGene refGene = mysql.first(RefGene.class, query);
             return new Position(refGene.getChrId(), refGene.getTxStart(), refGene.getTxEnd(), getChromosomeName(refGene.getChrId()));
         } catch (SQLException e) {
@@ -192,8 +192,8 @@ public class SQLLoader {
         
         try {
             Query query = new Query();
-            query.select("refGeneId", "name", "geneName", "chrId", "strand", "txStart", "txEnd", "exonCount", "exonStarts", "exonEnds");
-            query.where(" chrId= '" + c.getChrId() + "'" + " and " + " txEnd >= '" + start + "'" + " and " + " txStart <= '" + end + "'" );
+            query.select("ref_gene_id", "name", "gene_name", "chr_id", "strand", "tx_start", "tx_end", "exon_count", "exon_starts", "exon_ends");
+            query.where(" chr_id= '" + c.getChrId() + "'" + " and " + " tx_end >= '" + start + "'" + " and " + " tx_start <= '" + end + "'" );
             refGene = mysql.all(RefGene.class, query);
             geneLoaderResult = GeneLoader.getGenes(refGene);
         } catch (SQLException e) {
@@ -212,7 +212,7 @@ public class SQLLoader {
 
     public Bed[] loadBedFiles() {
         try {
-            return mysql.all(Bed.class, new Query().select("bedId", "fileName"));
+            return mysql.all(Bed.class, new Query().select("bed_id", "file_name"));
         } catch (SQLException e) {
             logger.error("Failed to load bed.");
             e.printStackTrace();
@@ -225,8 +225,8 @@ public class SQLLoader {
         BedFragment[] bf = null;
 
         try {
-            String whereStatement = " bedId = " + bedId + " and chrId = " + c.getChrId();
-            bf = mysql.all(BedFragment.class, new Query().select("chrId", "chrStart", "chrEnd", "name").where(whereStatement));			
+            String whereStatement = " bed_id = " + bedId + " and chr_id = " + c.getChrId();
+            bf = mysql.all(BedFragment.class, new Query().select("chr_id", "chr_start", "chr_end", "name").where(whereStatement));			
         } catch (SQLException e) {
             logger.error("Failed to load bedFragment.");
             e.printStackTrace();
@@ -241,8 +241,8 @@ public class SQLLoader {
         BedFragment[] bfs = null;
         
         try {
-            String whereStatement = "bedId=" + bedId + " and chrId=" + c.getChrId() + " and chrEnd >= " + start + " and chrStart <= " + end;
-            bfs = mysql.all(BedFragment.class, new Query().select("chrId", "chrStart", "chrEnd", "name").where(whereStatement));
+            String whereStatement = "bed_id=" + bedId + " and chr_id=" + c.getChrId() + " and chr_end >= " + start + " and chr_start <= " + end;
+            bfs = mysql.all(BedFragment.class, new Query().select("chr_id", "chr_start", "chr_end", "name").where(whereStatement));
         } catch (SQLException e) {
             logger.error("Failed to load bedFragment.");
             e.printStackTrace();

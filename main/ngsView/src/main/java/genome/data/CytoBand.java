@@ -24,24 +24,26 @@ import casmi.sql.annotation.Ignore;
 import casmi.sql.annotation.PrimaryKey;
 import casmi.sql.annotation.Tablename;
 
-@Tablename("cytoBand")
+@Tablename("cytoband")
 public class CytoBand extends Entity {
+    
     @PrimaryKey
+    @Fieldname("cytoband_id")
     private long cytobandId;
 
-    @Fieldname("chrId")
+    @Fieldname("chr_id")
     private long chrId;
     
-    @Fieldname("chrStart")
+    @Fieldname("chr_start")
     private long start;
 
-    @Fieldname("chrEnd")
+    @Fieldname("chr_end")
     private long end;
 
     @Fieldname("name")
     private String name;
 
-    @Fieldname("gieStain")
+    @Fieldname("gie_stain")
     private String color;
     
     @Ignore

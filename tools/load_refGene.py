@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 #
 #   ngsv
 #   http://github.com/xcoo/ngsv
@@ -15,9 +18,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 import sys
 import os.path
@@ -43,7 +43,7 @@ def load(filepath, db):
 
     # load refGene data
     for line in open(filepath, 'r'):
-        binsize, name, cyto_chr, cyto_strand, txStart, txEnd, cdsStart, cdsEnd, exonCount, exonStarts, exonEnds, score, geneName, cdsStartStat, cdsEndStat, exonFrames = line[:-1].split('¥t')
+        binsize, name, cyto_chr, cyto_strand, txStart, txEnd, cdsStart, cdsEnd, exonCount, exonStarts, exonEnds, score, geneName, cdsStartStat, cdsEndStat, exonFrames = line[:-1].split('\t')
 
 
         c_name = cyto_chr
@@ -100,7 +100,7 @@ def load(filepath, db):
 
         count += 1
 
-        print "loaded %d refGenes¥r" % count,
+        print "loaded %d refGenes\r" % count,
 
     print "loaded %d refGenes" % count
 

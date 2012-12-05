@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #
 #   ngsv
 #   http://github.com/xcoo/ngsv
@@ -16,8 +18,6 @@
 # limitations under the License.
 #
 
-# -*- coding: utf-8 -*-
-
 from sql import *
 
 import json
@@ -30,7 +30,7 @@ class CytoBand:
 
     def append(self, chrId, chrStart, chrEnd, name, gieStain):
 
-        SQL_TEMPLATE = u"INSERT INTO cytoBand (chrId, chrStart, chrEnd, name, gieStain) VALUES (%d, %d, %d, '%s', '%s')"
+        SQL_TEMPLATE = u"INSERT INTO cytoband (chr_id, chr_start, chr_end, name, gie_stain) VALUES (%d, %d, %d, '%s', '%s')"
 
         sql = SQL_TEMPLATE % (chrId,
                               chrStart,

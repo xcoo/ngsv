@@ -23,9 +23,11 @@ import casmi.sql.annotation.Fieldname;
 import casmi.sql.annotation.PrimaryKey;
 import casmi.sql.annotation.Tablename;
 
-@Tablename("refGene")
-public class RefGene extends Entity{
+@Tablename("ref_gene")
+public class RefGene extends Entity {
+    
     @PrimaryKey
+    @Fieldname("ref_gene_id")
     private long refGeneId;
 
     @Fieldname("bin")
@@ -34,46 +36,46 @@ public class RefGene extends Entity{
     @Fieldname("name")
     private String name;
 
-    @Fieldname("chrId")
+    @Fieldname("chr_id")
     private long chrId;
 
     @Fieldname("strand")
     private int strand;
     
-    @Fieldname("txStart")
+    @Fieldname("tx_start")
     private long txStart;
     
-    @Fieldname("txEnd")
+    @Fieldname("tx_end")
     private long txEnd;
 
-    @Fieldname("cdsStart")
+    @Fieldname("cds_start")
     private long cdsStart;
     
-    @Fieldname("cdsEnd")
+    @Fieldname("cds_end")
     private long cdsEnd;
 
-    @Fieldname("exonCount")
+    @Fieldname("exon_count")
     private long exonCount;
     
-    @Fieldname("exonStarts")
+    @Fieldname("exon_starts")
     private String exonStarts;
     
-    @Fieldname("exonEnds")
+    @Fieldname("exon_ends")
     private String exonEnds;
 
     @Fieldname("score")
     private long score;
 
-    @Fieldname("geneName")
+    @Fieldname("gene_name")
     private String geneName;
     
-    @Fieldname("cdsStartStat")
+    @Fieldname("cds_start_stat")
     private int cdsStartStat;
     
-    @Fieldname("cdsEndStat")
+    @Fieldname("cds_end_stat")
     private int cdsEndStat;
 
-    @Fieldname("exonFrames")
+    @Fieldname("exon_frames")
     private String exonFrames;
 
     public long getRefGeneId() {

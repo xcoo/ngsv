@@ -28,13 +28,13 @@ import casmi.sql.annotation.Tablename;
 public class Sam extends Entity {
     
 	@PrimaryKey
-	@Fieldname("samId")
+	@Fieldname("sam_id")
 	private long samId;
 
-	@Fieldname("fileName")
+	@Fieldname("file_name")
 	private String fileName;
 
-	@Fieldname("createdDate")
+	@Fieldname("created_date")
 	private long createdDate;
 
 	@Ignore
@@ -46,7 +46,7 @@ public class Sam extends Entity {
     @Ignore
     private String mapped;
 
-	@Fieldname("numberOfChromosomes")
+	@Fieldname("number_of_chromosomes")
 	private int numChromosome;
 
 	@Fieldname("chromosomes")

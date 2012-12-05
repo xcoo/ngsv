@@ -31,7 +31,7 @@ import casmi.sql.annotation.Tablename;
 public class Chromosome extends Entity {
 
     @PrimaryKey
-    @Fieldname("chrId")
+    @Fieldname("chr_id")
     private long chrId;
     
     @Fieldname("chromosome")

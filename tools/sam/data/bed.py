@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #
 #   ngsv
 #   http://github.com/xcoo/ngsv
@@ -16,8 +18,6 @@
 # limitations under the License.
 #
 
-# -*- coding: utf-8 -*-
-
 from sql import *
 
 import json
@@ -30,7 +30,7 @@ class Bed:
 
     def get_by_filename(self, filename):
 
-        sql = u"SELECT bedId, fileName, createdDate, itemRgb from bed where fileName = '%s'" % escape(filename)
+        sql = u"SELECT bed_id, file_name, created_date, item_rgb FROM bed WHERE file_name = '%s'" % escape(filename)
 
         result = self.db.execute(sql)
 
@@ -45,7 +45,7 @@ class Bed:
     def append(self, filename,
                trackname, description, visibility, itemRgb):
 
-        SQL_TEMPLATE = u"INSERT INTO bed (fileName, createdDate, trackName, description, visibility, itemRgb) VALUES ('%s', %d, '%s', '%s', %d, %d)"
+        SQL_TEMPLATE = u"INSERT INTO bed (file_name, created_date, track_name, description, visibility, item_rgb) VALUES ('%s', %d, '%s', '%s', %d, %d)"
 
         sql = SQL_TEMPLATE % (escape(filename),
                               get_time(),

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #
 #   ngsv
 #   http://github.com/xcoo/ngsv
@@ -16,8 +18,6 @@
 # limitations under the License.
 #
 
-# -*- coding: utf-8 -*-
-
 from sql import *
 
 
@@ -30,7 +30,7 @@ class SamHistogram:
 
     def get_by_samid(self, samId):
 
-        sql = u"SELECT samId, binSize, samHistogramId FROM samHistogram WHERE samId = '%d' ORDER BY createdDate DESC LIMIT 1" % samId
+        sql = u"SELECT sam_id, binsize, sam_histogram_id FROM sam_histogram WHERE sam_id = '%d' ORDER BY created_date DESC LIMIT 1" % samId
 
         result = self.db.execute(sql)
 
@@ -44,7 +44,7 @@ class SamHistogram:
 
     def get_by_samid_binSize(self, samId, binSize):
 
-        sql = u"SELECT samId, binSize, samHistogramId FROM samHistogram WHERE samId = '%d' AND binSize = '%d' ORDER BY createdDate DESC LIMIT 1" % (samId, binSize)
+        sql = u"SELECT sam_id, binsize, sam_histogram_id FROM sam_histogram WHERE sam_id = '%d' AND binsize = '%d' ORDER BY created_date DESC LIMIT 1" % (samId, binSize)
 
         result = self.db.execute(sql)
 
@@ -59,6 +59,6 @@ class SamHistogram:
 
     def append(self, samId, binSize):
 
-        sql = u"INSERT INTO samHistogram (samId, binSize, createdDate) VALUES (%d, %d, %d)" % (samId, binSize, get_time())
+        sql = u"INSERT INTO sam_histogram (sam_id, binsize, created_date) VALUES (%d, %d, %d)" % (samId, binSize, get_time())
 
         self.db.execute(sql)
