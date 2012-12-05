@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 #
@@ -58,9 +59,8 @@ def calc_histogram(samfile, chromosome, samId, binsize, samHistogramId, db):
             column += 1
 
         # Fill in zero-coverage areas
-        while column < pileupcolumn.pos / binsize:
-            hist_bin_data.append(samHistogramId, 0, binstart, chromosome[0])
-            
+        # NOTE: Not insert zero values to DB
+        while column < pileupcolumn.pos / binsize:            
             binstart = binsize * (column + 1)
             binvalues.append(0)
             column += 1
@@ -104,19 +104,24 @@ def calc_histogram_sum(samfile, chromosomes, samId, binSize, bins, db):
         for b in bins[c[0]]:
             if count != 0:
                 if count % 10 == 0:
-                    hist_bin_data.append(sam_hist10['hist_id'], sum10, (count - 10) * binSize, c[0])
+                    if sum10 != 0:
+                        hist_bin_data.append(sam_hist10['hist_id'], sum10, (count - 10) * binSize, c[0])
                     sum10 = 0
                 if count % 100 == 0:
-                    hist_bin_data.append(sam_hist100['hist_id'], sum100,  (count - 100) * binSize, c[0])
+                    if sum100 != 0:
+                        hist_bin_data.append(sam_hist100['hist_id'], sum100,  (count - 100) * binSize, c[0])
                     sum100 = 0
                 if count % 1000 == 0:
-                    hist_bin_data.append(sam_hist1000['hist_id'], sum1000, (count - 1000) * binSize, c[0])
+                    if sum1000 != 0:
+                        hist_bin_data.append(sam_hist1000['hist_id'], sum1000, (count - 1000) * binSize, c[0])
                     sum1000 = 0
                 if count % 10000 == 0:
-                    hist_bin_data.append(sam_hist10000['hist_id'], sum10000, (count - 10000) * binSize, c[0])
+                    if sum10000 != 0:
+                        hist_bin_data.append(sam_hist10000['hist_id'], sum10000, (count - 10000) * binSize, c[0])
                     sum10000 = 0
                 if count % 100000 == 0:
-                    hist_bin_data.append(sam_hist100000['hist_id'], sum100000, (count - 100000) * binSize, c[0])
+                    if sum100000 != 0:
+                        hist_bin_data.append(sam_hist100000['hist_id'], sum100000, (count - 100000) * binSize, c[0])
                     sum100000 = 0
 
             sum10 += b
