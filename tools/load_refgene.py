@@ -45,7 +45,6 @@ def load(filepath, db):
     for line in open(filepath, 'r'):
         binsize, name, cyto_chr, cyto_strand, txStart, txEnd, cdsStart, cdsEnd, exonCount, exonStarts, exonEnds, score, geneName, cdsStartStat, cdsEndStat, exonFrames = line[:-1].split('\t')
 
-
         c_name = cyto_chr
         c_name = c_name.replace('Chr', '')
         c_name = c_name.replace('chr', '')

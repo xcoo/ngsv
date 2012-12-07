@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #
 #   ngsv
 #   http://github.com/xcoo/ngsv
@@ -15,3 +17,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+
+def trim_chromosome_name(name):
+
+    result = name
+
+    result = result.replace('Chr', '')
+    result = result.replace('chr', '')
+    result = result.replace('.', '')
+    result = result.replace('\"', '')
+    result = result.replace('\'', '')
+
+    return result

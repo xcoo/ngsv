@@ -20,40 +20,36 @@
 
 from sql import *
 
-import json
-
 
 class Chromosome:
 
-	def __init__(self, db):
-		self.db = db
+    def __init__(self, db):
+        self.db = db
 
-	def get_by_name(self, name):
+    def get_by_name(self, name):
 
-		sql = u"SELECT chr_id, chromosome FROM chromosome WHERE chromosome = '%s'" % name
+        sql = u"SELECT chr_id, chromosome FROM chromosome WHERE chromosome = '%s'" % name
 
-		result = self.db.execute(sql)
+        result = self.db.execute(sql)
 
-		if len(result) > 0:
-			return {'id': result[0][0], 'name': result[0][1]}
-		else:
-			return None
+        if len(result) > 0:
+            return {'id': result[0][0], 'name': result[0][1]}
+        else:
+            return None
 
+    def get_all(self):
 
-	def get_all(self):
+        sql = u"SELECT chr_id, chromosome FROM chromosome"
 
-		sql = u"SELECT chr_id, chromosome FROM chromosome"
+        result = self.db.execute(sql)
 
-		result = self.db.execute(sql)
+        if len(result) > 0:
+            return result
+        else:
+            return None
 
-		if len(result) > 0:
-			return result
-		else:
-			return None
+    def append(self, name):
 
-
-	def append(self, name):
-
-		if self.get_by_name(name) is None:
-			sql = u"INSERT INTO chromosome (chromosome) VALUES ('%s')" % name
-			self.db.execute(sql)
+        if self.get_by_name(name) is None:
+            sql = u"INSERT INTO chromosome (chromosome) VALUES ('%s')" % name
+            self.db.execute(sql)

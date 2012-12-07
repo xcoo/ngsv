@@ -29,6 +29,7 @@ from sam.data.sam import Sam
 from sam.data.chromosome import Chromosome
 from sam.data.samhistogram import SamHistogram
 from sam.data.histogrambin import HistogramBin
+from sam.util import trim_chromosome_name
 
 from config import *
 
@@ -47,7 +48,7 @@ def calc_histogram(samfile, chromosome, samId, binsize, samHistogramId, db):
     print 'ChrID: %d, ChrName: %s' % (chromosome['id'], chromosome['name'])
     print '',
 
-    for pileupcolumn in samfile.pileup(str(chromosome['name'])):
+    for pileupcolumn in samfile.pileup(str(chromosome['ref'])):
 
         # Sum up counts within the region
         if pileupcolumn.pos >= binsize * (column + 1):
@@ -177,7 +178,12 @@ def run(filepath, binSize, db):
 
     chromosomes = []
     for ref in samfile.references:
-        chromosomes.append(chromosome_data.get_by_name(ref))
+        name = trim_chromosome_name(ref)
+
+        c = chromosome_data.get_by_name(name)
+        c['ref'] = ref
+
+        chromosomes.append(c)
 
     filename = os.path.basename(filepath)
     sam = sam_data.get_by_filename(filename)

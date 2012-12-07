@@ -27,8 +27,10 @@ import pysam
 from sam.data.sql import SQLDB
 from sam.data.sam import Sam
 from sam.data.chromosome import Chromosome
+from sam.util import trim_chromosome_name
 
 from config import *
+
 
 def load(filepath, db):
 
@@ -45,7 +47,7 @@ def load(filepath, db):
 
     if sam_data.get_by_filename(filename) is not None:
         print "Error : already loaded \"%s\"" % filename
-#        return
+        return
 
     print "begin to load", filename
 
@@ -57,11 +59,12 @@ def load(filepath, db):
                     samfile.mapped,
                     samfile.nreferences, samfile.references)
 
-    sam = sam_data.get_by_filename(filename)
+    #sam = sam_data.get_by_filename(filename)
 
     # load chromosome
-    for c in samfile.references:
-        chr_data.append(c)
+    for ref in samfile.references:
+        chr_data.append(trim_chromosome_name(ref))
+
 
 def main():
 
