@@ -36,7 +36,7 @@ Change [ngsv dir]/tools/config.py.
     SQLDB_PASSWD = "[password]"
     SAM_DB_NAME  = "samdb"
 
-For the preparation of genome data, please download cytoband.txt and refGene.txt from [the UCSC web site](http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/database/
+For the preparation of genome data, please download cytoband.txt and refGene.txt from [the UCSC web site](http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/
  "Human Genome Annotation DataBase").
 		
 Then, load data of the human genome, load data from sam/bed files, and calculate histograms.
