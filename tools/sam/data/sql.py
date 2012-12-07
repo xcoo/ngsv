@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #
 #   ngsv
 #   http://github.com/xcoo/ngsv
@@ -15,8 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-# -*- coding: utf-8 -*-
 
 import sys
 #import threading
@@ -83,3 +83,17 @@ class SQLDB(object):
     def commit(self):
 
         self._db.commit()
+
+    def executemany(self, sql, values):
+
+        try:
+            c = self._db.cursor()
+            c.executemany(sql, values)
+
+            c.close()
+
+        except:
+            raise
+
+        finally:
+            pass

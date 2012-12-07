@@ -40,6 +40,8 @@ def calc_histogram(samfile, chromosome, samId, binsize, samHistogramId, db):
     binsum = 0
     binvalues = []
     column = 0
+    
+    bufsize = 10000
 
     print 'ChrID: %d, ChrName: %s' % (chromosome[0], chromosome[1])
     print '',
@@ -48,10 +50,13 @@ def calc_histogram(samfile, chromosome, samId, binsize, samHistogramId, db):
 
         # Sum up counts within the region
         if pileupcolumn.pos >= binsize * (column + 1):
-            hist_bin_data.append(samHistogramId, binsum, binstart, chromosome[0])
+            hist_bin_data.appendbuf(samHistogramId, binsum, binstart, chromosome[0])
+
+            if hist_bin_data.lenbuf() >= bufsize:
+                hist_bin_data.flush()
 
             print '\r',
-            print '%013d: %07d' % (binstart, binsum),
+            print '%11d: %6d' % (binstart, binsum),
             
             binstart = binsize * (column + 1)
             binvalues.append(binsum)
@@ -66,6 +71,8 @@ def calc_histogram(samfile, chromosome, samId, binsize, samHistogramId, db):
             column += 1
         
         binsum += pileupcolumn.n
+
+    hist_bin_data.flush()
 
     print
 
@@ -88,6 +95,8 @@ def calc_histogram_sum(samfile, chromosomes, samId, binSize, bins, db):
     sam_hist_data.append(samId, binSize*10000)
     sam_hist_data.append(samId, binSize*100000)
 
+    bufsize = 10000
+    
     for c in chromosomes:
 
         print 'ChrID: %d, ChrName: %s' % (c[0], c[1])
@@ -105,25 +114,28 @@ def calc_histogram_sum(samfile, chromosomes, samId, binSize, bins, db):
             if count != 0:
                 if count % 10 == 0:
                     if sum10 != 0:
-                        hist_bin_data.append(sam_hist10['hist_id'], sum10, (count - 10) * binSize, c[0])
+                        hist_bin_data.appendbuf(sam_hist10['hist_id'], sum10, (count - 10) * binSize, c[0])
                     sum10 = 0
                 if count % 100 == 0:
                     if sum100 != 0:
-                        hist_bin_data.append(sam_hist100['hist_id'], sum100,  (count - 100) * binSize, c[0])
+                        hist_bin_data.appendbuf(sam_hist100['hist_id'], sum100,  (count - 100) * binSize, c[0])
                     sum100 = 0
                 if count % 1000 == 0:
                     if sum1000 != 0:
-                        hist_bin_data.append(sam_hist1000['hist_id'], sum1000, (count - 1000) * binSize, c[0])
+                        hist_bin_data.appendbuf(sam_hist1000['hist_id'], sum1000, (count - 1000) * binSize, c[0])
                     sum1000 = 0
                 if count % 10000 == 0:
                     if sum10000 != 0:
-                        hist_bin_data.append(sam_hist10000['hist_id'], sum10000, (count - 10000) * binSize, c[0])
+                        hist_bin_data.appendbuf(sam_hist10000['hist_id'], sum10000, (count - 10000) * binSize, c[0])
                     sum10000 = 0
                 if count % 100000 == 0:
                     if sum100000 != 0:
-                        hist_bin_data.append(sam_hist100000['hist_id'], sum100000, (count - 100000) * binSize, c[0])
+                        hist_bin_data.appendbuf(sam_hist100000['hist_id'], sum100000, (count - 100000) * binSize, c[0])
                     sum100000 = 0
 
+            if hist_bin_data.lenbuf() >= bufsize:
+                hist_bin_data.flush()
+                    
             sum10 += b
             sum100 += b
             sum1000 += b
@@ -131,6 +143,8 @@ def calc_histogram_sum(samfile, chromosomes, samId, binSize, bins, db):
             sum100000 += b
                     
             count += 1
+
+        hist_bin_data.flush()
 
 
 def load(filepath, db):
@@ -178,8 +192,9 @@ def run(filepath, binSize, db):
     if bins is not None:
         print 'Calculate extended histograms'
         calc_histogram_sum(samfile, chromosomes, samId, binSize, bins, db)
-        #print "calc ended %s" % c[1]
 
+    samfile.close()
+        
 def main():
     if len(sys.argv) < 2:
         print("No input files")

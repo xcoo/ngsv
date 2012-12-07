@@ -25,7 +25,8 @@ class HistogramBin:
 
     def __init__(self, db):
 
-        self.db = db
+        self._db = db
+        self._buf = []
 
 
     def append(self, samHistogramId, count, position, chrId):
@@ -37,4 +38,16 @@ class HistogramBin:
                               position,
                               chrId)
 
-        self.db.execute(sql)
+        self._db.execute(sql)
+
+    def appendbuf(self, samHistogramId, count, position, chrId):
+        self._buf.append((samHistogramId, count, position, chrId))
+
+    def lenbuf(self):
+        return len(self._buf)
+        
+    def flush(self):
+        if len(self._buf) > 0:
+            sql = u"INSERT INTO histogram_bin (sam_histogram_id, value, position, chr_id) VALUES (%s, %s, %s, %s)"
+            self._db.executemany(sql, self._buf)
+            del self._buf[:]
