@@ -32,11 +32,12 @@ from sam.data.histogrambin import HistogramBin
 
 from config import *
 
-def calc_hist_all(samfile, chromosomes, samId, db):
+def calc_hist_all(samfile, samId, db):
     sam_hist = SamHistogram(db)
     hist_bin = HistogramBin(db)
+    chromosome = Chromosome(db)
 
-    bins = [
+    bins = (
 #        { 'size': 1,        'sum': 0, 'hist_id': 0, 'pos': 0 },
 #        { 'size': 10,        'sum': 0, 'hist_id': 0, 'pos': 0 },
         { 'size': 100,       'sum': 0, 'hist_id': 0, 'pos': 0 },
@@ -46,21 +47,21 @@ def calc_hist_all(samfile, chromosomes, samId, db):
         { 'size': 1000000,   'sum': 0, 'hist_id': 0, 'pos': 0 },
         { 'size': 10000000,  'sum': 0, 'hist_id': 0, 'pos': 0 },
         { 'size': 100000000, 'sum': 0, 'hist_id': 0, 'pos': 0 }
-        ]
+        )
 
     bufsize = 10000
-
-    sam_hist.append(samId, 0)
-    bin0_hist_id = sam_hist.get_by_samid_binSize(samId, 0)['hist_id']
 
     for b in bins:
         sam_hist.append(samId, b['size'])
         b['hist_id'] = sam_hist.get_by_samid_binSize(samId, b['size'])['hist_id']
 
-    for c in chromosomes:
-        print 'ChrID: %d, ChrName: %s' % (c[0], c[1])
+    for r in samfile.references:
+        c = chromosome.get_by_name(r)
+        if c == None:
+            continue
+        print 'ChrID: %d, ChrName: %s' % (c['id'], c['name'])
         
-        for p in samfile.pileup(str(c[1])):
+        for p in samfile.pileup(str(c['name'])):
 
             for b in bins:
                 if b['size'] == 1:
@@ -68,20 +69,23 @@ def calc_hist_all(samfile, chromosomes, samId, db):
                     if hist_bin.lenbuf() >= bufsize:
                         hist_bin.flush()
                 else:
-                    if p.pos >= (b['pos'] / b['size'] + 1) * b['size']:
-                        hist_bin.appendbuf(b['hist_id'], b['sum'], b['pos'], c[0])
+                    if p.pos >= b['pos'] + b['size']:
+                        hist_bin.appendbuf(b['hist_id'], b['sum'], b['pos'], c['id'])
 
                         if hist_bin.lenbuf() >= bufsize:
                             hist_bin.flush()
 
-                        # Print for debug
                         if b['size'] == 1000:
-                            print '%11d: %6d\r' % (b['pos'], b['sum']),                    
+                            print '%11d: %6d\r' % (b['pos'], b['sum']),                 
                     
                         b['sum'] = 0
                         b['pos'] = p.pos / b['size'] * b['size']
 
                     b['sum'] += p.n
+
+        for b in bins:
+            if b['sum'] != 0:
+                hist_bin.appendbuf(b['hist_id'], b['sum'], b['pos'], c['id'])
 
         hist_bin.flush()
                 
@@ -133,7 +137,7 @@ def calc_hist(samfile, chromosomes, samId, binsize, db):
                 binvalues.append(0)
                 column += 1
         
-                binsum += pileupcolumn.n
+            binsum += pileupcolumn.n
 
         hist_bin_data.flush()
 
@@ -210,7 +214,7 @@ def calc_histogram_sum(samfile, chromosomes, samId, binSize, bins, db):
             sum100000 += b
                     
             count += 1
-
+            
         hist_bin_data.flush()
 
 
@@ -255,11 +259,11 @@ def run(filepath, binSize, db):
         
     if bins is not None:
         print 'Calculate extended histograms'
-        calc_histogram_sum(samfile, chromosomes, samId, binSize, bins, db)
-    '''
+        calc_histogram_sum(samfile, chromosomes, samId, binSize, bins, db)'''
+    
 
     # Algorithm 2
-    calc_hist_all(samfile, chromosomes, samId, db)
+    calc_hist_all(samfile, samId, db)
 
     samfile.close()
         
