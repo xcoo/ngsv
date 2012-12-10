@@ -32,8 +32,68 @@ from sam.data.histogrambin import HistogramBin
 
 from config import *
 
-def calc_histogram(samfile, chromosome, samId, binsize, samHistogramId, db):
+def calc_hist_all(samfile, chromosomes, samId, db):
+    sam_hist = SamHistogram(db)
+    hist_bin = HistogramBin(db)
+
+    bins = [
+#        { 'size': 1,        'sum': 0, 'hist_id': 0, 'pos': 0 },
+#        { 'size': 10,        'sum': 0, 'hist_id': 0, 'pos': 0 },
+        { 'size': 100,       'sum': 0, 'hist_id': 0, 'pos': 0 },
+        { 'size': 1000,      'sum': 0, 'hist_id': 0, 'pos': 0 },
+        { 'size': 10000,     'sum': 0, 'hist_id': 0, 'pos': 0 },
+        { 'size': 100000,    'sum': 0, 'hist_id': 0, 'pos': 0 },
+        { 'size': 1000000,   'sum': 0, 'hist_id': 0, 'pos': 0 },
+        { 'size': 10000000,  'sum': 0, 'hist_id': 0, 'pos': 0 },
+        { 'size': 100000000, 'sum': 0, 'hist_id': 0, 'pos': 0 }
+        ]
+
+    bufsize = 10000
+
+    sam_hist.append(samId, 0)
+    bin0_hist_id = sam_hist.get_by_samid_binSize(samId, 0)['hist_id']
+
+    for b in bins:
+        sam_hist.append(samId, b['size'])
+        b['hist_id'] = sam_hist.get_by_samid_binSize(samId, b['size'])['hist_id']
+
+    for c in chromosomes:
+        print 'ChrID: %d, ChrName: %s' % (c[0], c[1])
+        
+        for p in samfile.pileup(str(c[1])):
+
+            for b in bins:
+                if b['size'] == 1:
+                    hist_bin.appendbuf(bin0_hist_id, p.n, p.pos, c[0])
+                    if hist_bin.lenbuf() >= bufsize:
+                        hist_bin.flush()
+                else:
+                    if p.pos >= (b['pos'] / b['size'] + 1) * b['size']:
+                        hist_bin.appendbuf(b['hist_id'], b['sum'], b['pos'], c[0])
+
+                        if hist_bin.lenbuf() >= bufsize:
+                            hist_bin.flush()
+
+                        # Print for debug
+                        if b['size'] == 1000:
+                            print '%11d: %6d\r' % (b['pos'], b['sum']),                    
+                    
+                        b['sum'] = 0
+                        b['pos'] = p.pos / b['size'] * b['size']
+
+                    b['sum'] += p.n
+
+        hist_bin.flush()
+                
+        for b in bins:
+            b['sum'] = 0
+            b['pos'] = 0
+
+def calc_hist(samfile, chromosomes, samId, binsize, db):
+
+    bins = {}
     
+    sam_hist_data = SamHistogram(db)
     hist_bin_data = HistogramBin(db)
 
     binstart = 0
@@ -43,40 +103,47 @@ def calc_histogram(samfile, chromosome, samId, binsize, samHistogramId, db):
     
     bufsize = 10000
 
-    print 'ChrID: %d, ChrName: %s' % (chromosome[0], chromosome[1])
-    print '',
+    sam_hist_data.append(samId, binsize)
+    samHistogramId = sam_hist_data.get_by_samid(samId)['hist_id']
+
+    for chromosome in chromosomes:
+
+        print 'ChrID: %d, ChrName: %s' % (chromosome[0], chromosome[1])
     
-    for pileupcolumn in samfile.pileup(str(chromosome[1])):
+        for pileupcolumn in samfile.pileup(str(chromosome[1])):
 
-        # Sum up counts within the region
-        if pileupcolumn.pos >= binsize * (column + 1):
-            hist_bin_data.appendbuf(samHistogramId, binsum, binstart, chromosome[0])
+            # Sum up counts within the region
+            if pileupcolumn.pos >= binsize * (column + 1):
+                hist_bin_data.appendbuf(samHistogramId, binsum, binstart, chromosome[0])
 
-            if hist_bin_data.lenbuf() >= bufsize:
-                hist_bin_data.flush()
+                if hist_bin_data.lenbuf() >= bufsize:
+                    hist_bin_data.flush()
 
-            print '\r',
-            print '%11d: %6d' % (binstart, binsum),
+                print '%11d: %6d\r' % (binstart, binsum),
             
-            binstart = binsize * (column + 1)
-            binvalues.append(binsum)
-            binsum = 0
-            column += 1
+                binstart = binsize * (column + 1)
+                binvalues.append(binsum)
+                binsum = 0
+                column += 1
 
-        # Fill in zero-coverage areas
-        # NOTE: Not insert zero values to DB
-        while column < pileupcolumn.pos / binsize:            
-            binstart = binsize * (column + 1)
-            binvalues.append(0)
-            column += 1
+            # Fill in zero-coverage areas
+            # NOTE: Not insert zero values to DB
+            while column < pileupcolumn.pos / binsize:            
+                binstart = binsize * (column + 1)
+                binvalues.append(0)
+                column += 1
         
-        binsum += pileupcolumn.n
+                binsum += pileupcolumn.n
 
-    hist_bin_data.flush()
+        hist_bin_data.flush()
 
-    print
+        bins[chromosome[0]] = binvalues
+        
+        binsum = 0
+        binstart = 0
+        column = 0
 
-    return binvalues
+    return bins
 
 def calc_histogram_sum(samfile, chromosomes, samId, binSize, bins, db):
 
@@ -181,17 +248,18 @@ def run(filepath, binSize, db):
         print 'Error : please load "%s" first' % filename
 
     samId = sam['id']
-    sam_hist_data.append(samId, binSize)
-    sam_hist = sam_hist_data.get_by_samid(samId)
 
-    print 'Calculate base histograms'
-    
-    for c in chromosomes:
-        bins[c[0]] = calc_histogram(samfile, c, samId, binSize, sam_hist['hist_id'], db)
+    # Algorithm 1
+    '''print 'Calculate base histograms'   
+    bins = calc_hist(samfile, chromosomes, samId, binSize, db)
         
     if bins is not None:
         print 'Calculate extended histograms'
         calc_histogram_sum(samfile, chromosomes, samId, binSize, bins, db)
+    '''
+
+    # Algorithm 2
+    calc_hist_all(samfile, chromosomes, samId, db)
 
     samfile.close()
         
@@ -200,7 +268,8 @@ def main():
         print("No input files")
         sys.exit()
 
-    start = time.time()
+    start1 = time.time()
+    start2 = time.clock()
         
     files = sys.argv[1:]
 
@@ -209,7 +278,8 @@ def main():
     for f in files:
         run(f, 1000, db)
 
-    print 'Process time: %d sec' % (time.time() - start)
+    print 'Real time: %d sec' % (time.time()  - start1)
+    print 'CPU  time: %d sec' % (time.clock() - start2)
 
 if __name__ == '__main__':
     main()
