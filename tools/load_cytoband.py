@@ -22,8 +22,6 @@
 import sys
 import os.path
 
-import pybed
-
 from sam.data.sql import SQLDB
 from sam.data.chromosome import Chromosome
 from sam.data.cytoband import CytoBand
@@ -56,13 +54,13 @@ def load(filepath, db):
         if c is None:
             chr_data.append(c_name)
             c = chr_data.get_by_name(c_name)
-            
+
         cytoband_data.append(c['id'],
                              long(cyto_start),
                              long(cyto_end),
                              cyto_name,
                              cyto_gie)
- 
+
         count += 1
 
         print "loaded %d bands\r" % count,
