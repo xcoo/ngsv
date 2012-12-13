@@ -1,6 +1,6 @@
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
 
 DROP SCHEMA IF EXISTS `samdb` ;
 CREATE SCHEMA IF NOT EXISTS `samdb` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
@@ -51,7 +51,7 @@ CREATE  TABLE IF NOT EXISTS `samdb`.`sam_histogram` (
   `binsize` BIGINT NOT NULL ,
   `created_date` BIGINT NOT NULL ,
   `sam_histogram_id` BIGINT NOT NULL AUTO_INCREMENT ,
-  INDEX `fk_histogram_sam1` (`sam_id` ASC) ,
+  INDEX `fk_histogram_sam1_idx` (`sam_id` ASC) ,
   PRIMARY KEY (`sam_histogram_id`) ,
   INDEX `CREATEDDATEINDEX` (`created_date` ASC) )
 ENGINE = MyISAM;
@@ -68,11 +68,10 @@ CREATE  TABLE IF NOT EXISTS `samdb`.`histogram_bin` (
   `position` BIGINT NOT NULL ,
   `histogram_bin_id` BIGINT NOT NULL AUTO_INCREMENT ,
   `chr_id` BIGINT NOT NULL ,
-  INDEX `fk_histogramBin_samHistogram1` (`sam_histogram_id` ASC) ,
+  INDEX `fk_histogramBin_samHistogram1_idx` (`sam_histogram_id` ASC) ,
   PRIMARY KEY (`histogram_bin_id`) ,
-  INDEX `COUNTINDEX` (`value` ASC) ,
   INDEX `POSITIONINDEX` (`position` ASC) ,
-  INDEX `fk_histogramBin_chromosome1` (`chr_id` ASC) )
+  INDEX `fk_histogramBin_chromosome1_idx` (`chr_id` ASC) )
 ENGINE = MyISAM;
 
 
@@ -118,9 +117,9 @@ CREATE  TABLE IF NOT EXISTS `samdb`.`bed_fragment` (
   `block_starts` TEXT NOT NULL ,
   `bed_id` BIGINT NOT NULL ,
   PRIMARY KEY (`bed_fragment_id`) ,
-  INDEX `fk_bedData_bed1` (`bed_id` ASC) ,
+  INDEX `fk_bedData_bed1_idx` (`bed_id` ASC) ,
   INDEX `CHRSTARTENDINDEX` (`chr_start` ASC, `chr_end` ASC) ,
-  INDEX `fk_bedData_chromosome1` (`chr_id` ASC) )
+  INDEX `fk_bedData_chromosome1_idx` (`chr_id` ASC) )
 ENGINE = MyISAM;
 
 
@@ -137,7 +136,7 @@ CREATE  TABLE IF NOT EXISTS `samdb`.`cytoband` (
   `name` TEXT NOT NULL ,
   `gie_stain` VARCHAR(255) NOT NULL ,
   PRIMARY KEY (`cytoband_id`) ,
-  INDEX `fk_cytoBand_chromosome1` (`chr_id` ASC) ,
+  INDEX `fk_cytoBand_chromosome1_idx` (`chr_id` ASC) ,
   INDEX `CYTOBANDCHRINDEX` (`chr_id` ASC) ,
   INDEX `CYTOBANDPOSITIONINDEX` (`chr_start` ASC, `chr_end` ASC) )
 ENGINE = MyISAM;
@@ -167,7 +166,7 @@ CREATE  TABLE IF NOT EXISTS `samdb`.`ref_gene` (
   `cds_end_stat` INT NOT NULL ,
   `exon_frames` TEXT NOT NULL ,
   PRIMARY KEY (`ref_gene_id`) ,
-  INDEX `fk_refGene_chromosome1` (`chr_id` ASC) ,
+  INDEX `fk_refGene_chromosome1_idx` (`chr_id` ASC) ,
   INDEX `REFGENENAMEINDEX` (`gene_name` ASC) ,
   INDEX `REFGENECHRINDEX` (`chr_id` ASC) ,
   INDEX `REFGENETXPOSINDEX` (`tx_start` ASC, `tx_end` ASC) )
