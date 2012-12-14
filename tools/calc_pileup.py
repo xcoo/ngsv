@@ -24,6 +24,8 @@ import os.path
 import time
 import pysam
 
+import ngsv.cypileup
+
 from sam.data.sql import SQLDB
 from sam.data.sam import Sam
 from sam.data.chromosome import Chromosome
@@ -33,21 +35,20 @@ from sam.util import trim_chromosome_name
 
 from config import *
 
-def calc_hist_all(samfile, samId, db):
+def calc_hist_all(samfile, chromosomes, samId, db):
     sam_hist = SamHistogram(db)
     hist_bin = HistogramBin(db)
-    chromosome = Chromosome(db)
 
     bins = (
 #        { 'size': 1,        'sum': 0, 'hist_id': 0, 'pos': 0 },
 #        { 'size': 10,        'sum': 0, 'hist_id': 0, 'pos': 0 },
         { 'size': 100,       'sum': 0, 'hist_id': 0, 'pos': 0 },
-        { 'size': 1000,      'sum': 0, 'hist_id': 0, 'pos': 0 },
+#        { 'size': 1000,      'sum': 0, 'hist_id': 0, 'pos': 0 },
         { 'size': 10000,     'sum': 0, 'hist_id': 0, 'pos': 0 },
-        { 'size': 100000,    'sum': 0, 'hist_id': 0, 'pos': 0 },
+#        { 'size': 100000,    'sum': 0, 'hist_id': 0, 'pos': 0 },
         { 'size': 1000000,   'sum': 0, 'hist_id': 0, 'pos': 0 },
-        { 'size': 10000000,  'sum': 0, 'hist_id': 0, 'pos': 0 },
-        { 'size': 100000000, 'sum': 0, 'hist_id': 0, 'pos': 0 }
+#        { 'size': 10000000,  'sum': 0, 'hist_id': 0, 'pos': 0 },
+#        { 'size': 100000000, 'sum': 0, 'hist_id': 0, 'pos': 0 }
         )
 
     bufsize = 10000
@@ -56,13 +57,10 @@ def calc_hist_all(samfile, samId, db):
         sam_hist.append(samId, b['size'])
         b['hist_id'] = sam_hist.get_by_samid_binSize(samId, b['size'])['hist_id']
 
-    for r in samfile.references:
-        c = chromosome.get_by_name(r)
-        if c == None:
-            continue
+    for c in chromosomes:
         print 'ChrID: %d, ChrName: %s' % (c['id'], c['name'])
         
-        for p in samfile.pileup(str(c['name'])):
+        for p in samfile.pileup(str(c['ref'])):
 
             for b in bins:
                 if b['size'] == 1:
@@ -76,8 +74,8 @@ def calc_hist_all(samfile, samId, db):
                         if hist_bin.lenbuf() >= bufsize:
                             hist_bin.flush()
 
-                        if b['size'] == 1000:
-                            print '%11d: %6d\r' % (b['pos'], b['sum']),                 
+                        if b['size'] == 10000:
+                            print '%10d: %6d\r' % (b['pos'], b['sum']),                 
                     
                         b['sum'] = 0
                         b['pos'] = p.pos / b['size'] * b['size']
@@ -263,16 +261,19 @@ def run(filepath, binSize, db):
 
     samId = sam['id']
 
-    # Algorithm 1
-    print 'Calculate base histograms'   
+    # Low-memory algorithm
+    #calc_hist_all(samfile, chromosomes, samId, db)
+    
+    # Old algorithm
+    '''print 'Calculate base histograms'   
     bins = calc_hist(samfile, chromosomes, samId, binSize, db)
         
     if bins is not None:
         print 'Calculate extended histograms'
-        calc_histogram_sum(samfile, chromosomes, samId, binSize, bins, db)
-    
-    # Algorithm 2
-#    calc_hist_all(samfile, samId, db)
+        calc_histogram_sum(samfile, chromosomes, samId, binSize, bins, db)'''
+
+    # cypileup
+    ngsv.cypileup.pileup(samfile, chromosomes, samId, db)
 
     samfile.close()
 
