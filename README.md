@@ -39,12 +39,18 @@ Change [ngsv dir]/tools/config.py.
 For the preparation of genome data, please download cytoband.txt and refGene.txt from [the UCSC web site](http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/
  "Human Genome Annotation DataBase").
 		
-Then, load data of the human genome, load data from sam/bed files, and calculate histograms.
+Then, load data of the human genome, load data from sam/bed files,
 
     $ cd [ngsv dir]/tools
     $ python load_cytoband.py cytoband.txt
     $ python load_refGene.py refGene.txt
     $ python load_bam.py [sam/bam file name]
+    
+and calculate histograms.
+
+    $ cd [ngsv dir]/tools/cypileup
+    $ python setup.py install
+    $ cd [ngsv dir]/tools
     $ python calc_pileup.py [sam/bam file name]
 
 Setup configulation

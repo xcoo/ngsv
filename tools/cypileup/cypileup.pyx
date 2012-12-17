@@ -53,7 +53,7 @@ def pileup(samfile, chromosomes, samId, db):
 
     for c in chromosomes:
         
-        print 'ChrID: %d, ChrName: %s' % (c['id'], c['name'])
+        print 'ChrID: %2d, ChrName: %s' % (c['id'], c['name'])
         
         for p in samfile.pileup(str(c['ref'])):
 

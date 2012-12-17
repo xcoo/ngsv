@@ -30,193 +30,9 @@ from sam.data.sql import SQLDB
 from sam.data.sam import Sam
 from sam.data.chromosome import Chromosome
 from sam.data.samhistogram import SamHistogram
-from sam.data.histogrambin import HistogramBin
 from sam.util import trim_chromosome_name
 
 from config import *
-
-def calc_hist_all(samfile, chromosomes, samId, db):
-    sam_hist = SamHistogram(db)
-    hist_bin = HistogramBin(db)
-
-    bins = (
-#        { 'size': 1,        'sum': 0, 'hist_id': 0, 'pos': 0 },
-#        { 'size': 10,        'sum': 0, 'hist_id': 0, 'pos': 0 },
-        { 'size': 100,       'sum': 0, 'hist_id': 0, 'pos': 0 },
-#        { 'size': 1000,      'sum': 0, 'hist_id': 0, 'pos': 0 },
-        { 'size': 10000,     'sum': 0, 'hist_id': 0, 'pos': 0 },
-#        { 'size': 100000,    'sum': 0, 'hist_id': 0, 'pos': 0 },
-        { 'size': 1000000,   'sum': 0, 'hist_id': 0, 'pos': 0 },
-#        { 'size': 10000000,  'sum': 0, 'hist_id': 0, 'pos': 0 },
-#        { 'size': 100000000, 'sum': 0, 'hist_id': 0, 'pos': 0 }
-        )
-
-    bufsize = 10000
-
-    for b in bins:
-        sam_hist.append(samId, b['size'])
-        b['hist_id'] = sam_hist.get_by_samid_binSize(samId, b['size'])['hist_id']
-
-    for c in chromosomes:
-        print 'ChrID: %d, ChrName: %s' % (c['id'], c['name'])
-        
-        for p in samfile.pileup(str(c['ref'])):
-
-            for b in bins:
-                if b['size'] == 1:
-                    hist_bin.appendbuf(bin0_hist_id, p.n, p.pos, c[0])
-                    if hist_bin.lenbuf() >= bufsize:
-                        hist_bin.flush()
-                else:
-                    if p.pos >= b['pos'] + b['size']:
-                        hist_bin.appendbuf(b['hist_id'], b['sum'], b['pos'], c['id'])
-
-                        if hist_bin.lenbuf() >= bufsize:
-                            hist_bin.flush()
-
-                        if b['size'] == 10000:
-                            print '%10d: %6d\r' % (b['pos'], b['sum']),                 
-                    
-                        b['sum'] = 0
-                        b['pos'] = p.pos / b['size'] * b['size']
-
-                    b['sum'] += p.n
-
-        for b in bins:
-            if b['sum'] != 0:
-                hist_bin.appendbuf(b['hist_id'], b['sum'], b['pos'], c['id'])
-
-        hist_bin.flush()
-                
-        for b in bins:
-            b['sum'] = 0
-            b['pos'] = 0
-
-def calc_hist(samfile, chromosomes, samId, binsize, db):
-
-    bins = {}
-    
-    sam_hist_data = SamHistogram(db)
-    hist_bin_data = HistogramBin(db)
-
-    binstart = 0
-    binsum = 0
-    binvalues = []
-    column = 0
-
-    bufsize = 10000
-
-    sam_hist_data.append(samId, binsize)
-    samHistogramId = sam_hist_data.get_by_samid(samId)['hist_id']
-
-    for chromosome in chromosomes:
-
-        print 'ChrID: %d, ChrName: %s' % (chromosome['id'], chromosome['name'])
-    
-        for pileupcolumn in samfile.pileup(str(chromosome['ref'])):
-
-            # Sum up counts within the region
-            if pileupcolumn.pos >= binsize * (column + 1):
-                hist_bin_data.appendbuf(samHistogramId, binsum, binstart, chromosome['id'])
-
-                if hist_bin_data.lenbuf() >= bufsize:
-                    hist_bin_data.flush()
-
-                print '%11d: %6d\r' % (binstart, binsum),
-            
-                binstart = binsize * (column + 1)
-                binvalues.append(binsum)
-                binsum = 0
-                column += 1
-
-            # Fill in zero-coverage areas
-            # NOTE: Not insert zero values to DB
-            while column < pileupcolumn.pos / binsize:            
-                binstart = binsize * (column + 1)
-                binvalues.append(0)
-                column += 1
-        
-            binsum += pileupcolumn.n
-
-        hist_bin_data.flush()
-
-        bins[chromosome['id']] = binvalues
-        
-        binsum = 0
-        binstart = 0
-        column = 0
-
-    return bins
-
-
-def calc_histogram_sum(samfile, chromosomes, samId, binSize, bins, db):
-
-    sam_hist_data = SamHistogram(db)
-    hist_bin_data = HistogramBin(db)
-
-    sum10 = 0
-    sum100 = 0
-    sum1000 = 0
-    sum10000 = 0
-    sum100000 = 0
-
-    sam_hist_data.append(samId, binSize * 10)
-    sam_hist_data.append(samId, binSize * 100)
-    sam_hist_data.append(samId, binSize * 1000)
-    sam_hist_data.append(samId, binSize * 10000)
-    sam_hist_data.append(samId, binSize * 100000)
-
-    bufsize = 10000
-
-    for c in chromosomes:
-
-        print 'ChrID: %d, ChrName: %s' % (c['id'], c['name'])
-
-        sam_hist10     = sam_hist_data.get_by_samid_binSize(samId, binSize * 10)
-        sam_hist100    = sam_hist_data.get_by_samid_binSize(samId, binSize * 100)
-        sam_hist1000   = sam_hist_data.get_by_samid_binSize(samId, binSize * 1000)
-        sam_hist10000  = sam_hist_data.get_by_samid_binSize(samId, binSize * 10000)
-        sam_hist100000 = sam_hist_data.get_by_samid_binSize(samId, binSize * 100000)
-
-        start = 0
-
-        count = 0
-        for b in bins[c['id']]:
-            if count != 0:
-                if count % 10 == 0:
-                    if sum10 != 0:
-                        hist_bin_data.appendbuf(sam_hist10['hist_id'], sum10, (count - 10) * binSize, c['id'])
-                    sum10 = 0
-                if count % 100 == 0:
-                    if sum100 != 0:
-                        hist_bin_data.appendbuf(sam_hist100['hist_id'], sum100,  (count - 100) * binSize, c['id'])
-                    sum100 = 0
-                if count % 1000 == 0:
-                    if sum1000 != 0:
-                        hist_bin_data.appendbuf(sam_hist1000['hist_id'], sum1000, (count - 1000) * binSize, c['id'])
-                    sum1000 = 0
-                if count % 10000 == 0:
-                    if sum10000 != 0:
-                        hist_bin_data.appendbuf(sam_hist10000['hist_id'], sum10000, (count - 10000) * binSize, c['id'])
-                    sum10000 = 0
-                if count % 100000 == 0:
-                    if sum100000 != 0:
-                        hist_bin_data.appendbuf(sam_hist100000['hist_id'], sum100000, (count - 100000) * binSize, c['id'])
-                    sum100000 = 0
-
-            if hist_bin_data.lenbuf() >= bufsize:
-                hist_bin_data.flush()
-
-            sum10 += b
-            sum100 += b
-            sum1000 += b
-            sum10000 += b
-            sum100000 += b
-
-            count += 1
-            
-        hist_bin_data.flush()
-
 
 def load(filepath, db):
     filename = os.path.basename(filepath)
@@ -227,9 +43,8 @@ def load(filepath, db):
         print 'Error: not supported file format'
         return
 
-    print "begin to load", filename
+    print 'begin to load', filename
 
-    # load sam
     samfile = pysam.Samfile(filepath)
 
     return samfile
@@ -260,17 +75,6 @@ def run(filepath, binSize, db):
         print 'Error : please load "%s" first' % filename
 
     samId = sam['id']
-
-    # Low-memory algorithm
-    #calc_hist_all(samfile, chromosomes, samId, db)
-    
-    # Old algorithm
-    '''print 'Calculate base histograms'   
-    bins = calc_hist(samfile, chromosomes, samId, binSize, db)
-        
-    if bins is not None:
-        print 'Calculate extended histograms'
-        calc_histogram_sum(samfile, chromosomes, samId, binSize, bins, db)'''
 
     # cypileup
     ngsv.cypileup.pileup(samfile, chromosomes, samId, db)
