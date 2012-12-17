@@ -32,7 +32,11 @@ import org.slf4j.LoggerFactory;
 import casmi.Mouse;
 import casmi.graphics.element.Text;
 
-
+/**
+ * Histogram update manager.
+ * 
+ * @author T. Takeuchi
+ */
 public class HistogramUpdater {
 
     static Logger logger = LoggerFactory.getLogger(HistogramUpdater.class);
@@ -43,6 +47,7 @@ public class HistogramUpdater {
     
     private SamHistogram samHistogram;
     private Chromosome chromosome;
+    private long binSize;
     private long start, end;
     private HistogramBinGroup histogramBinGroup;
     private double scale;
@@ -55,9 +60,12 @@ public class HistogramUpdater {
         
         @Override
         public void run() {
+            
             // Load HistogramBins.
             // ---------------------------------------------------------------------
+            logger.debug("Start loading HistogramBin from DB");
             HistogramBin[] hbs = sqlLoader.loadHistgramBin(samHistogram.getSamHistogramId(), chromosome, start, end);
+            logger.debug("Finish");            
 
             if (hbs == null || hbs.length == 0) return;
             
@@ -72,11 +80,12 @@ public class HistogramUpdater {
             logger.info("Loaded " + hbs.length + " HistogramBins: (" + 
                         "samHistogramId: " + samHistogram.getSamHistogramId() + ", " +
                         "binSize: " + samHistogram.getBinSize() + ", " +
+                        "dispBinSize: " + binSize + ", " + 
                         "Max value: " + maxValue + ")");
 
             // Setup HistogramBinGroup.
             // ---------------------------------------------------------------------
-            histogramBinGroup.setup(samHistogram, hbs, samHistogram.getBinSize(), maxValue);
+            histogramBinGroup.setup(hbs, samHistogram.getBinSize(), binSize, maxValue);
             
             if (stopFlag) return;
 
@@ -97,10 +106,12 @@ public class HistogramUpdater {
         this.mouse = mouse;
     }
     
-    public void start(SamHistogram samHistogram, Chromosome chromosome, long start, long end,
+    public void start(SamHistogram samHistogram, Chromosome chromosome, 
+                      long binSize, long start, long end,
                       HistogramBinGroup histogramBinGroup, double scale) {
         this.samHistogram = samHistogram;
         this.chromosome = chromosome;
+        this.binSize = binSize;
         this.start = start;
         this.end = end;
         this.histogramBinGroup = histogramBinGroup;

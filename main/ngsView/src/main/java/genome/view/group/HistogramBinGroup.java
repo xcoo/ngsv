@@ -20,7 +20,6 @@ package genome.view.group;
 
 import genome.data.HistogramBin;
 import genome.data.Sam;
-import genome.data.SamHistogram;
 import genome.view.element.HistogramBinElement;
 
 import java.util.List;
@@ -44,8 +43,6 @@ public class HistogramBinGroup extends Group {
     
     private final Sam sam;
     
-    private SamHistogram samHistogram;
-    
     private double scale;
     
     public HistogramBinGroup(Sam sam, double scale) {
@@ -55,16 +52,32 @@ public class HistogramBinGroup extends Group {
         this.scale = scale;
     }
     
-    public void setup(SamHistogram samHistogram, HistogramBin[] histogramBins, long binSize, long maxValue) {
-        histogramBinElementList.clear();
-        
-        this.samHistogram  = samHistogram;
-        
-        for (HistogramBin hb : histogramBins) {
-            if (hb.getValue() == 0) continue;
-            HistogramBinElement e = new HistogramBinElement(hb, scale, binSize, maxValue);
-            histogramBinElementList.add(e);
-        }
+    public void setup(HistogramBin[] histogramBins, long binSize, long dispBinSize, long maxValue) {
+        histogramBinElementList.clear();        
+
+        if (binSize == dispBinSize) {        
+            for (HistogramBin hb : histogramBins) {                
+                if (hb.getValue() == 0) continue;
+                HistogramBinElement e = new HistogramBinElement(hb, scale, binSize, maxValue);
+                histogramBinElementList.add(e);
+            }
+        } else {
+            long sum = 0;
+            long startPos = histogramBins[0].getPosition() - histogramBins[0].getPosition() % dispBinSize;
+            long pos = startPos;
+            for (HistogramBin hb : histogramBins) {
+                if (hb.getPosition() >= pos + dispBinSize) {
+                    if (sum != 0) {
+                        HistogramBinElement e = new HistogramBinElement(sum, pos, scale, dispBinSize, maxValue);
+                        histogramBinElementList.add(e);
+                    }
+                    sum = 0;
+                    pos = hb.getPosition() / dispBinSize * dispBinSize;            
+                }                               
+
+                sum += hb.getValue();
+            }
+        }        
         
         clear();
         addAll(histogramBinElementList);
@@ -81,8 +94,5 @@ public class HistogramBinGroup extends Group {
         return sam;
     }
     
-    public SamHistogram getSamHistogram() {
-        return samHistogram;
-    }
     
 }

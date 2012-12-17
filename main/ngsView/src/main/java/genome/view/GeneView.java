@@ -115,7 +115,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
     
     private long leftValue = 0, rightValue = 0;
     
-    private long binSize = 0;
+    private long loadBinSize = 0;
+    private long dispBinSize = 0;
     private long start = 0, end = 0;
 
     // Graphics objects
@@ -483,18 +484,27 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
     
     private void updateData() {
         // Select appropriate binSize.
-        long newBinSize = 1000;
+        long newDispBinSize = 100;
+        long newLoadBinSize = 100; 
         
         if (scale < 0.0000005) {
-            newBinSize = 100000000;
+            newDispBinSize = 100000000;
+            newLoadBinSize = 1000000;
         } else if (scale < 0.000005) {
-            newBinSize = 10000000;
+            newDispBinSize = 10000000;
+            newLoadBinSize = 1000000;
         } else if (scale < 0.00005) {
-            newBinSize = 1000000;
+            newDispBinSize = 1000000;
+            newLoadBinSize = 1000000;
         } else if (scale < 0.0005) {
-            newBinSize = 100000;
+            newDispBinSize = 100000;
+            newLoadBinSize = 10000;
         } else if (scale < 0.005) {
-            newBinSize = 10000;
+            newDispBinSize = 10000;
+            newLoadBinSize = 10000;
+        } else if (scale < 0.05) {
+            newDispBinSize = 1000;
+            newLoadBinSize = 100;
         }
         
         // Calculate appropriate range.
@@ -506,7 +516,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
 //            updateShortRead(newStart, newEnd);
 
             // Update histogram data.
-            updateHistogram(newBinSize, newStart, newEnd);
+            updateHistogram(newDispBinSize, newLoadBinSize, newStart, newEnd);
 
             // Update bed data
             updateBed(newStart, newEnd);
@@ -514,15 +524,17 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
             // Update refGene.
             updateRefGene(newStart, newEnd);
             
-            binSize = newBinSize;
-            start   = newStart;
-            end     = newEnd;
-        } else if (newBinSize != binSize) {
-            updateHistogram(newBinSize, newStart, newEnd);
+            loadBinSize = newLoadBinSize;
+            dispBinSize = newDispBinSize;
+            start = newStart;
+            end   = newEnd;
+        } else if (newLoadBinSize != loadBinSize) {
+            updateHistogram(newDispBinSize, newLoadBinSize, newStart, newEnd);
             
-            binSize = newBinSize;
-            start   = newStart;
-            end     = newEnd;
+            loadBinSize = newLoadBinSize;
+            dispBinSize = newDispBinSize;
+            start = newStart;
+            end   = newEnd;
         }
     }
     
@@ -537,28 +549,32 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
 //        }
 //    }
     
-    private void updateHistogram(long newBinSize, long newStart, long newEnd) {
+    private void updateHistogram(long newBinSize, long newLoadBinSize, long newStart, long newEnd) {
 
         for (Sam sam : selectedSamList) {
-            long nearestBinSize = Long.MAX_VALUE;
-            SamHistogram nearestSH = null;
-            for (SamHistogram sh : sam.getSamHistograms()) {
-                if (Math.abs(sh.getBinSize() - newBinSize) < nearestBinSize) {
-                    nearestBinSize = sh.getBinSize();
-                    nearestSH = sh;
-                }
-            }
-            if (nearestSH != null) {
+            SamHistogram  sh = getLoadingSamHistogram(sam.getSamHistograms(), newLoadBinSize);            
+            
+            if (sh != null) {
                 for (HistogramBinGroup hbg : histogramBinGroupList) {
                     if (hbg.getSam().getSamId() == sam.getSamId()) {
 
                         // Update HistogramBin data and elements in background.
-                        histogramUpdater.start(nearestSH, selectedChromosome, newStart, newEnd, hbg, scale);
+                        histogramUpdater.start(sh, selectedChromosome, newBinSize, newStart, newEnd, hbg, scale);
                         break;
                     }
                 }
             }
         }
+    }
+    
+    private SamHistogram getLoadingSamHistogram(SamHistogram[] samHistograms, long newLoadBinSize) {
+        for (SamHistogram sh : samHistograms) {
+            if (sh.getBinSize() == newLoadBinSize) {
+                return sh;
+            }
+        }
+        
+        return null;
     }
     
     private void updateBed(long newStart, long newEnd) {
