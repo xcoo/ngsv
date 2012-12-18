@@ -66,8 +66,8 @@ public class GeneUpdater {
             
             if (stopFlag) return;
             
-            logger.info("Loaded " + geneList.size() + " Genes");
-            logger.info("Loaded " + exonList.size() + " Exons");
+            logger.info(String.format("Load %d genes", geneList.size()));
+            logger.info(String.format("Load %d exons", exonList.size()));
 
             // Setup GeneGroup.
             // -----------------------------------------------------------------

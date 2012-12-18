@@ -23,22 +23,21 @@ import genome.data.Gene;
 import genome.view.element.ExonElement;
 import genome.view.element.GeneElement;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import casmi.graphics.group.Group;
-
+import casmi.util.GraphicsUtil;
 
 /**
  * @author T. Takeuchi
- *
  */
 public class GeneGroup extends Group {
 
     private double scale;
     
-    private final List<GeneElement> geneElementList = new CopyOnWriteArrayList<GeneElement>();
-    private final List<ExonElement> exonElementList = new CopyOnWriteArrayList<ExonElement>();
+    private List<GeneElement> geneElementList = new ArrayList<GeneElement>();
+    private List<ExonElement> exonElementList = new ArrayList<ExonElement>();
     
     public GeneGroup(double scale) {
         super();
@@ -47,21 +46,27 @@ public class GeneGroup extends Group {
     }
     
     public void setup(List<Gene> geneList, List<Exon> exonList) {
-        geneElementList.clear();
-        exonElementList.clear();
-        clear();
+        List<GeneElement> geList = new ArrayList<GeneElement>();
+        List<ExonElement> eeList = new ArrayList<ExonElement>();              
+        
+        for (Gene gene : geneList) {
+            final GeneElement e = new GeneElement(gene, scale);
+            geList.add(e);
+        }
 
         for (Exon exon : exonList) {
             ExonElement e = new ExonElement(exon, scale);
-            exonElementList.add(e);
-            add(e);
+            eeList.add(e);
         }
-
-        for (Gene gene : geneList) {
-            final GeneElement e = new GeneElement(gene, scale);
-            geneElementList.add(e);
-            add(e);
-        }
+        
+        addAll(geList);        
+        GraphicsUtil.removeAll(geneElementList);
+        geneElementList = geList;
+        
+        addAll(eeList);
+        GraphicsUtil.removeAll(exonElementList);
+        exonElementList = eeList;
+        
     }
 
     @Override

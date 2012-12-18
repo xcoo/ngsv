@@ -3,7 +3,7 @@
 
     <groupId>xcoo</groupId>
     <artifactId>ngsView</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>ngsv</name>
@@ -154,7 +154,7 @@
         <dependency>
             <groupId>casmi</groupId>
             <artifactId>casmi</artifactId>
-            <version>0.3.0</version>
+            <version>0.3.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

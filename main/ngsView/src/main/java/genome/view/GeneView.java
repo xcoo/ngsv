@@ -487,23 +487,60 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
         long newDispBinSize = 100;
         long newLoadBinSize = 100; 
         
-        if (scale < 0.0000005) {
+        double base = 0.2;
+        if (scale < base * 0.00002) {
             newDispBinSize = 100000000;
             newLoadBinSize = 1000000;
-        } else if (scale < 0.000005) {
+        } else if (scale < base * 0.0001) {
             newDispBinSize = 10000000;
             newLoadBinSize = 1000000;
-        } else if (scale < 0.00005) {
+        } else if (scale < base * 0.0002) {
             newDispBinSize = 1000000;
             newLoadBinSize = 1000000;
-        } else if (scale < 0.0005) {
+        } else if (scale < base * 0.001) {
             newDispBinSize = 100000;
             newLoadBinSize = 10000;
-        } else if (scale < 0.005) {
+        } else if (scale < base * 0.1 * 0.1 * 0.125) {
+            newDispBinSize = 80000;
+            newLoadBinSize = 100;
+        } else if (scale < base * 0.1 * 0.1 * 0.17) {
+            newDispBinSize = 60000;
+            newLoadBinSize = 100;
+        } else if (scale < base * 0.1 * 0.1 * 0.25) {
+            newDispBinSize = 40000;
+            newLoadBinSize = 100;
+        } else if (scale < base * 0.1 * 0.1 * 0.5) {
+            newDispBinSize = 20000;
+            newLoadBinSize = 100;
+        } else if (scale < base * 0.1 * 0.1) {
             newDispBinSize = 10000;
             newLoadBinSize = 10000;
-        } else if (scale < 0.05) {
+        } else if (scale < base * 0.1 * 0.125) {
+            newDispBinSize = 8000;
+            newLoadBinSize = 100;
+        } else if (scale < base * 0.1 * 0.17) {
+            newDispBinSize = 6000;
+            newLoadBinSize = 100;
+        } else if (scale < base * 0.1 * 0.25) {
+            newDispBinSize = 4000;
+            newLoadBinSize = 100;
+        } else if (scale < base * 0.1 * 0.5) {
+            newDispBinSize = 2000;
+            newLoadBinSize = 100;
+        } else if (scale < base * 0.1) {
             newDispBinSize = 1000;
+            newLoadBinSize = 100;
+        } else if (scale < base * 0.125) {
+            newDispBinSize = 800;
+            newLoadBinSize = 100;
+        } else if (scale < base * 0.17) {
+            newDispBinSize = 600;
+            newLoadBinSize = 100;
+        } else if (scale < base * 0.25) {
+            newDispBinSize = 400;
+            newLoadBinSize = 100;
+        } else if (scale < base * 0.5) {
+            newDispBinSize = 200;
             newLoadBinSize = 100;
         }
         
@@ -516,7 +553,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
 //            updateShortRead(newStart, newEnd);
 
             // Update histogram data.
-            updateHistogram(newDispBinSize, newLoadBinSize, newStart, newEnd);
+            updateHistogram(newDispBinSize, newLoadBinSize, newStart, newEnd, true);
 
             // Update bed data
             updateBed(newStart, newEnd);
@@ -529,7 +566,14 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
             start = newStart;
             end   = newEnd;
         } else if (newLoadBinSize != loadBinSize) {
-            updateHistogram(newDispBinSize, newLoadBinSize, newStart, newEnd);
+            updateHistogram(newDispBinSize, newLoadBinSize, newStart, newEnd, true);
+            
+            loadBinSize = newLoadBinSize;
+            dispBinSize = newDispBinSize;
+            start = newStart;
+            end   = newEnd;
+        } else if (newDispBinSize != dispBinSize) {
+            updateHistogram(newDispBinSize, newLoadBinSize, newStart, newEnd, false);
             
             loadBinSize = newLoadBinSize;
             dispBinSize = newDispBinSize;
@@ -549,7 +593,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
 //        }
 //    }
     
-    private void updateHistogram(long newBinSize, long newLoadBinSize, long newStart, long newEnd) {
+    private void updateHistogram(long newBinSize, long newLoadBinSize, long newStart, long newEnd, boolean loadDB) {
 
         for (Sam sam : selectedSamList) {
             SamHistogram  sh = getLoadingSamHistogram(sam.getSamHistograms(), newLoadBinSize);            
@@ -559,7 +603,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
                     if (hbg.getSam().getSamId() == sam.getSamId()) {
 
                         // Update HistogramBin data and elements in background.
-                        histogramUpdater.start(sh, selectedChromosome, newBinSize, newStart, newEnd, hbg, scale);
+                        histogramUpdater.start(sh, selectedChromosome, newBinSize, newStart, newEnd, loadDB, hbg, scale);
                         break;
                     }
                 }

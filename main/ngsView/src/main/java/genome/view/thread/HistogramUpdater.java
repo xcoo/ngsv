@@ -49,8 +49,10 @@ public class HistogramUpdater {
     private Chromosome chromosome;
     private long binSize;
     private long start, end;
+    private boolean loadDB;
     private HistogramBinGroup histogramBinGroup;
     private double scale;
+    private long maxValue;
     
     private HistogramUpdateThread currentThread;
     
@@ -61,31 +63,30 @@ public class HistogramUpdater {
         @Override
         public void run() {
             
-            // Load HistogramBins.
-            // ---------------------------------------------------------------------
-            logger.debug("Start loading HistogramBin from DB");
-            HistogramBin[] hbs = sqlLoader.loadHistgramBin(samHistogram.getSamHistogramId(), chromosome, start, end);
-            logger.debug("Finish");            
+            if (loadDB) {
+                // Load HistogramBins.
+                // ---------------------------------------------------------------------
+                logger.debug("Start loading HistogramBin from DB");
+                HistogramBin[] hbs = sqlLoader.loadHistgramBin(samHistogram.getSamHistogramId(), chromosome, start, end);
+                logger.debug("Finish");            
 
-            if (hbs == null || hbs.length == 0) return;
+                if (hbs == null || hbs.length == 0) return;
             
-            if (stopFlag) return;
+                if (stopFlag) return;
 
-            samHistogram.setHistogramBins(hbs);
+                samHistogram.setHistogramBins(hbs);
 
-            // Get max value of histogram.
-            // ---------------------------------------------------------------------
-            long maxValue = sqlLoader.getMaxHistogram(samHistogram.getSamHistogramId(), chromosome.getChrId());
+                // Get max value of histogram.
+                // ---------------------------------------------------------------------
+                maxValue = sqlLoader.getMaxHistogram(samHistogram.getSamHistogramId(), chromosome.getChrId());
 
-            logger.info("Loaded " + hbs.length + " HistogramBins: (" + 
-                        "samHistogramId: " + samHistogram.getSamHistogramId() + ", " +
-                        "binSize: " + samHistogram.getBinSize() + ", " +
-                        "dispBinSize: " + binSize + ", " + 
-                        "Max value: " + maxValue + ")");
+                logger.info(String.format("Load %d HistogramBins: (samHistogramId: %d, binSize: %d, maxValue: %d)",
+                                          hbs.length, samHistogram.getSamHistogramId(), samHistogram.getBinSize(), maxValue));                
+            }
 
             // Setup HistogramBinGroup.
             // ---------------------------------------------------------------------
-            histogramBinGroup.setup(hbs, samHistogram.getBinSize(), binSize, maxValue);
+            histogramBinGroup.setup(samHistogram.getHistogramBins(), samHistogram.getBinSize(), binSize, maxValue);
             
             if (stopFlag) return;
 
@@ -95,6 +96,8 @@ public class HistogramUpdater {
                 
                 if (stopFlag) return;
             }
+            
+            logger.debug(String.format("Display binSize: %d", binSize));
 
             logger.debug("Finished updating histogram.");
         }
@@ -107,13 +110,14 @@ public class HistogramUpdater {
     }
     
     public void start(SamHistogram samHistogram, Chromosome chromosome, 
-                      long binSize, long start, long end,
+                      long binSize, long start, long end, boolean loadDB,
                       HistogramBinGroup histogramBinGroup, double scale) {
         this.samHistogram = samHistogram;
         this.chromosome = chromosome;
         this.binSize = binSize;
         this.start = start;
         this.end = end;
+        this.loadDB = loadDB;
         this.histogramBinGroup = histogramBinGroup;
         this.scale = scale;
         

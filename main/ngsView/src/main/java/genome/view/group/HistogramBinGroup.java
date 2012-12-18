@@ -22,13 +22,14 @@ import genome.data.HistogramBin;
 import genome.data.Sam;
 import genome.view.element.HistogramBinElement;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import casmi.graphics.group.Group;
+import casmi.util.GraphicsUtil;
 
 /**
  * 
@@ -39,7 +40,7 @@ public class HistogramBinGroup extends Group {
 
     static Logger logger = LoggerFactory.getLogger(HistogramBinGroup.class); 
     
-    private final List<HistogramBinElement> histogramBinElementList = new CopyOnWriteArrayList<HistogramBinElement>();
+    private List<HistogramBinElement> histogramBinElementList = new ArrayList<HistogramBinElement>();
     
     private final Sam sam;
     
@@ -53,13 +54,13 @@ public class HistogramBinGroup extends Group {
     }
     
     public void setup(HistogramBin[] histogramBins, long binSize, long dispBinSize, long maxValue) {
-        histogramBinElementList.clear();        
+        List<HistogramBinElement> list = new ArrayList<HistogramBinElement>();
 
         if (binSize == dispBinSize) {        
             for (HistogramBin hb : histogramBins) {                
                 if (hb.getValue() == 0) continue;
                 HistogramBinElement e = new HistogramBinElement(hb, scale, binSize, maxValue);
-                histogramBinElementList.add(e);
+                list.add(e);
             }
         } else {
             long sum = 0;
@@ -69,7 +70,7 @@ public class HistogramBinGroup extends Group {
                 if (hb.getPosition() >= pos + dispBinSize) {
                     if (sum != 0) {
                         HistogramBinElement e = new HistogramBinElement(sum, pos, scale, dispBinSize, maxValue);
-                        histogramBinElementList.add(e);
+                        list.add(e);
                     }
                     sum = 0;
                     pos = hb.getPosition() / dispBinSize * dispBinSize;            
@@ -78,9 +79,10 @@ public class HistogramBinGroup extends Group {
                 sum += hb.getValue();
             }
         }        
-        
-        clear();
-        addAll(histogramBinElementList);
+                
+        addAll(list);
+        GraphicsUtil.removeAll(histogramBinElementList);
+        histogramBinElementList = list;
     }
 
     @Override

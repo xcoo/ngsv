@@ -22,10 +22,11 @@ import genome.data.Bed;
 import genome.data.BedFragment;
 import genome.view.element.BedFragmentElement;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import casmi.graphics.group.Group;
+import casmi.util.GraphicsUtil;
 
 /**
  * @author T. Takeuchi
@@ -36,7 +37,7 @@ public class BedFragmentGroup extends Group {
     
     private double scale;
     
-    private List<BedFragmentElement> bedFragmentElementList = new CopyOnWriteArrayList<BedFragmentElement>();
+    private List<BedFragmentElement> bedFragmentElementList = new ArrayList<BedFragmentElement>();
     
     public BedFragmentGroup(Bed bed, double scale) {
         super();
@@ -48,14 +49,16 @@ public class BedFragmentGroup extends Group {
     }
     
     public void setup(BedFragment[] bedFragments) {
-        bedFragmentElementList.clear();
-        clear();
+        List<BedFragmentElement> list = new ArrayList<BedFragmentElement>();
         
         for (BedFragment bf : bedFragments) {
             BedFragmentElement e = new BedFragmentElement(bf, scale);
-            bedFragmentElementList.add(e);
-            add(e);
+            list.add(e);
         }
+        
+        addAll(list);
+        GraphicsUtil.removeAll(bedFragmentElementList);
+        bedFragmentElementList = list;
     }
 
     @Override
