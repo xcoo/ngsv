@@ -502,16 +502,16 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
             newLoadBinSize = 10000;
         } else if (scale < base * 0.1 * 0.1 * 0.125) {
             newDispBinSize = 80000;
-            newLoadBinSize = 100;
+            newLoadBinSize = 10000;
         } else if (scale < base * 0.1 * 0.1 * 0.17) {
             newDispBinSize = 60000;
-            newLoadBinSize = 100;
+            newLoadBinSize = 10000;
         } else if (scale < base * 0.1 * 0.1 * 0.25) {
             newDispBinSize = 40000;
-            newLoadBinSize = 100;
+            newLoadBinSize = 10000;
         } else if (scale < base * 0.1 * 0.1 * 0.5) {
             newDispBinSize = 20000;
-            newLoadBinSize = 100;
+            newLoadBinSize = 10000;
         } else if (scale < base * 0.1 * 0.1) {
             newDispBinSize = 10000;
             newLoadBinSize = 10000;
@@ -694,17 +694,19 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
         mainLine.setScale(scale);
         mainLine.setPosition(offset + (rulerGroup.getStart() + rulerGroup.getEnd()) / 2.0 * scale, RULER_POS_Y, 0);
 
-        long step = 1000;
-        if (scale < 0.000004) {
+        long step = 100;
+        if (scale < 0.000005) {
             step = 100000000;
-        } else if (scale < 0.00004) {
+        } else if (scale < 0.00005) {
             step = 10000000;
-        } else if (scale < 0.0004) {
+        } else if (scale < 0.0005) {
             step = 1000000;
-        } else if (scale < 0.004) {
+        } else if (scale < 0.005) {
             step = 100000;
-        } else if (scale < 0.04) {
+        } else if (scale < 0.05) {
             step = 10000;
+        } else if (scale < 0.5) {
+            step = 1000;
         }
 
         int idx = 0;
@@ -720,8 +722,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
             e.getLine().setPosition(offset + e.getBaseX(), RULER_POS_Y, 0);
             e.getText().setPosition(offset + e.getBaseX() + 3, RULER_POS_Y + 3, 0);
 
-            e.getLine().visible();
-            e.getText().visible();
+            e.getLine().setVisible(true);
+            e.getText().setVisible(true);
 
             idx++;
         }

@@ -66,9 +66,8 @@ public class HistogramUpdater {
             if (loadDB) {
                 // Load HistogramBins.
                 // ---------------------------------------------------------------------
-                logger.debug("Start loading HistogramBin from DB");
+                logger.debug("Loading HistogramBin from DB...");
                 HistogramBin[] hbs = sqlLoader.loadHistgramBin(samHistogram.getSamHistogramId(), chromosome, start, end);
-                logger.debug("Finish");            
 
                 if (hbs == null || hbs.length == 0) return;
             
@@ -80,8 +79,9 @@ public class HistogramUpdater {
                 // ---------------------------------------------------------------------
                 maxValue = sqlLoader.getMaxHistogram(samHistogram.getSamHistogramId(), chromosome.getChrId());
 
-                logger.info(String.format("Load %d HistogramBins: (samHistogramId: %d, binSize: %d, maxValue: %d)",
-                                          hbs.length, samHistogram.getSamHistogramId(), samHistogram.getBinSize(), maxValue));                
+                logger.info(
+                    String.format("Load %d HistogramBins: (samHistogramId: %d, binSize: %d, maxValue: %d)",
+                                  hbs.length, samHistogram.getSamHistogramId(), samHistogram.getBinSize(), maxValue));                
             }
 
             // Setup HistogramBinGroup.

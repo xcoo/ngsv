@@ -41,6 +41,7 @@ import casmi.sql.Query;
 public class SQLLoader {
 
     static Logger logger = LoggerFactory.getLogger(SQLLoader.class);
+    
     MySQL mysql = null;
 
     public SQLLoader() throws SQLException {
@@ -65,6 +66,7 @@ public class SQLLoader {
             return mysql.all(Sam.class);
         } catch (SQLException e) {
             logger.error("Failed to load sam.");
+            logger.error(e.getMessage());
             e.printStackTrace();
         } 
 
@@ -76,6 +78,7 @@ public class SQLLoader {
             return mysql.all(Chromosome.class);
         } catch (SQLException e) {
             logger.error("Failed to load chromosome.");
+            logger.error(e.getMessage());
             e.printStackTrace();
         }
 
@@ -88,6 +91,7 @@ public class SQLLoader {
             return mysql.all(CytoBand.class);
         } catch (SQLException e) {
             logger.error("Failed to load cytoband.");
+            logger.error(e.getMessage());
             e.printStackTrace();
         }
 
@@ -100,19 +104,23 @@ public class SQLLoader {
             return mysql.all(SamHistogram.class, new Query().where(whereStatement));
         } catch (SQLException e) {
             logger.error("Failed to load samHistogram.");
+            logger.error(e.getMessage());
             e.printStackTrace();
         } 
 
         return null;
     }
 
-    public HistogramBin[] loadHistgramBin(long samHistgramId, Chromosome c, long start, long end) {
+    public HistogramBin[] loadHistgramBin(long samHistogramId, Chromosome c, long start, long end) {
         HistogramBin[] hb = null;
-        try{
-            String whereStatement = " sam_histogram_id = " + samHistgramId + " and chr_id = " + c.getChrId() + " and position >= " + start + " and position <= " + end;
+        try {
+            String whereStatement = 
+                String.format(" sam_histogram_id=%d AND chr_id=%d AND position>=%d AND position<=%d",
+                              samHistogramId, c.getChrId(), start, end);
             hb = mysql.all(HistogramBin.class, new Query().select("chr_id", "position", "value").where(whereStatement));
         } catch (SQLException e) {
             logger.error("Failed to load histogramBin");
+            logger.error(e.getMessage());
             e.printStackTrace();
         } 
         return hb;
@@ -193,7 +201,9 @@ public class SQLLoader {
         try {
             Query query = new Query();
             query.select("ref_gene_id", "name", "gene_name", "chr_id", "strand", "tx_start", "tx_end", "exon_count", "exon_starts", "exon_ends");
-            query.where(" chr_id= '" + c.getChrId() + "'" + " and " + " tx_end >= '" + start + "'" + " and " + " tx_start <= '" + end + "'" );
+            query.where(
+                String.format(" chr_id='%d' AND tx_end>='%d' AND tx_start<='%d'",
+                              c.getChrId(), start, end));
             refGene = mysql.all(RefGene.class, query);
             geneLoaderResult = GeneLoader.getGenes(refGene);
         } catch (SQLException e) {
