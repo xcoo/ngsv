@@ -28,18 +28,18 @@ class RefGene:
     def __init__(self, db):
         self.db = db
 
-    def append(self, bin, name, chrId, strand, txStart, txEnd, 
+    def append(self, bin, name, chrId, strand, txStart, txEnd,
                cdsStart, cdsEnd, exonCount, exonStarts, exonEnds, score,
                geneName, cdsStartStat, cdsEndStat, exonFrames):
 
         SQL_TEMPLATE = u"INSERT INTO ref_gene (bin, name, chr_id, strand, tx_start, tx_end, cds_start, cds_end, exon_count, exon_starts, exon_ends, score, gene_name, cds_start_stat, cds_end_stat, exon_frames) VALUES (%d, '%s', %d, %d, %d, %d, %d, %d, %d, '%s', '%s', %d, '%s', %d, %d, '%s')"
 
-        sql = SQL_TEMPLATE % (bin, 
-                              escape(name), 
+        sql = SQL_TEMPLATE % (bin,
+                              escape(name),
                               chrId,
                               strand,
                               txStart,
-                              txEnd, 
+                              txEnd,
                               cdsStart,
                               cdsEnd,
                               exonCount,
@@ -52,3 +52,8 @@ class RefGene:
                               escape(json.dumps(exonFrames)))
 
         self.db.execute(sql)
+
+    def count(self):
+
+        sql = "SELECT count(*) from ref_gene"
+        return self.db.execute(sql)[0][0]

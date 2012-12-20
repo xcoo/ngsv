@@ -20,8 +20,6 @@
 
 from sql import *
 
-import json
-
 
 class CytoBand:
 
@@ -39,3 +37,8 @@ class CytoBand:
                               escape(gieStain))
 
         self.db.execute(sql)
+
+    def count(self):
+
+        sql = "SELECT count(*) from cytoband"
+        return self.db.execute(sql)[0][0]

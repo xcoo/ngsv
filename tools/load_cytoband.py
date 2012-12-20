@@ -20,7 +20,9 @@
 #
 
 import sys
-import os.path
+import gzip
+
+from cache import Cache
 
 from sam.data.sql import SQLDB
 from sam.data.chromosome import Chromosome
@@ -29,19 +31,12 @@ from sam.data.cytoband import CytoBand
 from config import *
 
 
-def load(filepath, db):
-
-    filename = os.path.basename(filepath)
-
-    cytoband_data = CytoBand(db)
-    chr_data = Chromosome(db)
-
-    print "begin to load", filename
+def _update_database(fp, cytoband_data, chromosome_data):
 
     count = 0
 
     # load cytoband data
-    for line in open(filepath, 'r'):
+    for line in fp:
         cyto_chr, cyto_start, cyto_end, cyto_name, cyto_gie = line[:-1].split('\t')
 
         c_name = cyto_chr
@@ -49,7 +44,7 @@ def load(filepath, db):
         c_name = c_name.replace('chr', '')
         c_name = c_name.replace('.', '')
 
-        c = chr_data.get_by_name(c_name)
+        c = chromosome_data.get_by_name(c_name)
 
         if c is None:
             chr_data.append(c_name)
@@ -68,17 +63,31 @@ def load(filepath, db):
     print "loaded %d bands" % count
 
 
-def main():
-
-    if len(sys.argv) < 2:
-        print("No input files")
-        sys.exit()
-
-    f = sys.argv[1]
+def load():
 
     db = SQLDB(SAM_DB_NAME, SQLDB_HOST, SQLDB_USER, SQLDB_PASSWD)
 
-    load(f, db)
+    cytoband_data = CytoBand(db)
+    chromosome_data = Chromosome(db)
+
+    if cytoband_data.count() > 0:
+        print "CytoBand is already loaded"
+        sys.exit()
+
+    url = "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/cytoBand.txt.gz"
+
+    print "begin to download from %s" % url
+
+    c = Cache(url)
+    c.load()
+
+    print "updating database"
+
+    f = gzip.open(c.name)
+
+    _update_database(f, cytoband_data, chromosome_data)
+
+    f.close()
 
 if __name__ == '__main__':
-    main()
+    load()
