@@ -129,6 +129,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
     private List<BedFragmentGroup>  bedFragmentGroupList  = new ArrayList<BedFragmentGroup>();
 
     private RulerGroup rulerGroup;
+    private List<Text> explanationTextList = new ArrayList<Text>();
 
     private Text annotationText;
     
@@ -360,6 +361,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
 
     private void setupRuler(long start, long end) {
         rulerGroup = new RulerGroup(start, end, scale);
+        rulerGroup.getMainLine().set(viewScale.getStart(), 0, viewScale.getEnd(), 0);
         baseObject.add(rulerGroup);
     }
 
@@ -452,6 +454,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
         for (ExplanationTextData e: explanationTextData) {
             Text t = new Text(e.getName(), EXPLANATION_F, e.getX(), e.getY());
             t.setStrokeColor(ColorSet.LIGHT_GRAY);
+            explanationTextList.add(t);
             addObject(t);
         }
     }
@@ -488,10 +491,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
         long newLoadBinSize = 100; 
         
         double base = 0.2;
-        if (scale < base * 0.00002) {
-            newDispBinSize = 100000000;
-            newLoadBinSize = 1000000;
-        } else if (scale < base * 0.0001) {
+        if (scale < base * 0.0001) {
             newDispBinSize = 10000000;
             newLoadBinSize = 1000000;
         } else if (scale < base * 0.0002) {
@@ -545,11 +545,13 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
         }
         
         boolean showRefGene = true;
-        if (scale < 0.002) {
+        if (scale < 0.0015) {
             showRefGene = false;
             geneGroup.setVisible(false);
+            explanationTextList.get(2).setStrokeColor(new GrayColor(0.2));
         } else {
             geneGroup.setVisible(true);
+            explanationTextList.get(2).setStrokeColor(ColorSet.LIGHT_GRAY);
         }
         
         // Calculate appropriate range.
@@ -694,15 +696,15 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
     }
 
     private void updateRuler(double offset) {
-        Line mainLine = rulerGroup.getMainLine();
         long start = leftValue, end = rightValue;
         if (start < 0) start = 0;
         if (end < 0) end = 0;
-        mainLine.set(start, 0, end, 0);
         rulerGroup.setStart(start);
         rulerGroup.setEnd(end);
+        
+        Line mainLine = rulerGroup.getMainLine();
         mainLine.setScale(scale);
-        mainLine.setPosition(offset + (rulerGroup.getStart() + rulerGroup.getEnd()) / 2.0 * scale, RULER_POS_Y, 0);
+        mainLine.setPosition(offset + (viewScale.getStart() + viewScale.getEnd()) / 2.0 * scale, RULER_POS_Y, 0);
 
         long step = 100;
         if (scale < 0.000005) {
@@ -852,9 +854,9 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
     }
     
     public static void main(String[] args) {        
-        logger.info("Start ngsView (Next Generation Sequencer View).");
+        logger.info("Start NGSV");
         
         GeneView.args = args;
-        AppletRunner.run("genome.view.GeneView", "ngs View");        
+        AppletRunner.run("genome.view.GeneView", "NGSV: Next-Generation DNA Sequencing Viewer");        
     }
 }
