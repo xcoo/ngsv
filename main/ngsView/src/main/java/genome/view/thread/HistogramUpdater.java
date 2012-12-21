@@ -84,6 +84,9 @@ public class HistogramUpdater {
                                   hbs.length, samHistogram.getSamHistogramId(), samHistogram.getBinSize(), maxValue));                
             }
 
+            if (samHistogram.getHistogramBins() == null || samHistogram.getHistogramBins().length == 0)
+                return;
+            
             // Setup HistogramBinGroup.
             // ---------------------------------------------------------------------
             histogramBinGroup.setup(samHistogram.getHistogramBins(), samHistogram.getBinSize(), binSize, maxValue);

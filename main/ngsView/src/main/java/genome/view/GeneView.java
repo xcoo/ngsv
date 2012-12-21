@@ -544,6 +544,14 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
             newLoadBinSize = 100;
         }
         
+        boolean showRefGene = true;
+        if (scale < 0.002) {
+            showRefGene = false;
+            geneGroup.setVisible(false);
+        } else {
+            geneGroup.setVisible(true);
+        }
+        
         // Calculate appropriate range.
         long newStart = leftValue  - (long)(700.0 / scale);
         long newEnd   = rightValue + (long)(700.0 / scale);
@@ -559,7 +567,9 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
             updateBed(newStart, newEnd);
             
             // Update refGene.
-            updateRefGene(newStart, newEnd);
+            if (showRefGene) {
+                updateRefGene(newStart, newEnd);
+            }
             
             loadBinSize = newLoadBinSize;
             dispBinSize = newDispBinSize;
@@ -730,8 +740,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
         
         for (int i = idx; i < rulerGroup.getRulerElementList().size(); i++) {
             RulerElement e = rulerGroup.getRulerElementList().get(i);
-            e.getLine().hidden();
-            e.getText().hidden();
+            e.getLine().setVisible(false);
+            e.getText().setVisible(false);
         }
     }
     

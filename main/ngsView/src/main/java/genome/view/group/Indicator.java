@@ -44,7 +44,7 @@ public final class Indicator extends Group {
         this.y = y;
         
         setup();
-        hidden();
+        setVisible(false);
     }
     
     @Override
@@ -97,13 +97,13 @@ public final class Indicator extends Group {
         highlight[1] = -1;
         highlight[2] = -1;
         
-        visible();
+        setVisible(true);
         
         isStarting = true;
     }
     
     public final void stop() {
-        hidden();
+        setVisible(false);
         isStarting = false;
     }
     
