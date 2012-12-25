@@ -1,0 +1,29 @@
+/* -*- coding: utf-8 -*- */
+
+@charset "utf-8";
+
+.clear {
+  clear: both;
+}
+
+body {
+  position: relative;
+  padding-top: 60px;
+}
+
+/* footer */
+.footer {
+  text-align: center;
+  padding-top: 10px;
+  margin-top: 70px;
+  border-top: 1px solid #E5E5E5;
+  background-color: whiteSmoke;
+}
+
+.footer-fixed-bottom {
+  position: fixed;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1030;
+}

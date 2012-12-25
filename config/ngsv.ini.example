@@ -1,0 +1,6 @@
+DEBUG=False
+TESTING=False
+
+DB_URI='mysql://user:password@localhost/ngsv?charset=utf8'
+
+UPLOAD_DIR='upload_dir'
