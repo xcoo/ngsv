@@ -50,11 +50,18 @@ def root():
 
 @app.route('/api/upload-sam', methods=[ 'POST' ])
 def upload_sam():
-    file = request.files['samfile']
-    if file and allowed_file(file.filename, [ 'sam', 'bam', 'txt' ]):
+    file = request.files['file']
+    if file and allowed_file(file.filename, [ 'sam', 'bam' ]):
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_DIR'], filename))
+    return redirect('/')
 
+@app.route('/api/upload-bed', methods=[ 'POST' ])
+def upload_bed():
+    file = request.files['file']
+    if file and allowed_file(file.filename, [ 'bed' ]):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_DIR'], filename))
     return redirect('/')
 
 def allowed_file(filename, extensions):

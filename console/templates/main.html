@@ -7,13 +7,9 @@
     <title>NGSV Console</title>
 
     <link type="text/css" href="/css/bootstrap.min.css" rel="stylesheet" />
-    <link type="text/css" href="/css/bootstrap-responsive.min.css" rel="stylesheet" />
     <link type="text/css" href="/css/main.css" rel="stylesheet" />
 
-    <!--
-    <link rel="shortcut icon" href="/favicon.ico">
-    <link rel="apple-touch-icon-precomposed" href="/img/icon.png">
-    -->
+<!--    <link rel="shortcut icon" href="/favicon.ico"> -->
 
     <!--[if lt IE 9]>
       <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -30,48 +26,56 @@
             <span class="icon-bar"></span>
           </button>
           <a class="brand" href="/">NGSV Console</a>
-          <!--
-          <div class="nav-collapse collapse">
-            <ul class="nav">
-              <li class="active">
-                <a href="./index.html">Home</a>
-              </li>
-              <li class="">
-                <a href="./getting-started.html">Get started</a>
-              </li>
-            </ul>
-          </div>
-          -->
         </div>
       </div>
     </div>
 
-    <div class="container">
-      <p>SAM/BAM file</p>
-      <form action="/api/upload-sam" method="post" enctype="multipart/form-data">
-        <input type="file" name="samfile">
-        <button type="submit" class="btn">Send</button>
-        <p>Load SAM/BAM</p>
-        <div class="progress progress-striped active">
-          <div class="bar" style="width: 0;"></div>
-        </div>
-        <p>Histogram</p>
-        <div class="progress progress-striped active">
-          <div class="bar" style="width: 0;"></div>
-        </div>
-      </form>
+    <div class="container">      
+      <div class="row">
+        <div class="span9">
+          <h1>SAM/BAM file</h1>
+          <h2>Upload</h2>
+          <p>Select and upload SAM/BAM files</p>
+          <input type="file" id="sam-upload" name="file">
+          <button id="sam-upload-btn" class="btn">Upload</button>
+          <div class="progress" style="margin-top: 10px;">
+            <div id="sam-upload-progress" class="bar" style="width: 0;"></div>
+          </div>
 
-      <p>Bed file</p>
-      <form action="/api/upload-bed" method="post" enctype="multipart/form-data">
-        <input type="file" name="datafile">
-        <button type="submit" class="btn">Send</button>
-      </form>
+          <h2>Load SAM/BAM</h2>
+          <div class="progress progress-striped" style="margin-top: 10px;">
+            <div id="sam-load-progress" class="bar" style="width: 0;"></div>
+          </div>
+
+          <h2>Histogram</h2>
+          <div class="progress progress-striped" style="margin-top: 10px;">
+            <div id="hist-calc-progress" class="bar" style="width: 0;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="span9">
+          <h1>Bed file</h1>
+          <h2>Upload</h2>
+            <input type="file" id="bed-upload" name="file">
+            <button id="bed-upload-btn" class="btn">Upload</button>
+            <div class="progress progress-striped" style="margin-top: 10px;">
+              <div id="bed-upload-progress" class="bar" style="width: 0;"></div>
+            </div>
+        </div>
+      </div>
     </div>
 
     <footer class="footer footer-fixed-bottom">
       <div class="container">
-        <p>Xcoo, Inc.</p>
+        <p><a href="http://www.xcoo.jp" target="_blank">Xcoo, Inc.</a></p>
       </div>
     </footer>
+
+    <script type="text/javascript" src="/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/js/uploader.js"></script>
+
+    <script type="text/javascript" src="/js/ngsv-console.js"></script>
   </body>
 </html>
