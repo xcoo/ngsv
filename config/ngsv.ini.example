@@ -1,6 +1,8 @@
-DEBUG=False
-TESTING=False
+[db]
+db_uri='mysql://user:password@localhost/ngsv?charset=utf8'
 
-DB_URI='mysql://user:password@localhost/ngsv?charset=utf8'
+[console]
+debug=False
+testing=False
 
-UPLOAD_DIR='upload_dir'
+upload_dir='upload_dir'

@@ -19,10 +19,7 @@
 # limitations under the License.
 #
 
-import datetime
-import math
 import os
-import re
 import sys
 
 from flask import Flask, Response
@@ -30,15 +27,22 @@ from flask import render_template, redirect, request, abort
 from werkzeug import SharedDataMiddleware
 from werkzeug import secure_filename
 
+from config import Config
+
 app = Flask(__name__)
 
 try:
-    app.config.from_envvar('NGSV_CONSOLE_CONFIG')
-except RuntimeError:
-    app.debug = True
-    app.testing = True
-    app.config['DB_URI'] = 'mysql://root:root@localhost/samdb?charset=utf8'
-    app.config['UPLOAD_DIR'] = os.environ['TMPDIR']
+    ini = os.environ['NGSV_CONSOLE_CONFIG']
+except KeyError:
+    ini = os.path.join(os.path.dirname(__file__), '../config/ngsv.ini')
+
+if not os.path.isfile(ini):
+    sys.exit('Not found "ngsv.ini"')
+
+conf = Config(ini)
+
+app.debug = conf.debug
+app.testing = conf.testing
 
 app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
         '/': os.path.join(os.path.dirname(__file__), 'static')
@@ -53,7 +57,7 @@ def upload_sam():
     file = request.files['file']
     if file and allowed_file(file.filename, [ 'sam', 'bam' ]):
         filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_DIR'], filename))
+        file.save(os.path.join(conf.upload_dir, filename))
     return redirect('/')
 
 @app.route('/api/upload-bed', methods=[ 'POST' ])
@@ -61,7 +65,7 @@ def upload_bed():
     file = request.files['file']
     if file and allowed_file(file.filename, [ 'bed' ]):
         filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_DIR'], filename))
+        file.save(os.path.join(conf.upload_dir, filename))
     return redirect('/')
 
 def allowed_file(filename, extensions):
