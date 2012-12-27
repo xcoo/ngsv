@@ -9,7 +9,7 @@
     <link type="text/css" href="/css/bootstrap.min.css" rel="stylesheet" />
     <link type="text/css" href="/css/main.css" rel="stylesheet" />
 
-<!--    <link rel="shortcut icon" href="/favicon.ico"> -->
+    <link rel="shortcut icon" href="/img/favicon.ico"> 
 
     <!--[if lt IE 9]>
       <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
@@ -36,8 +36,12 @@
           <h1>SAM/BAM file</h1>
           <h2>Upload</h2>
           <p>Select and upload SAM/BAM files</p>
-          <input type="file" id="sam-upload" name="file">
-          <button id="sam-upload-btn" class="btn">Upload</button>
+          <input type="file" id="sam-upload" name="file" style="display: none;">
+          <div class="input-prepend" style="float:left; margin-right: 20px;">
+            <a class="btn" onclick="$('#sam-upload').click();">Browse</a>
+            <input id="sam-upload-cover" class="input-large" type="text" placeholder="sam/bam file" readonly>
+          </div>
+          <button id="sam-upload-btn" class="btn btn-primary">Upload</button>
           <div class="progress" style="margin-top: 10px;">
             <div id="sam-upload-progress" class="bar" style="width: 0;"></div>
           </div>
@@ -58,11 +62,15 @@
         <div class="span9">
           <h1>Bed file</h1>
           <h2>Upload</h2>
-            <input type="file" id="bed-upload" name="file">
-            <button id="bed-upload-btn" class="btn">Upload</button>
-            <div class="progress progress-striped" style="margin-top: 10px;">
-              <div id="bed-upload-progress" class="bar" style="width: 0;"></div>
-            </div>
+          <input type="file" id="bed-upload" name="file" style="display: none;">
+          <div class="input-prepend" style="float:left; margin-right: 20px;">
+            <a class="btn" onclick="$('#bed-upload').click();">Browse</a>
+            <input id="bed-upload-cover" class="input-large" type="text" placeholder="bed file" readonly>
+          </div>
+          <button id="bed-upload-btn" class="btn btn-primary">Upload</button>
+          <div class="progress progress-striped" style="margin-top: 10px;">
+            <div id="bed-upload-progress" class="bar" style="width: 0;"></div>
+          </div>
         </div>
       </div>
     </div>
