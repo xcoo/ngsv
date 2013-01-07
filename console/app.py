@@ -27,6 +27,8 @@ from flask import render_template, redirect, request, abort
 from werkzeug import SharedDataMiddleware
 from werkzeug import secure_filename
 
+from task_server.tasks import load_bam
+
 from config import Config
 
 app = Flask(__name__)
@@ -52,12 +54,16 @@ app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
 def root():
     return render_template('main.html')
 
-@app.route('/api/upload-sam', methods=[ 'POST' ])
-def upload_sam():
-    file = request.files['file']
-    if file and allowed_file(file.filename, [ 'sam', 'bam' ]):
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(conf.upload_dir, filename))
+@app.route('/api/upload-bam', methods=[ 'POST' ])
+def upload_bam():
+    f = request.files['file']
+    if f and allowed_file(f.filename, [ 'bam' ]):
+        filename = secure_filename(f.filename)
+        bam_file = os.path.join(conf.upload_dir, filename) 
+        f.save(bam_file)
+
+        load_bam.delay(bam_file)
+
     return redirect('/')
 
 @app.route('/api/upload-bed', methods=[ 'POST' ])

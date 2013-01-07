@@ -33,17 +33,19 @@
     <div class="container">
       <div class="row">
         <div class="span12">
-          <h1>SAM/BAM file</h1>
+          <h1>BAM file</h1>
           <h2>Upload</h2>
-          <p>Select and upload SAM/BAM files</p>
-          <input type="file" id="sam-upload" name="file" style="display: none;">
+          <p>Select and upload BAM files</p>
+
+          <input type="file" id="bam-upload" name="file" style="display: none;">
           <div class="input-prepend" style="float:left; margin-right: 20px;">
-            <a class="btn" onclick="$('#sam-upload').click();">Browse</a>
-            <input id="sam-upload-cover" class="input-large" type="text" placeholder="sam/bam file" readonly>
+            <a class="btn" onclick="$('#bam-upload').click();">Browse</a>
+            <input id="bam-upload-cover" class="input-large" type="text" placeholder="sam/bam file" autocomplete="off" readonly>
           </div>
-          <button id="sam-upload-btn" class="btn btn-primary">Upload</button>
+
+          <button id="bam-upload-btn" class="btn btn-primary">Upload</button>
           <div class="progress" style="margin-top: 10px;">
-            <div id="sam-upload-progress" class="bar" style="width: 0;"></div>
+            <div id="bam-upload-progress" class="bar" style="width: 0;"></div>
           </div>
 
           <h2>Load SAM/BAM</h2>

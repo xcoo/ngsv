@@ -31,9 +31,8 @@ from sam.util import trim_chromosome_name
 
 from config import *
 
-
 def load(filepath, db):
-
+    
     filename = os.path.basename(filepath)
 
     file_ext = filename.split('.')[-1]
@@ -50,21 +49,20 @@ def load(filepath, db):
         return
 
     print "begin to load", filename
-
+    
     # load sam
     samfile = pysam.Samfile(filepath)
-
     sam_data.append(filename,
                     samfile.header, samfile.lengths,
                     samfile.mapped,
                     samfile.nreferences, samfile.references)
-
     #sam = sam_data.get_by_filename(filename)
 
     # load chromosome
     for ref in samfile.references:
         chr_data.append(trim_chromosome_name(ref))
 
+    return
 
 def main():
 

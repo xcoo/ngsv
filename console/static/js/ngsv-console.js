@@ -4,14 +4,14 @@ ngsv.console = ngsv.console || {};
 (function() {
 
     ngsv.console.main = function() {
-        $('#sam-upload').change(function() {
-            $('#sam-upload-cover').val($(this).val());
+        $('#bam-upload').change(function() {
+            $('#bam-upload-cover').val($(this).val());
         });
         $('#bed-upload').change(function() {
             $('#bed-upload-cover').val($(this).val());
         });
 
-        ngsv.console.initUploader('/api/upload-sam', $('#sam-upload'), $('#sam-upload-btn'), $('#sam-upload-progress'));
+        ngsv.console.initUploader('/api/upload-bam', $('#bam-upload'), $('#bam-upload-btn'), $('#bam-upload-progress'));
         ngsv.console.initUploader('/api/upload-bed', $('#bed-upload'), $('#bed-upload-btn'), $('#bed-upload-progress'));
     };
 
