@@ -18,8 +18,14 @@
 # limitations under the License.
 #
 
-BROKER_URL = 'sqla+mysql://root:root@localhost/ngsv_celery_broker'
+# RabbitMQ settings
+BROKER_URL = 'amqp://guest@localhost//'
+CELERY_RESULT_BACKEND = 'amqp'
+CELERY_TASK_RESULT_EXPIRES = 18000
 
-CELERY_RESULT_ENGINE_OPTIONS = { 'echo': True }
-CELERY_RESULT_BACKEND = 'database'
-CELERY_RESULT_DBURI = 'mysql://root:root@localhost/ngsv_celery_backend'
+# MySQL settings
+# NOTE: not working
+#BROKER_URL = 'sqla+mysql://root:root@localhost/ngsv_celery_broker'
+#CELERY_RESULT_BACKEND = 'database'
+#CELERY_RESULT_DBURI = 'mysql://root:root@localhost/ngsv_celery_backend'
+#CELERY_RESULT_ENGINE_OPTIONS = { 'echo': True }

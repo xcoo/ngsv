@@ -30,7 +30,7 @@ ngsv.console = ngsv.console || {};
                 console.log('success');
                 progress.html('100%');
                 progress.css('width', '100%');
-                progress.parent("div").removeClass('progress-striped active');
+                progress.parent('div').removeClass('progress-striped active');
             }
         });
 

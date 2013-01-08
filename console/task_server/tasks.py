@@ -20,6 +20,9 @@
 
 from __future__ import absolute_import
 
+from celery import current_task
+from celery.decorators import task
+
 from task_server.celery import celery
 
 import tools.load_bam
@@ -31,14 +34,19 @@ from tools.sam.data.sql import SQLDB
 from config import Config
 
 # Load a bam file and calculate histograms.
-@celery.task
+@task(name='tasks.load_bam')
 def load_bam(bam_file, conf):
+    current_task.update_state(state='STARTED')
     db = SQLDB(conf.db_name, conf.db_host, conf.db_user, conf.db_password)
+
     tools.load_bam.load(bam_file, db)
+    current_task.update_state(state='BAM_FINISH')
+
     tools.calc_pileup.run(bam_file, db)
 
 # Load a bed file.
-@celery.task
+@task(name='tasks.load_bed')
 def load_bed(bed_file, conf):
+    current_task.update_state(state='STARTED')
     db = SQLDB(conf.db_name, conf.db_host, conf.db_user, conf.db_password)
     tools.load_bed.load(bed_file, db)

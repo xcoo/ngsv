@@ -21,6 +21,8 @@
 from tools.sam.data.samhistogram import SamHistogram
 from tools.sam.data.histogrambin import HistogramBin
 
+from celery import current_task
+
 cdef class Bin:
 
     cdef int size
@@ -50,7 +52,7 @@ def pileup(samfile, chromosomes, samId, db):
         sam_hist.append(samId, b.size)
         b.hist_id = sam_hist.get_by_samid_binSize(samId, b.size)['hist_id']
 
-    for c in chromosomes:
+    for i, c in enumerate(chromosomes):
         
         print 'ChrID: %2d, ChrName: %s' % (c['id'], c['name'])
         
@@ -85,3 +87,6 @@ def pileup(samfile, chromosomes, samId, db):
         for b in bins:
             b.sum = 0
             b.pos = 0
+
+        current_task.update_state(state='PROGRESS',
+            meta={ 'current': i + 1, 'total': len(chromosomes) })

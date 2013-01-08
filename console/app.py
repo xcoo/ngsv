@@ -27,6 +27,7 @@ from flask import render_template, redirect, request, abort
 from werkzeug import SharedDataMiddleware
 from werkzeug import secure_filename
 
+from celery.result import AsyncResult
 from task_server.tasks import load_bam, load_bed
 
 from config import Config
@@ -50,9 +51,33 @@ app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
         '/': os.path.join(os.path.dirname(__file__), 'static')
         })
 
+results = []
+
 @app.route('/')
 def root():
-    return render_template('main.html')
+    bam_load_progress = 0
+    hist_calc_progress = 0
+    bed_load_progress = 0
+    
+    for r in results:
+        if r.task_name == 'tasks.load_bam':
+            if r.status == 'BAM_FINISH':
+                bam_load_progress = '100%'
+            if r.status == 'PROGRESS':
+                bam_load_progress = '100%'
+                hist_calc_progress = str(100 * r.result['current'] / r.result['total']) + '%'
+            if r.status == 'SUCCESS':
+                bam_load_progress = '100%'
+                hist_calc_progress = '100%'
+                
+        if r.task_name == 'tasks.load_bed':
+            if r.status == 'SUCCESS':
+                bed_load_progress = '100%'
+        
+    return render_template('main.html',
+                           bam_load_progress=bam_load_progress,
+                           hist_calc_progress=hist_calc_progress,
+                           bed_load_progress=bed_load_progress)
 
 @app.route('/api/upload-bam', methods=[ 'POST' ])
 def upload_bam():
@@ -62,7 +87,8 @@ def upload_bam():
         bam_file = os.path.join(conf.upload_dir, filename) 
         f.save(bam_file)
 
-        load_bam.delay(bam_file, conf)
+        r = load_bam.delay(bam_file, conf)
+        results.append(r)
 
     return redirect('/')
 
@@ -74,7 +100,8 @@ def upload_bed():
         bed_file = os.path.join(conf.upload_dir, filename) 
         f.save(bed_file)
 
-        load_bed.delay(bed_file, conf)
+        r = load_bed.delay(bed_file, conf)
+        results.append(r)
         
     return redirect('/')
 

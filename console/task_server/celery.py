@@ -27,9 +27,6 @@ celery = Celery('task_server.celery', include=['task_server.tasks'])
 
 celery.config_from_object('celeryconfig')
 
-celery.conf.update(
-    CELERY_TASK_RESULT_EXPIRES=3600,
-)
 
 if __name__ == '__main__':
     celery.start()

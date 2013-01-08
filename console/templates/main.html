@@ -40,7 +40,7 @@
           <input type="file" id="bam-upload" name="file" style="display: none;">
           <div class="input-prepend" style="float:left; margin-right: 20px;">
             <a class="btn" onclick="$('#bam-upload').click();">Browse</a>
-            <input id="bam-upload-cover" class="input-large" type="text" placeholder="sam/bam file" autocomplete="off" readonly>
+            <input id="bam-upload-cover" class="input-large" type="text" placeholder="bam file" autocomplete="off" readonly>
           </div>
 
           <button id="bam-upload-btn" class="btn btn-primary">Upload</button>
@@ -48,14 +48,14 @@
             <div id="bam-upload-progress" class="bar" style="width: 0;"></div>
           </div>
 
-          <h2>Load SAM/BAM</h2>
-          <div class="progress progress-striped" style="margin-top: 10px;">
-            <div id="sam-load-progress" class="bar" style="width: 0;"></div>
+          <h2>Load BAM</h2>
+          <div class="progress progress-striped active" style="margin-top: 10px;">
+            <div id="bam-load-progress" class="bar" style="width: {{ bam_load_progress }};">{{ bam_load_progress }}</div>
           </div>
 
           <h2>Histogram</h2>
-          <div class="progress progress-striped" style="margin-top: 10px;">
-            <div id="hist-calc-progress" class="bar" style="width: 0;"></div>
+          <div class="progress progress-striped active" style="margin-top: 10px;">
+            <div id="hist-calc-progress" class="bar" style="width: {{ hist_calc_progress }};">{{ hist_calc_progress }}</div>
           </div>
         </div>
       </div>
@@ -64,14 +64,21 @@
         <div class="span12">
           <h1>Bed file</h1>
           <h2>Upload</h2>
+
           <input type="file" id="bed-upload" name="file" style="display: none;">
           <div class="input-prepend" style="float:left; margin-right: 20px;">
             <a class="btn" onclick="$('#bed-upload').click();">Browse</a>
-            <input id="bed-upload-cover" class="input-large" type="text" placeholder="bed file" readonly>
+            <input id="bed-upload-cover" class="input-large" type="text" placeholder="bed file" autocomplete="off" readonly>
           </div>
+
           <button id="bed-upload-btn" class="btn btn-primary">Upload</button>
-          <div class="progress progress-striped" style="margin-top: 10px;">
+          <div class="progress progress-striped active" style="margin-top: 10px;">
             <div id="bed-upload-progress" class="bar" style="width: 0;"></div>
+          </div>
+
+          <h2>Load Bed</h2>
+          <div class="progress progress-striped active" style="margin-top: 10px;">
+            <div id="bem-load-progress" class="bar" style="width: {{ bed_load_progress }};">{{ bed_load_progress }}</div>
           </div>
         </div>
       </div>
