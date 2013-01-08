@@ -27,7 +27,7 @@ from flask import render_template, redirect, request, abort
 from werkzeug import SharedDataMiddleware
 from werkzeug import secure_filename
 
-from task_server.tasks import load_bam
+from task_server.tasks import load_bam, load_bed
 
 from config import Config
 
@@ -62,16 +62,20 @@ def upload_bam():
         bam_file = os.path.join(conf.upload_dir, filename) 
         f.save(bam_file)
 
-        load_bam.delay(bam_file)
+        load_bam.delay(bam_file, conf)
 
     return redirect('/')
 
 @app.route('/api/upload-bed', methods=[ 'POST' ])
 def upload_bed():
-    file = request.files['file']
-    if file and allowed_file(file.filename, [ 'bed' ]):
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(conf.upload_dir, filename))
+    f = request.files['file']
+    if f and allowed_file(f.filename, [ 'bed' ]):
+        filename = secure_filename(f.filename)
+        bed_file = os.path.join(conf.upload_dir, filename) 
+        f.save(bed_file)
+
+        load_bed.delay(bed_file, conf)
+        
     return redirect('/')
 
 def allowed_file(filename, extensions):

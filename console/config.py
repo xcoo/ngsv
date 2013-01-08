@@ -26,16 +26,31 @@ class Config(object):
         conf = ConfigParser.SafeConfigParser()
         conf.read(ini_file)
 
-        self.__db_uri = conf.get('db', 'db_uri')
+        self.__db_host = conf.get('db', 'host')
+        self.__db_user = conf.get('db', 'user')
+        self.__db_password = conf.get('db', 'password')
+        self.__db_name = conf.get('db', 'db_name')
 
         self.__console_debug = conf.get('console', 'debug')
         self.__console_testing = conf.get('console', 'testing')
         self.__console_upload_dir = conf.get('console', 'upload_dir')
 
     @property
-    def db_uri(self):
-        return self.__db_uri
+    def db_host(self):
+        return self.__db_host
+    
+    @property
+    def db_user(self):
+        return self.__db_user
 
+    @property
+    def db_password(self):
+        return self.__db_password
+
+    @property
+    def db_name(self):
+        return self.__db_name
+    
     @property
     def debug(self):
         return self.__console_debug

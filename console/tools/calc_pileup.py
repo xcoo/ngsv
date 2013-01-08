@@ -50,7 +50,7 @@ def load(filepath, db):
     return samfile
 
 
-def run(filepath, binSize, db):
+def run(filepath, db):
     bins = {}
 
     samfile = load(filepath, db)
@@ -95,7 +95,7 @@ def main():
     db = SQLDB(SAM_DB_NAME, SQLDB_HOST, SQLDB_USER, SQLDB_PASSWD)
 
     for f in files:
-        run(f, 1000, db)
+        run(f, db)
 
     print 'Real time: %d sec' % (time.time()  - start1)
     print 'CPU  time: %d sec' % (time.clock() - start2)

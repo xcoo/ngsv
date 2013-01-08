@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 #
@@ -19,8 +18,8 @@
 # limitations under the License.
 #
 
-from sam.data.samhistogram import SamHistogram
-from sam.data.histogrambin import HistogramBin
+from tools.sam.data.samhistogram import SamHistogram
+from tools.sam.data.histogrambin import HistogramBin
 
 cdef class Bin:
 
@@ -69,8 +68,8 @@ def pileup(samfile, chromosomes, samId, db):
                         if hist_bin.lenbuf() >= bufsize:
                             hist_bin.flush()
 
-                        if b.size == 10000:
-                            print '%10d: %6d\r' % (b.pos, b.sum),       
+#                        if b.size == 10000:
+#                            print '%10d: %6d\r' % (b.pos, b.sum),       
                     
                         b.sum = 0
                         b.pos = p.pos / b.size * b.size

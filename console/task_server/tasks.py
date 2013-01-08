@@ -23,17 +23,22 @@ from __future__ import absolute_import
 from task_server.celery import celery
 
 import tools.load_bam
+import tools.calc_pileup
+import tools.load_bed
+
 from tools.sam.data.sql import SQLDB
 
+from config import Config
+
+# Load a bam file and calculate histograms.
 @celery.task
-def load_bam(bam_file):
-    db = SQLDB('samdb', '127.0.0.1', 'root', 'root')
+def load_bam(bam_file, conf):
+    db = SQLDB(conf.db_name, conf.db_host, conf.db_user, conf.db_password)
     tools.load_bam.load(bam_file, db)
+    tools.calc_pileup.run(bam_file, db)
 
+# Load a bed file.
 @celery.task
-def mul(x, y):
-    return x * y
-
-@celery.task
-def xsum(numbers):
-    return sum(numbers)
+def load_bed(bed_file, conf):
+    db = SQLDB(conf.db_name, conf.db_host, conf.db_user, conf.db_password)
+    tools.load_bed.load(bed_file, db)

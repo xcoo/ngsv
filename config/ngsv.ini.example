@@ -1,5 +1,8 @@
 [db]
-db_uri=mysql://user:password@localhost/ngsv?charset=utf8
+host=mysql_host
+user=mysql_user
+password=mysql_password
+db_name=samdb
 
 [console]
 debug=False
