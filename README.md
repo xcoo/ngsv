@@ -1,70 +1,99 @@
-ngsv: Next Generation Sequencer Viewer
+# NGSV: Next Generation Sequencer Viewer
 
-About
-==============
-
-__ngsv__ is a novel viewer for data of Next-generation DNA sequencing (NGS).
+__NGSV__ is a novel viewer for data of Next-generation DNA sequencing (NGS).
 It visualizes them 3-dimentionally and provides us seamless zooming and moving for browsing the data.
 It has a database inside the system and uses OpenGL for rendering.
 
-Requirements
-==============
+## Requirements
 
 * Java (later than 1.6SE)
-    * casmi (ver. 0.2.1-SNAPSHOT in dev branch)
+    * casmi (ver. 0.3.1)
     * logback
-* MySQL
 * Python
+    * Flask
+    * MySQL-python
+    * SQLAlchemy
+    * Celery
+    * Cython
+* MySQL
+* RabbitMQ
 
-Installation
-==============
+## Installation
 
-Setup database
------------------
+### Setup database (NGSV Console)
+
+Compile.
+
+```
+$ cd [ngsv dir]/console/tools/cypileup
+$ python setup.py install
+```
 
 ngsv uses MySQL database.
-
 First, create database.
 
-    $ mysql -u root -p
-    $ mysql> source [ngsv dir]/db/samdb.sql
+```
+$ cd [ngsv dir]/db
+$ mysql -u root -p < samdb.sql
+```
 
-Change [ngsv dir]/tools/config.py.
+Setup configuration.
 
-    SQLDB_HOST   = "[hostname]"
-    SQLDB_USER   = "[user]"
-    SQLDB_PASSWD = "[password]"
-    SAM_DB_NAME  = "samdb"
+```
+$ cp config/ngsv.ini.example config/ngsv.ini
+```
 
-For the preparation of genome data, please download cytoband.txt and refGene.txt from [the UCSC web site](http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/
- "Human Genome Annotation DataBase").
-		
-Then, load data of the human genome, load data from sam/bed files,
+```
+[db]
+host=mysql_host
+user=mysql_user
+password=mysql_password
+db_name=samdb
 
-    $ cd [ngsv dir]/tools
-    $ python load_cytoband.py cytoband.txt
-    $ python load_refGene.py refGene.txt
-    $ python load_bam.py [sam/bam file name]
+[console]
+debug=False
+testing=False
+
+upload_dir=upload_dir
+```
+
+Start MySQL and RabbitMQ.
+
+Start Celery.
+
+```
+$ cd [ngsv dir]/console
+$ celery worker --app=task_server -l info
+```
+
+Start web server
+
+```
+$ ./app.py
+```
+
+Browse `http://localhost:5000`. And upload bam/bed files.
+
+Then, load data of the human genome.
+
+```
+$ cd [ngsv dir]/console/tools
+$ python load_cytoband.py
+$ python load_refGene.py
+```
+
+### Setup viewer configulation
+
+Setup database settings in `main/ngsView/config/config.properties`.
+
+```
+db.host     = [hostname]
+db.database = samdb
+db.user     = [user]
+db.password = [password]
+```
     
-and calculate histograms.
-
-    $ cd [ngsv dir]/tools/cypileup
-    $ python setup.py install
-    $ cd [ngsv dir]/tools
-    $ python calc_pileup.py [sam/bam file name]
-
-Setup configulation
------------------
-
-Setup database settings in config.properties.
-
-    db.host     = [hostname]
-    db.database = samdb
-    db.user     = [user]
-    db.password = [password]
-    
-Usage
------------------
+## Usage
 
 1. Select sam files, bed files, a chromosome name, and region (and a gene name optionally). And click 'OK'.
 2. Drag left or right to scroll the view.
@@ -73,17 +102,16 @@ Usage
 5. 'Space + drag' to display 3-D view. 'r' to reset the view.
 6. 'c' to re-select dataset.
 
-Package
------------------
+## Package
 
 Build main project and package as executable file (.app/.exe).
 
-### Mac
+### Mac OS X
 
     $ cd main/ngsView
     $ mvn -P production-mac -Dmaven.test.skip=true package
     
-### Win
+### Windos
 
     $ cd main/ngsView
     $ mvn -P production-win -Dmaven.test.skip=true package
@@ -93,8 +121,7 @@ Build main project and package as executable file (.app/.exe).
      $ cp [jogl-all-2.0-rc9-natives-windows-i586.jar] [exe directory]
      $ cp [gluegen-all-2.0-rc9-natives-windows-i586.jar] [exe directory]
     
-License
------------------
+## License
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
 
