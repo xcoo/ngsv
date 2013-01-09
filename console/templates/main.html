@@ -30,58 +30,58 @@
       </div>
     </div>
 
-    <div class="container">
+    <div id="main" class="container">
+
       <div class="row">
-        <div class="span12">
-          <h1>BAM file</h1>
-          <h2>Upload</h2>
-          <p>Select and upload BAM files</p>
-
-          <input type="file" id="bam-upload" name="file" style="display: none;">
-          <div class="input-prepend" style="float:left; margin-right: 20px;">
-            <a class="btn" onclick="$('#bam-upload').click();">Browse</a>
-            <input id="bam-upload-cover" class="input-large" type="text" placeholder="bam file" autocomplete="off" readonly>
-          </div>
-
-          <button id="bam-upload-btn" class="btn btn-primary">Upload</button>
-          <div class="progress" style="margin-top: 10px;">
-            <div id="bam-upload-progress" class="bar" style="width: 0;"></div>
-          </div>
-
-          <h2>Load BAM</h2>
-          <div class="progress progress-striped active" style="margin-top: 10px;">
-            <div id="bam-load-progress" class="bar" style="width: {{ bam_load_progress }};">{{ bam_load_progress }}</div>
-          </div>
-
-          <h2>Histogram</h2>
-          <div class="progress progress-striped active" style="margin-top: 10px;">
-            <div id="hist-calc-progress" class="bar" style="width: {{ hist_calc_progress }};">{{ hist_calc_progress }}</div>
-          </div>
+        <div class="span12" style="margin-bottom: 10px;">
+          <button id="bam-upload-select-btn" class="btn">Upload Bam File</button>
+          <button id="bed-upload-select-btn" class="btn">Upload Bed File</button>          
         </div>
       </div>
 
       <div class="row">
-        <div class="span12">
-          <h1>Bed file</h1>
-          <h2>Upload</h2>
-
-          <input type="file" id="bed-upload" name="file" style="display: none;">
-          <div class="input-prepend" style="float:left; margin-right: 20px;">
-            <a class="btn" onclick="$('#bed-upload').click();">Browse</a>
-            <input id="bed-upload-cover" class="input-large" type="text" placeholder="bed file" autocomplete="off" readonly>
-          </div>
-
-          <button id="bed-upload-btn" class="btn btn-primary">Upload</button>
-          <div class="progress progress-striped active" style="margin-top: 10px;">
-            <div id="bed-upload-progress" class="bar" style="width: 0;"></div>
-          </div>
-
-          <h2>Load Bed</h2>
-          <div class="progress progress-striped active" style="margin-top: 10px;">
-            <div id="bem-load-progress" class="bar" style="width: {{ bed_load_progress }};">{{ bed_load_progress }}</div>
-          </div>
+        <div class="span12" id="new-task">
         </div>
       </div>
+
+      <div class="row">
+        <div class="span12" id="old-task">
+
+          {% for t in tasks %}
+          <div class="row">
+            <div class="span12 job">
+              <p>Task name: {{ t.task_name }}</p>
+              <p>Task ID: {{ t.task_id }}</p>
+
+              {% if t.task_name == 'tasks.load_bam' %}
+              <p>Bam file: {{ t.bam_file }}</p>
+
+              <p>Load Bam</p>
+              <div class="progress progress-striped active" style="margin-top: 10px;">
+                <div class="bar" style="width: {{ t.bam_load_progress }};">{{ t.bam_load_progress }}</div>
+              </div>
+
+              <p>Calculate Histogram</p>
+              <div class="progress progress-striped active" style="margin-top: 10px;">
+                <div class="bar" style="width: {{ t.hist_calc_progress }};">{{ t.hist_calc_progress }}</div>
+              </div>
+              {% endif %}
+
+              {% if t.task_name == 'tasks.load_bed' %}
+              <p>Bed file: {{ t.bed_file }}</p>
+
+              <p>Load Bed</p>
+              <div class="progress progress-striped active" style="margin-top: 10px;">
+                <div class="bar" style="width: {{ t.bed_load_progress }};">{{ t.bed_load_progress }}</div>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+
+        </div>
+      </div>
+
     </div>
 
     <footer class="footer footer-fixed-bottom">
@@ -91,6 +91,7 @@
     </footer>
 
     <script type="text/javascript" src="/js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="/js/format4js.js"></script>
     <script type="text/javascript" src="/js/uploader.js"></script>
 
     <script type="text/javascript" src="/js/ngsv-console.js"></script>

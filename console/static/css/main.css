@@ -12,6 +12,26 @@ body {
   padding-bottom: 60px;
 }
 
+/* main */
+
+#main .job {
+  margin-bottom: 10px;
+  padding: 4px 12px;
+  border: 1px solid #DDD;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+}
+
+#main .job .input-prepend {
+  float:left;
+  margin-right: 10px;
+}
+
+#main .job .progress {
+  margin-top: 10px;
+}
+
 /* footer */
 .footer {
   text-align: center;

@@ -51,16 +51,23 @@ app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
         '/': os.path.join(os.path.dirname(__file__), 'static')
         })
 
-results = []
+tasks_info = []
 
 @app.route('/')
 def root():
-    bam_load_progress = 0
-    hist_calc_progress = 0
-    bed_load_progress = 0
+    tasks = []
     
-    for r in results:
+    for ti in reversed(tasks_info):
+        r = ti['result']        
+        
         if r.task_name == 'tasks.load_bam':
+            bam_file = 'Unknown'
+            bam_load_progress = 0
+            hist_calc_progress = 0
+
+            if ti['file'] is not None:
+                bam_file = ti['file']
+            
             if r.status == 'BAM_FINISH':
                 bam_load_progress = '100%'
             if r.status == 'PROGRESS':
@@ -69,15 +76,29 @@ def root():
             if r.status == 'SUCCESS':
                 bam_load_progress = '100%'
                 hist_calc_progress = '100%'
+
+            tasks.append({ 'task_id': r.id,
+                           'task_name': r.task_name,
+                           'bam_file': bam_file,
+                           'bam_load_progress': bam_load_progress,
+                           'hist_calc_progress': hist_calc_progress });
                 
         if r.task_name == 'tasks.load_bed':
+            bed_file = 'Unknown'            
+            bed_load_progress = 0
+
+            if ti['file'] is not None:
+                bed_file = ti['file']
+            
             if r.status == 'SUCCESS':
                 bed_load_progress = '100%'
+
+            tasks.append({ 'task_id': r.id,
+                           'task_name': r.task_name,
+                           'bed_file': bed_file,
+                           'bed_load_progress': bed_load_progress });
         
-    return render_template('main.html',
-                           bam_load_progress=bam_load_progress,
-                           hist_calc_progress=hist_calc_progress,
-                           bed_load_progress=bed_load_progress)
+    return render_template('main.html', tasks=tasks)
 
 @app.route('/api/upload-bam', methods=[ 'POST' ])
 def upload_bam():
@@ -88,7 +109,7 @@ def upload_bam():
         f.save(bam_file)
 
         r = load_bam.delay(bam_file, conf)
-        results.append(r)
+        tasks_info.append({ 'result': r, 'file': filename })
 
     return redirect('/')
 
@@ -101,7 +122,7 @@ def upload_bed():
         f.save(bed_file)
 
         r = load_bed.delay(bed_file, conf)
-        results.append(r)
+        tasks_info.append({ 'result': r, 'file': filename })
         
     return redirect('/')
 
