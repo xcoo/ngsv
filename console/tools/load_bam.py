@@ -49,6 +49,12 @@ def load(filepath, db):
         return
 
     print "begin to load", filename
+
+    # Create index if not exist
+    bai = filepath + '.bai'
+    if not os.path.isfile(bai):
+        print 'Create index "%s"' % os.path.basename(bai)
+        pysam.index(filepath)
     
     # load sam
     samfile = pysam.Samfile(filepath)
@@ -56,7 +62,6 @@ def load(filepath, db):
                     samfile.header, samfile.lengths,
                     samfile.mapped,
                     samfile.nreferences, samfile.references)
-    #sam = sam_data.get_by_filename(filename)
 
     # load chromosome
     for ref in samfile.references:

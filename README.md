@@ -12,7 +12,6 @@ It has a database inside the system and uses OpenGL for rendering.
 * Python
     * Flask
     * MySQL-python
-    * SQLAlchemy
     * Celery
     * Cython
 * MySQL

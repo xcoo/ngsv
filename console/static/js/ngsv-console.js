@@ -11,7 +11,7 @@ ngsv.console = ngsv.console || {};
             if ($(this).html() == '100%') {
                 $(this).parent('div').removeClass('active');
             } else {
-                $(this).parend('div').addClass('active');
+                $(this).parent('div').addClass('active');
             }
         });
     };
@@ -130,7 +130,7 @@ ngsv.console = ngsv.console || {};
         });
 
 		button.click(function() {
-            progress.parent("div").addClass('active');
+            progress.parent('div').addClass('active');
 			up.send();
 		});
     };
