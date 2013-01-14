@@ -61,42 +61,44 @@ def root():
         r = ti['result']        
         
         if r.task_name == 'tasks.load_bam':
-            bam_file = 'Unknown'
-            bam_load_progress = 0
-            hist_calc_progress = 0
+            task = {
+                'task_id': r.id,
+                'task_name': r.task_name,
+                'bam_file': 'Unknown',
+                'bam_load_progress': 0
+                }
 
-            if ti['file'] is not None:
-                bam_file = ti['file']
+            if ti['file'] != None:
+                task['bam_file'] = ti['file']
             
-            if r.status == 'BAM_FINISH':
-                bam_load_progress = '100%'
             if r.status == 'PROGRESS':
-                bam_load_progress = '100%'
-                hist_calc_progress = str(100 * r.result['current'] / r.result['total']) + '%'
+                task['bam_load_progress'] =  str(r.result['progress']) + '%'
             if r.status == 'SUCCESS':
-                bam_load_progress = '100%'
-                hist_calc_progress = '100%'
+                task['bam_load_progress'] = '100%'
+                if r.result['state'] == 'SUCCESS_WITH_ALERT':
+                    task['alert'] = r.result['alert']
+            if r.status == 'FAILURE':
+                task['bam_load_progress'] = '100%'
 
-            tasks.append({ 'task_id': r.id,
-                           'task_name': r.task_name,
-                           'bam_file': bam_file,
-                           'bam_load_progress': bam_load_progress,
-                           'hist_calc_progress': hist_calc_progress });
+            tasks.append(task);
                 
         if r.task_name == 'tasks.load_bed':
-            bed_file = 'Unknown'            
-            bed_load_progress = 0
+            task = {
+                'task_id': r.id,
+                'task_name': r.task_name,
+                'bed_file': 'Unknown',
+                'bed_load_progress': 0
+                }
 
             if ti['file'] is not None:
-                bed_file = ti['file']
-            
-            if r.status == 'SUCCESS':
-                bed_load_progress = '100%'
+                task['bed_file'] = ti['file']
 
-            tasks.append({ 'task_id': r.id,
-                           'task_name': r.task_name,
-                           'bed_file': bed_file,
-                           'bed_load_progress': bed_load_progress });
+            if r.status == 'PROGRESS':
+                task['bed_load_progress'] =  str(r.result['progress']) + '%'
+            if r.status == 'SUCCESS':
+                task['bed_load_progress'] = '100%'
+
+            tasks.append(task);
         
     return render_template('main.html', tasks=tasks)
 

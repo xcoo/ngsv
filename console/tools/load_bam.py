@@ -24,6 +24,8 @@ import os.path
 
 import pysam
 
+from celery import current_task
+
 from sam.data.sql import SQLDB
 from sam.data.sam import Sam
 from sam.data.chromosome import Chromosome
@@ -31,15 +33,15 @@ from sam.util import trim_chromosome_name
 
 from config import *
 
+from exception import UnsupportedFileError
+
 def load(filepath, db):
     
     filename = os.path.basename(filepath)
 
     file_ext = filename.split('.')[-1]
-
     if file_ext != 'bam':
-        print 'Error: not supported file format'
-        return
+        raise UnsupportedFileError('Error: not supported file format')
 
     sam_data = Sam(db)
     chr_data = Chromosome(db)

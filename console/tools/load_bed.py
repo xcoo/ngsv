@@ -22,6 +22,8 @@
 import sys
 import os.path
 
+from celery import current_task
+
 import pybed
 
 from sam.data.sql import SQLDB
@@ -31,10 +33,16 @@ from sam.data.bedfragment import BedFragment
 
 from config import *
 
+from exception import UnsupportedFileError
+
 
 def load(filepath, db):
 
     filename = os.path.basename(filepath)
+
+    file_ext = filename.split('.')[-1]
+    if file_ext != 'bed':
+        raise UnsupportedFileError('Error: not supported file format')
 
     bed_data = Bed(db)
     chr_data = Chromosome(db)
@@ -101,7 +109,10 @@ def load(filepath, db):
 
         count += 1
 
-        print "loaded %d fragments¥r" % count,
+        if count % (bedfile.length / 100) == 0:
+            current_task.update_state(state='PROGRESS', meta={ 'progress': (count + 1) * 100 / bedfile.length })
+
+#        print 'loaded %d fragments\r' % count,
 
     print "loaded %d fragments" % count
 

@@ -31,6 +31,8 @@ import tools.load_bed
 
 from tools.sam.data.sql import SQLDB
 
+from tools.exception import UnsupportedFileError
+
 from config import Config
 
 # Load a bam file and calculate histograms.
@@ -39,14 +41,26 @@ def load_bam(bam_file, conf):
     current_task.update_state(state='STARTED')
     db = SQLDB(conf.db_name, conf.db_host, conf.db_user, conf.db_password)
 
-    tools.load_bam.load(bam_file, db)
-    current_task.update_state(state='BAM_FINISH')
+    try:
+        tools.load_bam.load(bam_file, db)
+    except UnsupportedFileError, e:
+        return { 'state': 'SUCCESS_WITH_ALERT', 'alert': e.msg };
+    
+    current_task.update_state(state='PROGRESS', meta={ 'progress': 50 })
 
     tools.calc_pileup.run(bam_file, db)
+
+    return { 'state': 'SUCCESS' }
 
 # Load a bed file.
 @task(name='tasks.load_bed')
 def load_bed(bed_file, conf):
     current_task.update_state(state='STARTED')
     db = SQLDB(conf.db_name, conf.db_host, conf.db_user, conf.db_password)
-    tools.load_bed.load(bed_file, db)
+
+    try:
+        tools.load_bed.load(bed_file, db)
+    except UnsupportedFileError, e:
+        return { 'state': 'SUCCESS_WITH_ALERT', 'alert': e.msg };
+
+    return { 'state': 'SUCCESS' }

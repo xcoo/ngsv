@@ -88,5 +88,4 @@ def pileup(samfile, chromosomes, samId, db):
             b.sum = 0
             b.pos = 0
 
-        current_task.update_state(state='PROGRESS',
-            meta={ 'current': i + 1, 'total': len(chromosomes) })
+        current_task.update_state(state='PROGRESS', meta={ 'progress': 50 + (i + 1) * 50 / len(chromosomes) })

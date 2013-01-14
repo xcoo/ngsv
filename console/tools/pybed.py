@@ -94,10 +94,13 @@ class BedReader(object):
         self.source = source
         self.delim = delimiter
 
+        self.length = sum(1 for line in self.source)
+        self.source.seek(0)
+
     def yield_lines(self):
         for line in self.source:
             yield line
-
+            
     def _return(self, form, line):
         if form == 'list':
             return line.split(self.delim)
