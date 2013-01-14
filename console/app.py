@@ -27,7 +27,8 @@ from flask import render_template, redirect, request, abort
 from werkzeug import SharedDataMiddleware
 from werkzeug import secure_filename
 
-from celery.result import AsyncResult
+from celery.result import BaseAsyncResult
+from celery.task.control import inspect
 from task_server.tasks import load_bam, load_bed
 
 from config import Config
@@ -53,6 +54,18 @@ app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
 
 tasks_info = []
 
+def list_active_task():
+    i = inspect()
+    active = i.active()
+    if active != None:
+        for v in active.values():
+            for t in v:
+                r = BaseAsyncResult(t['id'])
+                r.task_name = t['name']
+                tasks_info.append({ 'result': r })
+
+list_active_task()
+
 @app.route('/')
 def root():
     tasks = []
@@ -64,11 +77,10 @@ def root():
             task = {
                 'task_id': r.id,
                 'task_name': r.task_name,
-                'bam_file': 'Unknown',
                 'bam_load_progress': 0
                 }
 
-            if ti['file'] != None:
+            if 'file' in ti and ti['file'] != None:
                 task['bam_file'] = ti['file']
             
             if r.status == 'PROGRESS':
@@ -86,11 +98,10 @@ def root():
             task = {
                 'task_id': r.id,
                 'task_name': r.task_name,
-                'bed_file': 'Unknown',
                 'bed_load_progress': 0
                 }
 
-            if ti['file'] is not None:
+            if 'file' in ti and ti['file'] != None:
                 task['bed_file'] = ti['file']
 
             if r.status == 'PROGRESS':

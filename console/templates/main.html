@@ -54,7 +54,10 @@
               <p>Task ID: {{ t.task_id }}</p>
 
               {% if t.task_name == 'tasks.load_bam' %}
+
+              {% if t.bam_file %}
               <p>Bam file: {{ t.bam_file }}</p>
+              {% endif %}
 
               <div class="progress progress-striped active" style="margin-top: 10px;">
                 <div class="bar" style="width: {{ t.bam_load_progress }};">{{ t.bam_load_progress }}</div>
