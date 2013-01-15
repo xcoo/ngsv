@@ -47,8 +47,8 @@ def _update_database(fp, cytoband_data, chromosome_data):
         c = chromosome_data.get_by_name(c_name)
 
         if c is None:
-            chr_data.append(c_name)
-            c = chr_data.get_by_name(c_name)
+            chromosome_data.append(c_name)
+            c = chromosome_data.get_by_name(c_name)
 
         cytoband_data.append(c['id'],
                              long(cyto_start),

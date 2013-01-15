@@ -128,7 +128,7 @@ def upload_bam():
     f = request.files['file']
     if f and allowed_file(f.filename, [ 'bam' ]):
         filename = secure_filename(f.filename)
-        bam_file = os.path.join(conf.upload_dir, filename) 
+        bam_file = os.path.join(conf.upload_dir, filename)
         f.save(bam_file)
 
         r = load_bam.delay(bam_file, conf)
@@ -154,4 +154,4 @@ def allowed_file(filename, extensions):
            filename.rsplit('.', 1)[1] in extensions
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
