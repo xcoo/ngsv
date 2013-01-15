@@ -23,9 +23,18 @@
           <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
           </button>
           <a class="brand" href="/">NGSV Console</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="active">
+                <a href="/">Upload</a>
+              </li>
+              <li>
+                <a href="/help">Help</a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -50,13 +59,14 @@
           {% for t in tasks %}
           <div class="row">
             <div class="span12 job">
-              <p>Task name: {{ t.task_name }}</p>
-              <p>Task ID: {{ t.task_id }}</p>
-
               {% if t.task_name == 'tasks.load_bam' %}
 
+              <h3>Loading Bam</h3>
+
               {% if t.bam_file %}
-              <p>Bam file: {{ t.bam_file }}</p>
+              <dl>
+                <dt>Bam file</dt><dd>{{ t.bam_file }}</dd>
+              </dl>
               {% endif %}
 
               <div class="progress progress-striped active" style="margin-top: 10px;">
@@ -65,7 +75,6 @@
 
               {% if t.alert %}
               <div class="alert">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
                 {{ t.alert }}
               </div>
               {% endif %}
@@ -73,7 +82,14 @@
               {% endif %}
 
               {% if t.task_name == 'tasks.load_bed' %}
-              <p>Bed file: {{ t.bed_file }}</p>
+
+              <h3>Loading Bed</h3>
+
+              {% if t.bed_file %}
+              <dl>
+                <dt>Bed file</dt><dd>{{ t.bed_file }}</dd>
+              </dl>
+              {% endif %}
 
               <div class="progress progress-striped active" style="margin-top: 10px;">
                 <div class="bar" style="width: {{ t.bed_load_progress }};">{{ t.bed_load_progress }}</div>
@@ -81,7 +97,6 @@
 
               {% if t.alert %}
               <div class="alert">
-                <button type="button" class="close" data-dismiss="alert">&times;</button>
                 {{ t.alert }}
               </div>
               {% endif %}
@@ -96,11 +111,7 @@
 
     </div>
 
-    <footer class="footer footer-fixed-bottom">
-      <div class="container">
-        <p><a href="http://www.xcoo.jp" target="_blank">Xcoo, Inc.</a></p>
-      </div>
-    </footer>
+    {% include 'footer.html' %}
 
     <script type="text/javascript" src="/js/jquery.min.js"></script>
     <script type="text/javascript" src="/js/format4js.js"></script>

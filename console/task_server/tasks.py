@@ -31,7 +31,7 @@ import tools.load_bed
 
 from tools.sam.data.sql import SQLDB
 
-from tools.exception import UnsupportedFileError
+from tools.exception import *
 
 from config import Config
 
@@ -41,15 +41,24 @@ def load_bam(bam_file, conf):
     current_task.update_state(state='STARTED')
     db = SQLDB(conf.db_name, conf.db_host, conf.db_user, conf.db_password)
 
+    bam_already_loaded = False
+    alert = ''
+    
     try:
         tools.load_bam.load(bam_file, db)
     except UnsupportedFileError, e:
         return { 'state': 'SUCCESS_WITH_ALERT', 'alert': e.msg };
+    except AlreadyLoadedError, e:
+        bam_already_loaded = True
+        alert = e.msg
     
     current_task.update_state(state='PROGRESS', meta={ 'progress': 50 })
 
     tools.calc_pileup.run(bam_file, db)
 
+    if bam_already_loaded:
+        return { 'state': 'SUCCESS_WITH_ALERT', 'alert': alert }
+    
     return { 'state': 'SUCCESS' }
 
 # Load a bed file.
@@ -61,6 +70,8 @@ def load_bed(bed_file, conf):
     try:
         tools.load_bed.load(bed_file, db)
     except UnsupportedFileError, e:
+        return { 'state': 'SUCCESS_WITH_ALERT', 'alert': e.msg };
+    except AlreadyLoadedError, e:
         return { 'state': 'SUCCESS_WITH_ALERT', 'alert': e.msg };
 
     return { 'state': 'SUCCESS' }

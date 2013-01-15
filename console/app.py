@@ -91,6 +91,7 @@ def root():
                     task['alert'] = r.result['alert']
             if r.status == 'FAILURE':
                 task['bam_load_progress'] = '100%'
+                task['alert'] = 'FAILURE'
 
             tasks.append(task);
                 
@@ -108,10 +109,19 @@ def root():
                 task['bed_load_progress'] =  str(r.result['progress']) + '%'
             if r.status == 'SUCCESS':
                 task['bed_load_progress'] = '100%'
+                if r.result['state'] == 'SUCCESS_WITH_ALERT':
+                    task['alert'] = r.result['alert']
+            if r.status == 'FAILURE':
+                task['bed_load_progress'] = '100%'
+                task['alert'] = 'FAILURE'
 
             tasks.append(task);
         
     return render_template('main.html', tasks=tasks)
+
+@app.route('/help')
+def help():
+    return render_template('help.html')
 
 @app.route('/api/upload-bam', methods=[ 'POST' ])
 def upload_bam():

@@ -33,7 +33,7 @@ from sam.util import trim_chromosome_name
 
 from config import *
 
-from exception import UnsupportedFileError
+from exception import *
 
 def load(filepath, db):
     
@@ -41,16 +41,15 @@ def load(filepath, db):
 
     file_ext = filename.split('.')[-1]
     if file_ext != 'bam':
-        raise UnsupportedFileError('Error: not supported file format')
+        raise UnsupportedFileError('ERROR: Not supported file format')
 
     sam_data = Sam(db)
     chr_data = Chromosome(db)
 
     if sam_data.get_by_filename(filename) is not None:
-        print "Error : already loaded \"%s\"" % filename
-        return
+        raise AlreadyLoadedError('WARNING: Already loaded "%s"' % filename)
 
-    print "begin to load", filename
+    print 'begin to load', filename
 
     # Create index if not exist
     bai = filepath + '.bai'

@@ -33,7 +33,7 @@ from sam.data.bedfragment import BedFragment
 
 from config import *
 
-from exception import UnsupportedFileError
+from exception import *
 
 
 def load(filepath, db):
@@ -42,17 +42,16 @@ def load(filepath, db):
 
     file_ext = filename.split('.')[-1]
     if file_ext != 'bed':
-        raise UnsupportedFileError('Error: not supported file format')
+        raise UnsupportedFileError('ERROR: Not supported file format')
 
     bed_data = Bed(db)
     chr_data = Chromosome(db)
     bed_fragment_data = BedFragment(db)
 
     if bed_data.get_by_filename(filename) is not None:
-        print 'Error : already loaded "%s"' % filename
-        return
+        raise AlreadyLoadedError('WARNING: Already loaded "%s"' % filename)
 
-    print "begin to load", filename
+    print 'begin to load', filename
 
     # load bed
     bedfile = pybed.BedReader(open(filepath, 'r'))

@@ -25,3 +25,8 @@ class UnsupportedFileError(Error):
 
     def __init__(self, msg):
         self.msg = msg
+
+class AlreadyLoadedError(Error):
+
+    def __init__(self, msg):
+        self.msg = msg

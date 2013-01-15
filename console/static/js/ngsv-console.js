@@ -9,9 +9,9 @@ ngsv.console = ngsv.console || {};
 
         $('.progress .bar').each(function() {
             if ($(this).html() == '100%') {
-                $(this).parent('div').removeClass('active');
+                $(this).parent('div').removeClass('active progress-striped');
             } else {
-                $(this).parent('div').addClass('active');
+                $(this).parent('div').addClass('active progress-striped');
             }
         });
     };
@@ -33,11 +33,11 @@ ngsv.console = ngsv.console || {};
         var $e = $($.format('\
 <div class="row">\
   <div class="span12 job">\
-    <p>Select and upload BAM files</p>\
+    <h3>Uploading Bam File</h3>\
     <input type="file" id="%s" name="file" style="display: none;">\
     <div class="input-prepend">\
-      <a class="btn" onclick="$(\'#%s\').click();">Browse</a>\
-      <input id="%s" class="input-large" type="text" placeholder="bam file" autocomplete="off" readonly>\
+      <a class="btn" onclick="$(\'#%s\').click();"><i class="icon-folder-open"></i></a>\
+      <input id="%s" class="input-xlarge" type="text" placeholder="bam file" autocomplete="off" readonly>\
     </div>\
     <div class="btn-toolbar">\
       <button id="%s" class="btn btn-primary">Upload</button>\
@@ -80,11 +80,11 @@ ngsv.console = ngsv.console || {};
         var $e = $($.format('\
 <div class="row">\
   <div class="span12 job">\
-    <p>Select and upload Bed file</p>\
+    <h3>Uploading Bed File</h3>\
     <input type="file" id="%s" name="file" style="display: none;">\
     <div class="input-prepend">\
-      <a class="btn" onclick="$(\'#%s\').click();">Browse</a>\
-      <input id="%s" class="input-large" type="text" placeholder="bed file" autocomplete="off" readonly>\
+      <a class="btn" onclick="$(\'#%s\').click();"><i class="icon-folder-open"></i></a>\
+      <input id="%s" class="input-xlarge" type="text" placeholder="bed file" autocomplete="off" readonly>\
     </div>\
     <div class="btn-toolbar">\
       <button id="%s" class="btn btn-primary">Upload</button>\
@@ -125,12 +125,12 @@ ngsv.console = ngsv.console || {};
                 console.log('success');
                 progress.html('100%');
                 progress.css('width', '100%');
-                progress.parent('div').removeClass('active');
+                progress.parent('div').removeClass('active progress-striped');
             }
         });
 
 		button.click(function() {
-            progress.parent('div').addClass('active');
+            progress.parent('div').addClass('active progress-striped');
 			up.send();
 		});
     };
