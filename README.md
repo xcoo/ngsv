@@ -62,7 +62,7 @@ Start Celery.
 
 ```
 $ cd [ngsv dir]/console
-$ celery worker --app=task_server -l info
+$ celery worker --app=taskserver -l info
 ```
 
 Start web server

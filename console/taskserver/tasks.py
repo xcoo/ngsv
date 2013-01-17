@@ -23,17 +23,13 @@ from __future__ import absolute_import
 from celery import current_task
 from celery.decorators import task
 
-from task_server.celery import celery
-
 import tools.load_bam
 import tools.calc_pileup
 import tools.load_bed
 
 from tools.sam.data.sql import SQLDB
 
-from tools.exception import *
-
-from config import Config
+from tools.exception import UnsupportedFileError, AlreadyLoadedError
 
 # Load a bam file and calculate histograms.
 @task(name='tasks.load_bam')

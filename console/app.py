@@ -22,14 +22,14 @@
 import os
 import sys
 
-from flask import Flask, Response
-from flask import render_template, redirect, request, abort
+from flask import Flask
+from flask import render_template, redirect, request
 from werkzeug import SharedDataMiddleware
 from werkzeug import secure_filename
 
 from celery.result import BaseAsyncResult
 from celery.task.control import inspect
-from task_server.tasks import load_bam, load_bed
+from taskserver.tasks import load_bam, load_bed
 
 from config import Config
 

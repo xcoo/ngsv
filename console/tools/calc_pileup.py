@@ -29,10 +29,9 @@ import ngsv.cypileup
 from sam.data.sql import SQLDB
 from sam.data.sam import Sam
 from sam.data.chromosome import Chromosome
-from sam.data.samhistogram import SamHistogram
 from sam.util import trim_chromosome_name
 
-from config import *
+from config import SQLDB_HOST, SQLDB_USER, SQLDB_PASSWD, SAM_DB_NAME
 
 def load(filepath, db):
     filename = os.path.basename(filepath)
@@ -51,13 +50,10 @@ def load(filepath, db):
 
 
 def run(filepath, db):
-    bins = {}
-
     samfile = load(filepath, db)
 
     sam_data = Sam(db)
     chromosome_data = Chromosome(db)
-    sam_hist_data = SamHistogram(db)
 
     chromosomes = []
     for ref in samfile.references:

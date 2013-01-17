@@ -23,7 +23,7 @@ from __future__ import absolute_import
 
 from celery import Celery
 
-celery = Celery('task_server.celery', include=['task_server.tasks'])
+celery = Celery('taskserver.celery', include=['taskserver.tasks'])
 
 celery.config_from_object('celeryconfig')
 

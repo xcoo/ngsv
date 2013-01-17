@@ -24,16 +24,14 @@ import os.path
 
 import pysam
 
-from celery import current_task
-
 from sam.data.sql import SQLDB
 from sam.data.sam import Sam
 from sam.data.chromosome import Chromosome
 from sam.util import trim_chromosome_name
 
-from config import *
+from config import SQLDB_HOST, SQLDB_USER, SQLDB_PASSWD, SAM_DB_NAME
 
-from exception import *
+from exception import AlreadyLoadedError, UnsupportedFileError
 
 def load(filepath, db):
     
