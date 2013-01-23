@@ -83,6 +83,14 @@ $ python load_refGene.py
 
 ### Setup viewer configulation
 
+Download Java-WebSocket library from [here](https://github.com/TooTallNate/Java-WebSocket/tarball/master), and install it into your local repository because it has not been uploaded to any remote repository yet.
+
+```
+$ tar -xvzf TooTallNate-Java-WebSocket-v1.0.0-alpha1-154-g7d4d69a.tar.gz
+$ cd TooTallNate-Java-WebSocket-v1.0.0-alpha1-154-g7d4d69a/dist
+$ mvn install:install-file -Dfile=java_websocket.jar -DgroupId=org.java_websocket -DartifactId=Java-WebSocket -Dversion=1.0.0-SNAPSHOT -Dpackaging=jar -DgeneratePom=true -DcreateChecksum=true
+```
+
 Setup database settings in `main/ngsView/config/config.properties`.
 
 ```
