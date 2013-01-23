@@ -27,6 +27,9 @@ import genome.data.Sam;
 import genome.data.SamHistogram;
 import genome.data.ViewScale;
 import genome.db.SQLLoader;
+import genome.net.DataSelectionListener;
+import genome.net.Selection;
+import genome.net.WebSocket;
 import genome.view.SamSelectionDialogBox.SamSelectionDialongBoxListener;
 import genome.view.element.BedFragmentElement;
 import genome.view.element.CytobandElement;
@@ -46,6 +49,7 @@ import genome.view.thread.BedUpdater;
 import genome.view.thread.GeneUpdater;
 import genome.view.thread.HistogramUpdater;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -67,6 +71,7 @@ import casmi.graphics.element.Text;
 import casmi.graphics.font.Font;
 import casmi.graphics.font.FontStyle;
 import casmi.graphics.object.GraphicsObject;
+import casmi.parser.JSON;
 
 /**
  * Class for Gene View
@@ -74,7 +79,7 @@ import casmi.graphics.object.GraphicsObject;
  * @author K. Nishimura
  * 
  */
-public class GeneView extends Applet implements SamSelectionDialongBoxListener {
+public class GeneView extends Applet implements SamSelectionDialongBoxListener, DataSelectionListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -170,6 +175,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
     private HistogramUpdater histogramUpdater;
     private BedUpdater       bedUpdater;
     private GeneUpdater      geneUpdater;
+    
+    private WebSocket webSocket;
 
     @Override
     public void setup() {
@@ -190,7 +197,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
 
         // load mysql database
         try {
-            sqlLoader = new SQLLoader();	
+            sqlLoader = new SQLLoader();
         } catch (Exception e) {
             logger.error("Failed to connect to database.");
             showAlert("Error", "Could not connect to database");
@@ -213,13 +220,22 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
         cytobands = sqlLoader.loadCytoBand();
         Map<String, Long> chrLengthMap = calcCytoBandLength(cytobands, chromosomes);
         
+        // WebSocket
+        try {
+            webSocket = new WebSocket(this);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }        
+        webSocket.connect();
+        
         // set dialog box for sam
         dbox = new SamSelectionDialogBox(samFiles, bedFiles, chrLengthMap, sqlLoader, this);
     }
     
-    public void initViews() {        
+    public void initViews(String chrName, long start, long end) {        
         // initialize view scale (region)
-        viewScale = new ViewScale(dbox.getChrName(), dbox.getStart(), dbox.getEnd());
+        viewScale = new ViewScale(chrName, start, end);
 
         // load data for view related to viewScale.getChr()
         reloadViewData(viewScale.getChr(), viewScale.getStart(), viewScale.getEnd());
@@ -838,7 +854,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
         dbox.setVisible(false);
         
         if (!isFinishedInitialSelection) {
-            initViews();
+            initViews(dbox.getChrName(), dbox.getStart(), dbox.getEnd());
+            webSocket.connect();
             isFinishedInitialSelection = true;
         } else {
             // initialize view scale (region)
@@ -851,6 +868,38 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener {
                 rebuildViewData(viewScale.getChr(), viewScale.getStart(), viewScale.getEnd());
             }
         }
+    }
+    
+    public void finishedDataSelection(String jsonText) {                
+        Selection s = new JSON().decode(jsonText, Selection.class);                
+                
+        for (Sam sam : samFiles) {
+            sam.setSelected(s.hasBam(sam.getSamId()));                
+        }
+        
+        for (Bed bed : bedFiles) {
+            bed.setSelected(s.hasBed(bed.getBedId()));                
+        }
+        
+        if (!isFinishedInitialSelection) {
+            initViews(s.chromosome.name, s.chromosome.start, s.chromosome.end);
+            isFinishedInitialSelection = true;
+        } else {
+            // initialize view scale (region)
+            viewScale.setViewScale(s.chromosome.name, s.chromosome.start, s.chromosome.end);
+
+            // load data for view related to viewScale.getChr()
+            reloadViewData(s.chromosome.name, s.chromosome.start, s.chromosome.end);
+
+            synchronized (this.getListener()) {
+                rebuildViewData(s.chromosome.name, s.chromosome.start, s.chromosome.end);
+            }            
+        }
+    }
+    
+    @Override
+    public void exit() {
+        webSocket.close();
     }
     
     public static void main(String[] args) {        

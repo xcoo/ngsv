@@ -167,6 +167,11 @@
             <artifactId>logback-classic</artifactId>
             <version>0.9.30</version>
         </dependency>
+        <dependency>
+            <groupId>TooTallNate</groupId>
+            <artifactId>java-websocket</artifactId>
+            <version>1.0.0-alpha1</version>
+        </dependency>
     </dependencies>
 
     <build>

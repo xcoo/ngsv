@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>Viewer | NGSV Console</title>
+
+    <link type="text/css" href="/css/bootstrap.min.css" rel="stylesheet" />
+    <link type="text/css" href="/css/main.css" rel="stylesheet" />
+
+    <link rel="shortcut icon" href="/img/favicon.ico"> 
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="brand" href="/">NGSV Console</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li><a href="/">Upload</a></li>
+              <li class="active"><a href="/viewer">Viewer</a></li>
+              <li><a href="/help">Help</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="main" class="container">
+      <div class="row">
+        <div class="span12">
+          <form>
+            <h3>Bam</h3>
+            <label class="checkbox">
+              <input name="bam" type="checkbox" value="1">
+              NA06984.454.BCM.crossmatch.SRP000033.2009_08.bam
+            </label>
+
+            <h3>Bed</h3>
+            <label class="checkbox">
+              <input name="bed" type="checkbox" value="1">
+              shSRR015294.fastq.sh.out.bed
+            </label>
+            <label class="checkbox">
+              <input name="bed" type="checkbox" value="2">
+              test.bed
+            </label>
+
+            <h3>Chromosome</h3>
+              <select id="chr-select">
+                <option>1</option>
+                <option>2</option>
+                <option>3</option>
+                <option>4</option>
+                <option>5</option>
+              </select>
+              from
+              <input type="text" id="chr-start" class="input-small" placeholder="Start position" value="0">
+              to
+              <input type="text" id="chr-end" class="input-small" placeholder="End position" value="900000">
+
+          </form>
+          <button id="viewer-select-btn" class="btn btn-primary">Select</button>
+        </div>
+
+
+
+      </div>
+    </div>
+
+    {% include 'footer.html' %}
+
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/console-viewer.js"></script>
+  </body>
+</html>

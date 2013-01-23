@@ -1,11 +1,11 @@
-var ngsv = ngsv || {};
-ngsv.console = ngsv.console || {};
+var console = console || {};
+console.uploader = console.uploader || {};
 
 (function() {
 
-    ngsv.console.main = function() {
-        $('#bam-upload-select-btn').click(ngsv.console.addBamUploader);
-        $('#bed-upload-select-btn').click(ngsv.console.addBedUploader);
+    console.uploader.main = function() {
+        $('#bam-upload-select-btn').click(console.uploader.addBamUploader);
+        $('#bed-upload-select-btn').click(console.uploader.addBedUploader);
 
         $('.progress .bar').each(function() {
             if ($(this).html() == '100%') {
@@ -16,7 +16,7 @@ ngsv.console = ngsv.console || {};
         });
     };
 
-    ngsv.console.addBamUploader = function() {
+    console.uploader.addBamUploader = function() {
         var id = 0;
         while (1) {
             if ($($.format('#bam-upload_%02d', id)).length == 0)
@@ -54,7 +54,7 @@ ngsv.console = ngsv.console || {};
             $('#' + cover).val($(this).val());
         });
 
-        ngsv.console.initUploader('/api/upload-bam', $('#' + upload), $('#' + btn), $('#' + progress));
+        console.uploader.initUploader('/api/upload-bam', $('#' + upload), $('#' + btn), $('#' + progress));
 
         $('#' + cancel).click(function() {
             $e.fadeOut(200, function() {
@@ -63,7 +63,7 @@ ngsv.console = ngsv.console || {};
         });
     };
 
-    ngsv.console.addBedUploader = function() {
+    console.uploader.addBedUploader = function() {
         var id = 0;
         while (1) {
             if ($($.format('#bed-upload_%02d', id)).length == 0)
@@ -101,7 +101,7 @@ ngsv.console = ngsv.console || {};
             $('#' + cover).val($(this).val());
         });
 
-        ngsv.console.initUploader('/api/upload-bed', $('#' + upload), $('#' + btn), $('#' + progress));
+        console.uploader.initUploader('/api/upload-bed', $('#' + upload), $('#' + btn), $('#' + progress));
 
         $('#' + cancel).click(function() {
             $e.fadeOut(200, function() {
@@ -110,7 +110,7 @@ ngsv.console = ngsv.console || {};
         });
     };
 
-    ngsv.console.initUploader = function(url, file, button, progress) {
+    console.uploader.initUploader = function(url, file, button, progress) {
         var up = new uploader(file.get(0), {
             url: url,
 			progress: function(ev) {
@@ -135,4 +135,4 @@ ngsv.console = ngsv.console || {};
     };
 }());
 
-$(document).ready(ngsv.console.main);
+$(document).ready(console.uploader.main);

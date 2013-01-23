@@ -26,11 +26,12 @@ from flask import Flask
 from flask import render_template, redirect, request
 from werkzeug import SharedDataMiddleware
 from werkzeug import secure_filename
-
+from gevent import pywsgi
+from geventwebsocket import WebSocketHandler, WebSocketError
 from celery.result import BaseAsyncResult
 from celery.task.control import inspect
-from taskserver.tasks import load_bam, load_bed
 
+from taskserver.tasks import load_bam, load_bed
 from config import Config
 
 app = Flask(__name__)
@@ -53,6 +54,7 @@ app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
         })
 
 tasks_info = []
+ws_viewer_sockets = {}
 
 def list_active_task():
     i = inspect()
@@ -119,39 +121,111 @@ def root():
         
     return render_template('main.html', tasks=tasks)
 
+@app.route('/viewer')
+def viewer():
+    return render_template('viewer.html')
+
 @app.route('/help')
 def help():
     return render_template('help.html')
 
-@app.route('/api/upload-bam', methods=[ 'POST' ])
+@app.route('/api/upload-bam', methods=['POST'])
 def upload_bam():
     f = request.files['file']
-    if f and allowed_file(f.filename, [ 'bam' ]):
+    if f and allowed_file(f.filename, ['bam']):
         filename = secure_filename(f.filename)
         bam_file = os.path.join(conf.upload_dir, filename)
         f.save(bam_file)
 
         r = load_bam.delay(bam_file, conf)
-        tasks_info.append({ 'result': r, 'file': filename })
+        tasks_info.append({'result': r, 'file': filename})
 
     return redirect('/')
 
-@app.route('/api/upload-bed', methods=[ 'POST' ])
+@app.route('/api/upload-bed', methods=['POST'])
 def upload_bed():
     f = request.files['file']
-    if f and allowed_file(f.filename, [ 'bed' ]):
+    if f and allowed_file(f.filename, ['bed']):
         filename = secure_filename(f.filename)
         bed_file = os.path.join(conf.upload_dir, filename) 
         f.save(bed_file)
 
         r = load_bed.delay(bed_file, conf)
-        tasks_info.append({ 'result': r, 'file': filename })
+        tasks_info.append({'result': r, 'file': filename})
         
     return redirect('/')
+
+@app.route('/api/ws/connect')
+def ws_connect():
+    if request.environ.get('wsgi.websocket') is None:
+        return redirect('/viewer')
+
+    ip = request.remote_addr
+    ws = request.environ['wsgi.websocket']
+    ws_viewer_sockets[ip] = ws
+    print 'Register: ', request.remote_addr
+
+    while True:
+        src = ws.receive()
+        if src is None:
+            break
+
+    return redirect('/viewer')
+
+@app.route('/api/ws/send-config')
+def ws_send_config():
+    if request.environ.get('wsgi.websocket') is None:
+        return redirect('/viewer')
+
+    ip = request.remote_addr
+    ws = request.environ['wsgi.websocket']
+
+    while True:
+        src = ws.receive()
+        print src
+        if src is None:
+            break
+        if ip in ws_viewer_sockets:
+            try:
+                ws_viewer_sockets[ip].send(src)
+            except WebSocketError:
+                del ws_viewer_sockets[ip]
+
+    return redirect('/viewer')
+
+@app.route('/api/ws/echo')
+def ws_echo():
+    if request.environ.get('wsgi.websocket') is None:
+        return redirect('/viewer')
+
+    ws = request.environ['wsgi.websocket']
+
+    while True:
+        src = ws.receive()
+        if src is None:
+            break
+        ws.send(src)
+
+    return redirect('/viewer')
 
 def allowed_file(filename, extensions):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in extensions
 
+def run():
+    if len(sys.argv) == 2 and sys.argv[1] == '--wsgi':
+        print 'Debug: Disable\n', \
+            'Testing: Disable\n', \
+            'Websocket: Enable\n\n', \
+            'Run "$ python app.py" if you want to use Debug/Testing mode\n'
+        server = pywsgi.WSGIServer(('', 5000), app, handler_class=WebSocketHandler)
+        server.serve_forever()        
+    else:
+        print 'Debug: Enable\n', \
+            'Testing: Enable\n', \
+            'Websocket: Disable\n\n', \
+            'Run "$ python app.py --wsgi" if you want to use websocket\n'
+        app.run(host='0.0.0.0')
+    
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    run()

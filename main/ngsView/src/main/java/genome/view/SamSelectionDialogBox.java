@@ -178,7 +178,7 @@ public class SamSelectionDialogBox extends JFrame implements ChangeListener, Act
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Select Sam and Bed Files");
         setSize(WIDTH, HEIGHT);
-        setVisible(true);
+//        setVisible(true);
     }
 
     private long validateStart(String chrName, long val) {
