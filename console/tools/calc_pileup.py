@@ -21,7 +21,9 @@
 
 import sys
 import os.path
+import re
 import time
+
 import pysam
 
 import ngsv.cypileup
@@ -33,17 +35,27 @@ from sam.util import trim_chromosome_name
 
 from config import SQLDB_HOST, SQLDB_USER, SQLDB_PASSWD, SAM_DB_NAME
 
+from exception import UnsupportedFileError
+
 def load(filepath, db):
     filename = os.path.basename(filepath)
+    base, ext = os.path.splitext(filepath)
 
-    file_ext = filename.split('.')[-1]
-
-    if file_ext != 'bam':
-        print 'Error: not supported file format'
-        return
+    if not re.match('^\.(sam|bam)', ext):
+        raise UnsupportedFileError('ERROR: Not supported file format')
 
     print 'begin to load', filename
 
+    if ext == '.sam':
+        if os.path.isfile(base + '.bam'):
+            filepath = base + '.bam'
+        else:
+            insam = pysam.Samfile(filepath, 'r')
+            filepath = base + '.bam'
+            outbam = pysam.Samfile(filepath, 'wb', template=insam)
+            for s in insam:
+                outbam.write(s)
+    
     samfile = pysam.Samfile(filepath)
 
     return samfile

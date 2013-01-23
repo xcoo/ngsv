@@ -21,6 +21,7 @@
 
 import sys
 import os.path
+import re
 
 import pysam
 
@@ -36,9 +37,8 @@ from exception import AlreadyLoadedError, UnsupportedFileError
 def load(filepath, db):
     
     filename = os.path.basename(filepath)
-
-    file_ext = filename.split('.')[-1]
-    if file_ext != 'bam':
+    base, ext = os.path.splitext(filepath)
+    if not re.match('^\.(sam|bam)', ext):
         raise UnsupportedFileError('ERROR: Not supported file format')
 
     sam_data = Sam(db)
@@ -49,6 +49,14 @@ def load(filepath, db):
 
     print 'begin to load', filename
 
+    # Convert sam to bam
+    if ext == '.sam':
+        insam = pysam.Samfile(filepath, 'r')
+        filepath = base + '.bam'
+        outbam = pysam.Samfile(filepath, 'wb', template=insam)
+        for s in insam:
+            outbam.write(s)
+    
     # Create index if not exist
     bai = filepath + '.bai'
     if not os.path.isfile(bai):

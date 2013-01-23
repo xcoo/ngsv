@@ -132,7 +132,7 @@ def help():
 @app.route('/api/upload-bam', methods=['POST'])
 def upload_bam():
     f = request.files['file']
-    if f and allowed_file(f.filename, ['bam']):
+    if f and allowed_file(f.filename, ['sam', 'bam']):
         filename = secure_filename(f.filename)
         bam_file = os.path.join(conf.upload_dir, filename)
         f.save(bam_file)
@@ -214,17 +214,23 @@ def allowed_file(filename, extensions):
 
 def run():
     if len(sys.argv) == 2 and sys.argv[1] == '--wsgi':
-        print 'Debug: Disable\n', \
-            'Testing: Disable\n', \
-            'Websocket: Enable\n\n', \
-            'Run "$ python app.py" if you want to use Debug/Testing mode\n'
+        print '''\
+Debug: Disable
+Testing: Disable
+Websocket: Enable
+
+Run "$ python app.py" if you want to use Debug/Testing mode
+'''
         server = pywsgi.WSGIServer(('', 5000), app, handler_class=WebSocketHandler)
         server.serve_forever()        
     else:
-        print 'Debug: Enable\n', \
-            'Testing: Enable\n', \
-            'Websocket: Disable\n\n', \
-            'Run "$ python app.py --wsgi" if you want to use websocket\n'
+        print '''\
+Debug: Enable
+Testing: Enable
+Websocket: Disable
+
+Run "$ python app.py --wsgi" if you want to use websocket
+'''
         app.run(host='0.0.0.0')
     
 if __name__ == '__main__':
