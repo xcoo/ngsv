@@ -31,7 +31,7 @@ from geventwebsocket import WebSocketHandler, WebSocketError
 from celery.result import BaseAsyncResult
 from celery.task.control import inspect
 
-from taskserver.tasks import load_bam, load_bed
+from taskserver.tasks import load_sam, load_bed
 from config import Config
 
 app = Flask(__name__)
@@ -75,24 +75,24 @@ def root():
     for ti in reversed(tasks_info):
         r = ti['result']        
         
-        if r.task_name == 'tasks.load_bam':
+        if r.task_name == 'tasks.load_sam':
             task = {
                 'task_id': r.id,
                 'task_name': r.task_name,
-                'bam_load_progress': 0
+                'sam_load_progress': 0
                 }
 
             if 'file' in ti and ti['file'] != None:
-                task['bam_file'] = ti['file']
+                task['sam_file'] = ti['file']
             
             if r.status == 'PROGRESS':
-                task['bam_load_progress'] =  str(r.result['progress']) + '%'
+                task['sam_load_progress'] =  str(r.result['progress']) + '%'
             if r.status == 'SUCCESS':
-                task['bam_load_progress'] = '100%'
+                task['sam_load_progress'] = '100%'
                 if r.result['state'] == 'SUCCESS_WITH_ALERT':
                     task['alert'] = r.result['alert']
             if r.status == 'FAILURE':
-                task['bam_load_progress'] = '100%'
+                task['sam_load_progress'] = '100%'
                 task['alert'] = 'FAILURE'
 
             tasks.append(task);
@@ -129,15 +129,15 @@ def viewer():
 def help():
     return render_template('help.html')
 
-@app.route('/api/upload-bam', methods=['POST'])
+@app.route('/api/upload-sam', methods=['POST'])
 def upload_bam():
     f = request.files['file']
     if f and allowed_file(f.filename, ['sam', 'bam']):
         filename = secure_filename(f.filename)
-        bam_file = os.path.join(conf.upload_dir, filename)
-        f.save(bam_file)
+        sam_file = os.path.join(conf.upload_dir, filename)
+        f.save(sam_file)
 
-        r = load_bam.delay(bam_file, conf)
+        r = load_sam.delay(sam_file, conf)
         tasks_info.append({'result': r, 'file': filename})
 
     return redirect('/')

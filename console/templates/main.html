@@ -47,7 +47,7 @@
 
       <div class="row">
         <div class="span12" style="margin-bottom: 10px;">
-          <button id="bam-upload-select-btn" class="btn">Upload Bam File</button>
+          <button id="sam-upload-select-btn" class="btn">Upload Sam/Bam File</button>
           <button id="bed-upload-select-btn" class="btn">Upload Bed File</button>          
         </div>
       </div>
@@ -63,18 +63,18 @@
           {% for t in tasks %}
           <div class="row">
             <div class="span12 job">
-              {% if t.task_name == 'tasks.load_bam' %}
+              {% if t.task_name == 'tasks.load_sam' %}
 
-              <h3>Loading Bam</h3>
+              <h3>Loading Sam/Bam</h3>
 
-              {% if t.bam_file %}
+              {% if t.sam_file %}
               <dl>
-                <dt>Bam file</dt><dd>{{ t.bam_file }}</dd>
+                <dt>Sam/Bam file</dt><dd>{{ t.sam_file }}</dd>
               </dl>
               {% endif %}
 
               <div class="progress progress-striped active" style="margin-top: 10px;">
-                <div class="bar" style="width: {{ t.bam_load_progress }};">{{ t.bam_load_progress }}</div>
+                <div class="bar" style="width: {{ t.sam_load_progress }};">{{ t.sam_load_progress }}</div>
               </div>
 
               {% if t.alert %}

@@ -23,7 +23,7 @@ from __future__ import absolute_import
 from celery import current_task
 from celery.decorators import task
 
-import tools.load_bam
+import tools.load_sam
 import tools.calc_pileup
 import tools.load_bed
 
@@ -31,28 +31,28 @@ from tools.sam.data.sql import SQLDB
 
 from tools.exception import UnsupportedFileError, AlreadyLoadedError
 
-# Load a bam file and calculate histograms.
-@task(name='tasks.load_bam')
-def load_bam(bam_file, conf):
+# Load a sam file and calculate histograms.
+@task(name='tasks.load_sam')
+def load_sam(sam_file, conf):
     current_task.update_state(state='STARTED')
     db = SQLDB(conf.db_name, conf.db_host, conf.db_user, conf.db_password)
 
-    bam_already_loaded = False
+    sam_already_loaded = False
     alert = ''
     
     try:
-        tools.load_bam.load(bam_file, db)
+        tools.load_sam.load(sam_file, db)
     except UnsupportedFileError, e:
         return { 'state': 'SUCCESS_WITH_ALERT', 'alert': e.msg };
     except AlreadyLoadedError, e:
-        bam_already_loaded = True
+        sam_already_loaded = True
         alert = e.msg
     
     current_task.update_state(state='PROGRESS', meta={ 'progress': 50 })
 
-    tools.calc_pileup.run(bam_file, db)
+    tools.calc_pileup.run(sam_file, db)
 
-    if bam_already_loaded:
+    if sam_already_loaded:
         return { 'state': 'SUCCESS_WITH_ALERT', 'alert': alert }
     
     return { 'state': 'SUCCESS' }

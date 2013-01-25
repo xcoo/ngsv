@@ -4,7 +4,7 @@ console.uploader = console.uploader || {};
 (function() {
 
     console.uploader.main = function() {
-        $('#bam-upload-select-btn').click(console.uploader.addBamUploader);
+        $('#sam-upload-select-btn').click(console.uploader.addSamUploader);
         $('#bed-upload-select-btn').click(console.uploader.addBedUploader);
 
         $('.progress .bar').each(function() {
@@ -16,28 +16,28 @@ console.uploader = console.uploader || {};
         });
     };
 
-    console.uploader.addBamUploader = function() {
+    console.uploader.addSamUploader = function() {
         var id = 0;
         while (1) {
-            if ($($.format('#bam-upload_%02d', id)).length == 0)
+            if ($($.format('#sam-upload_%02d', id)).length == 0)
                 break;
             id++;
         };
 
-        var upload = $.format('bam-upload_%02d', id);
-        var cover = $.format('bam-upload-cover_%02d', id);
-        var btn = $.format('bam-upload-btn_%02d', id);
-        var cancel = $.format('bam-upload-cancel_%02d', id);
-        var progress = $.format('bam-upload-progress_%02d', id);
+        var upload = $.format('sam-upload_%02d', id);
+        var cover = $.format('sam-upload-cover_%02d', id);
+        var btn = $.format('sam-upload-btn_%02d', id);
+        var cancel = $.format('sam-upload-cancel_%02d', id);
+        var progress = $.format('sam-upload-progress_%02d', id);
 
         var $e = $($.format('\
 <div class="row">\
   <div class="span12 job">\
-    <h3>Uploading Bam File</h3>\
+    <h3>Uploading Sam/Bam File</h3>\
     <input type="file" id="%s" name="file" style="display: none;">\
     <div class="input-prepend">\
       <a class="btn" onclick="$(\'#%s\').click();"><i class="icon-folder-open"></i></a>\
-      <input id="%s" class="input-xlarge" type="text" placeholder="bam file" autocomplete="off" readonly>\
+      <input id="%s" class="input-xlarge" type="text" placeholder="sam/bam file" autocomplete="off" readonly>\
     </div>\
     <div class="btn-toolbar">\
       <button id="%s" class="btn btn-primary">Upload</button>\
@@ -54,7 +54,7 @@ console.uploader = console.uploader || {};
             $('#' + cover).val($(this).val());
         });
 
-        console.uploader.initUploader('/api/upload-bam', $('#' + upload), $('#' + btn), $('#' + progress));
+        console.uploader.initUploader('/api/upload-sam', $('#' + upload), $('#' + btn), $('#' + progress));
 
         $('#' + cancel).click(function() {
             $e.fadeOut(200, function() {
