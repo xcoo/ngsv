@@ -9,79 +9,11 @@ It has a database inside the system and uses OpenGL for rendering.
 * Java (later than 1.6SE)
     * casmi (ver. 0.3.1)
     * logback
-* Python
-    * Flask
-    * MySQL-python
-    * Celery
-    * Cython
+    * Java-WebSocket (by TooTallNate)
 * MySQL
-* RabbitMQ
+* NGSV Console
 
-## Installation
-
-### Setup database (NGSV Console)
-
-Compile.
-
-```
-$ cd [ngsv dir]/console/tools/cypileup
-$ python setup.py install
-```
-
-ngsv uses MySQL database.
-First, create database.
-
-```
-$ cd [ngsv dir]/db
-$ mysql -u root -p < samdb.sql
-```
-
-Setup configuration.
-
-```
-$ cp config/ngsv.ini.example config/ngsv.ini
-```
-
-```
-[db]
-host=mysql_host
-user=mysql_user
-password=mysql_password
-db_name=samdb
-
-[console]
-debug=False
-testing=False
-
-upload_dir=upload_dir
-```
-
-Start MySQL and RabbitMQ.
-
-Start Celery.
-
-```
-$ cd [ngsv dir]/console
-$ celery worker --app=taskserver -l info
-```
-
-Start web server
-
-```
-$ ./app.py
-```
-
-Browse `http://localhost:5000`. And upload bam/bed files.
-
-Then, load data of the human genome.
-
-```
-$ cd [ngsv dir]/console/tools
-$ python load_cytoband.py
-$ python load_refGene.py
-```
-
-### Setup viewer configulation
+## Setup viewer configulation
 
 Download Java-WebSocket library from [here](https://github.com/TooTallNate/Java-WebSocket/tarball/master), and install it into your local repository because it has not been uploaded to any remote repository yet.
 
