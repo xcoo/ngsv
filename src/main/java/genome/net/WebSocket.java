@@ -18,6 +18,8 @@
 
 package genome.net;
 
+import genome.config.Config;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -35,7 +37,8 @@ public class WebSocket extends WebSocketClient {
 
     static Logger logger = LoggerFactory.getLogger(WebSocket.class);
     
-    private static final String WS_HOST = "ws://127.0.0.1:5000/api/ws/connect"; 
+//    private static final String WS_HOST = "ws://127.0.0.1:5000/api/ws/connect"; 
+    private static final String WS_HOST = "ws://" + Config.getInstance().getConsoleHost() + ":5000/api/ws/connect"; 
     
     private DataSelectionListener listener;
     

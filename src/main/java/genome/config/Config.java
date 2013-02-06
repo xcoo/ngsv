@@ -48,9 +48,11 @@ public class Config {
     private static final String DB_USER_KEY     = "db.user";
     private static final String DB_PASSWORD_KEY = "db.password";
   
-    private static final String CYTOBAND_DATA_URL_KEY = "cytoband.data_url";
-    private static final String GENE_DATA_URL_KEY     = "gene.data_url";
-      
+//    private static final String CYTOBAND_DATA_URL_KEY = "cytoband.data_url";
+//    private static final String GENE_DATA_URL_KEY     = "gene.data_url";
+    
+    private static final String CONSOLE_HOST_KEY     = "console.host";
+    
     private static Config instance = new Config();
     
     private Properties properties = new Properties();
@@ -94,11 +96,15 @@ public class Config {
         return properties.getProperty(DB_PASSWORD_KEY);
     }
     
-    public String getCytobandDataURL() {
-        return properties.getProperty(CYTOBAND_DATA_URL_KEY);
-    }
+//    public String getCytobandDataURL() {
+//        return properties.getProperty(CYTOBAND_DATA_URL_KEY);
+//    }
+//    
+//    public String getGeneDataURL() {
+//        return properties.getProperty(GENE_DATA_URL_KEY);
+//    }
     
-    public String getGeneDataURL() {
-        return properties.getProperty(GENE_DATA_URL_KEY);
+    public String getConsoleHost() {
+    	return properties.getProperty(CONSOLE_HOST_KEY);
     }
 }
