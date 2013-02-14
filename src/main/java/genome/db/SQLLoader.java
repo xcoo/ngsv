@@ -22,6 +22,7 @@ import genome.config.Config;
 import genome.data.Bed;
 import genome.data.BedFragment;
 import genome.data.Chromosome;
+import genome.data.Cnv;
 import genome.data.CytoBand;
 import genome.data.HistogramBin;
 import genome.data.RefGene;
@@ -290,4 +291,17 @@ public class SQLLoader {
         return null;
     }
 
+    public Cnv[] loadCnv(Chromosome chr, long start, long end) {
+        Cnv[] cnv = null;
+        try {
+            String where = String.format("chr_id=%d AND chr_end>=%d AND chr_start<=%d",
+                                         chr.getChrId(), start, end);
+            cnv = mysql.all(Cnv.class, new Query().where(where));
+        } catch (SQLException e) {
+            logger.error("Failed to load cnv");
+            logger.error(e.getMessage());
+            e.printStackTrace();
+        } 
+        return cnv;
+    }
 }

@@ -22,6 +22,7 @@ import genome.config.Config;
 import genome.data.Bed;
 import genome.data.BedFragment;
 import genome.data.Chromosome;
+import genome.data.Cnv;
 import genome.data.CytoBand;
 import genome.data.Sam;
 import genome.data.SamHistogram;
@@ -32,6 +33,7 @@ import genome.net.Selection;
 import genome.net.WebSocket;
 import genome.view.SamSelectionDialogBox.SamSelectionDialongBoxListener;
 import genome.view.element.BedFragmentElement;
+import genome.view.element.CnvElement;
 import genome.view.element.CytobandElement;
 import genome.view.element.ExonElement;
 import genome.view.element.GeneElement;
@@ -39,6 +41,7 @@ import genome.view.element.HistogramBinElement;
 import genome.view.element.RulerElement;
 import genome.view.element.ShortReadElement;
 import genome.view.group.BedFragmentGroup;
+import genome.view.group.CnvGroup;
 import genome.view.group.CytobandGroup;
 import genome.view.group.GeneGroup;
 import genome.view.group.HistogramBinGroup;
@@ -46,6 +49,7 @@ import genome.view.group.Indicator;
 import genome.view.group.RulerGroup;
 import genome.view.group.ShortReadGroup;
 import genome.view.thread.BedUpdater;
+import genome.view.thread.CnvUpdater;
 import genome.view.thread.GeneUpdater;
 import genome.view.thread.HistogramUpdater;
 
@@ -95,6 +99,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private static final double BED_FRAGMENT_POS_Y  = 700.0;
     private static final double SHORTREAD_POS_Y     = 400.0;
     private static final double HISTOGRAM_BIN_POS_Y = 500.0;
+    private static final double CNV_POS_Y           = 400.0;
 
     private static final double TEXT_OFFSET_POS_X =  15.0;
     private static final double TEXT_OFFSET_POS_Y = -30.0;
@@ -132,6 +137,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private List<HistogramBinGroup> histogramBinGroupList = new ArrayList<HistogramBinGroup>();
     private CytobandGroup           cytobandGroup;
     private List<BedFragmentGroup>  bedFragmentGroupList  = new ArrayList<BedFragmentGroup>();
+    private CnvGroup                cnvGroup;
 
     private RulerGroup rulerGroup;
     private List<Text> explanationTextList = new ArrayList<Text>();
@@ -159,6 +165,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private Chromosome   selectedChromosome;
 
     private CytoBand[] cytobands;
+    
+    private Cnv[] cnvs;
 
     private SQLLoader sqlLoader;
 
@@ -175,6 +183,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private HistogramUpdater histogramUpdater;
     private BedUpdater       bedUpdater;
     private GeneUpdater      geneUpdater;
+    private CnvUpdater       cnvUpdater;
     
     private WebSocket webSocket;
 
@@ -252,6 +261,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         histogramUpdater = new HistogramUpdater(sqlLoader, annotationText, getMouse());
         bedUpdater       = new BedUpdater(sqlLoader, annotationText, getMouse());
         geneUpdater      = new GeneUpdater(sqlLoader, annotationText, getMouse());
+        cnvUpdater       = new CnvUpdater(sqlLoader, annotationText, getMouse());
         
         rebuildViewData(viewScale.getChr(), viewScale.getStart(), viewScale.getEnd());
 
@@ -373,6 +383,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
         setupCytoband(c.getChromosome());
         setupGene();
+        setupCnv();
     }
 
     private void setupRuler(long start, long end) {
@@ -432,6 +443,11 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         baseObject.add(geneGroup);
         
     }
+    
+    private void setupCnv() {
+        cnvGroup = new CnvGroup(scale);
+        baseObject.add(cnvGroup);
+    }
 
     private class ExplanationTextData {
         
@@ -464,7 +480,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             new ExplanationTextData(TEXT_OFFSET_POS_X, BED_FRAGMENT_POS_Y  + TEXT_OFFSET_POS_Y, "bed"),
 //            new ExplanationTextData(TEXT_OFFSET_POS_X, SHORTREAD_POS_Y     + TEXT_OFFSET_POS_Y, "short read"),
             new ExplanationTextData(TEXT_OFFSET_POS_X, RULER_POS_Y         + TEXT_OFFSET_POS_Y, "known gene"),
-            new ExplanationTextData(TEXT_OFFSET_POS_X, HISTOGRAM_BIN_POS_Y + TEXT_OFFSET_POS_Y, "histogram")                
+            new ExplanationTextData(TEXT_OFFSET_POS_X, HISTOGRAM_BIN_POS_Y + TEXT_OFFSET_POS_Y, "histogram"),
+            new ExplanationTextData(TEXT_OFFSET_POS_X, CNV_POS_Y + TEXT_OFFSET_POS_Y, "cnv") 
         };
         
         for (ExplanationTextData e: explanationTextData) {
@@ -589,6 +606,9 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
                 updateRefGene(newStart, newEnd);
             }
             
+            // Update cnv data
+            updateCnv(newStart, newEnd);
+            
             loadBinSize = newLoadBinSize;
             dispBinSize = newDispBinSize;
             start = newStart;
@@ -658,10 +678,14 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
                 }
             }
         }
-    }
+    }    
     
     private void updateRefGene(long newStart, long newEnd) {
         geneUpdater.start(selectedChromosome, newStart, newEnd, geneGroup, scale);
+    }
+    
+    private void updateCnv(long newStart, long newEnd) {
+        cnvUpdater.start(cnvs, selectedChromosome, newStart, newEnd, cnvGroup, scale);
     }
     
     private void updateElements() {
@@ -709,6 +733,12 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             e.setScale(scale);
             e.setPosition(offset + e.getBaseX(), RULER_POS_Y + e.getBaseY(), 0);
         }
+        
+        for (CnvElement e : cnvGroup.getCnvElementList()) {
+            e.setScale(scale);
+            e.setPosition(offset + e.getBaseX(), e.getBaseY(), 0);
+        }
+        cnvGroup.setY(CNV_POS_Y);
     }
 
     private void updateRuler(double offset) {
