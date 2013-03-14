@@ -1,4 +1,8 @@
-bin
-target
-log
-.settings
+bin/**
+target/**
+.project
+.metadata
+.classpath
+.settings/
+
+log/**
