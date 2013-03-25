@@ -23,6 +23,7 @@ import genome.data.Bed;
 import genome.data.BedFragment;
 import genome.data.Chromosome;
 import genome.data.Cnv;
+import genome.data.CnvFragment;
 import genome.data.CytoBand;
 import genome.data.HistogramBin;
 import genome.data.RefGene;
@@ -42,13 +43,13 @@ import casmi.sql.Query;
 public class SQLLoader {
 
     static Logger logger = LoggerFactory.getLogger(SQLLoader.class);
-    
+
     MySQL mysql = null;
 
     public SQLLoader() throws SQLException {
         // create instance
         Config config = Config.getInstance();
-        mysql = new MySQL(config.getHost(), 
+        mysql = new MySQL(config.getHost(),
                 config.getDatabase(),
                 config.getUser(),
                 config.getPassword());
@@ -69,7 +70,7 @@ public class SQLLoader {
             logger.error("Failed to load sam.");
             logger.error(e.getMessage());
             e.printStackTrace();
-        } 
+        }
 
         return null;
     }
@@ -107,7 +108,7 @@ public class SQLLoader {
             logger.error("Failed to load samHistogram.");
             logger.error(e.getMessage());
             e.printStackTrace();
-        } 
+        }
 
         return null;
     }
@@ -115,7 +116,7 @@ public class SQLLoader {
     public HistogramBin[] loadHistgramBin(long samHistogramId, Chromosome c, long start, long end) {
         HistogramBin[] hb = null;
         try {
-            String whereStatement = 
+            String whereStatement =
                 String.format(" sam_histogram_id=%d AND chr_id=%d AND position>=%d AND position<=%d",
                               samHistogramId, c.getChrId(), start, end);
             hb = mysql.all(HistogramBin.class, new Query().select("chr_id", "position", "value").where(whereStatement));
@@ -123,7 +124,7 @@ public class SQLLoader {
             logger.error("Failed to load histogramBin");
             logger.error(e.getMessage());
             e.printStackTrace();
-        } 
+        }
         return hb;
     }
 
@@ -192,13 +193,13 @@ public class SQLLoader {
             logger.error(e.getMessage());
             e.printStackTrace();
         }
-        return null;  
+        return null;
     }
 
     public GeneLoaderResult loadGene(Chromosome c, long start, long end) {
         RefGene[] refGene = null;
         GeneLoaderResult geneLoaderResult = null;
-        
+
         try {
             Query query = new Query();
             query.select("ref_gene_id", "name", "gene_name", "chr_id", "strand", "tx_start", "tx_end", "exon_count", "exon_starts", "exon_ends");
@@ -212,11 +213,11 @@ public class SQLLoader {
             logger.error(e.getMessage());
             e.printStackTrace();
         }
-        
+
         if (geneLoaderResult == null) {
             return new GeneLoaderResult(null, null);
         }
-        
+
         return geneLoaderResult;
     }
 
@@ -227,9 +228,9 @@ public class SQLLoader {
         } catch (SQLException e) {
             logger.error("Failed to load bed.");
             e.printStackTrace();
-        } 
+        }
 
-        return null; 
+        return null;
     }
 
     public BedFragment[] loadBedFragment(long bedId, Chromosome c) {
@@ -237,20 +238,20 @@ public class SQLLoader {
 
         try {
             String whereStatement = " bed_id = " + bedId + " and chr_id = " + c.getChrId();
-            bf = mysql.all(BedFragment.class, new Query().select("chr_id", "chr_start", "chr_end", "name").where(whereStatement));			
+            bf = mysql.all(BedFragment.class, new Query().select("chr_id", "chr_start", "chr_end", "name").where(whereStatement));
         } catch (SQLException e) {
             logger.error("Failed to load bedFragment.");
             e.printStackTrace();
-        } 
+        }
 
         if (bf == null) return new BedFragment[0];
 
         return bf;
     }
 
-    public BedFragment[] loadBedFragment(long bedId, Chromosome c, long start, long end) {		
+    public BedFragment[] loadBedFragment(long bedId, Chromosome c, long start, long end) {
         BedFragment[] bfs = null;
-        
+
         try {
             String whereStatement = "bed_id=" + bedId + " and chr_id=" + c.getChrId() + " and chr_end >= " + start + " and chr_start <= " + end;
             bfs = mysql.all(BedFragment.class, new Query().select("chr_id", "chr_start", "chr_end", "name").where(whereStatement));
@@ -258,10 +259,10 @@ public class SQLLoader {
             logger.error("Failed to load bedFragment.");
             e.printStackTrace();
         }
-        
+
         return bfs;
     }
-    
+
     public static Map<String, Long> loadCytoBandLength(CytoBand[] cytoBands, Chromosome[] chromosomes) {
         Map<String, Long> result = new HashMap<String, Long>();
 
@@ -291,17 +292,43 @@ public class SQLLoader {
         return null;
     }
 
-    public Cnv[] loadCnv(Chromosome chr, long start, long end) {
-        Cnv[] cnv = null;
+    public Cnv[] loadCnvFiles() {
         try {
-            String where = String.format("chr_id=%d AND chr_end>=%d AND chr_start<=%d",
-                                         chr.getChrId(), start, end);
-            cnv = mysql.all(Cnv.class, new Query().where(where));
+            return mysql.all(Cnv.class, new Query().select("cnv_id", "file_name"));
         } catch (SQLException e) {
-            logger.error("Failed to load cnv");
-            logger.error(e.getMessage());
+            logger.error("Failed to load bed.");
             e.printStackTrace();
-        } 
-        return cnv;
+        }
+
+        return null;
+    }
+
+    public CnvFragment[] loadCnvFragment(long cnvId, Chromosome c) {
+        CnvFragment[] cfs = null;
+
+        try {
+            String where = String.format("cnv_id=%d AND chr_id=%d", cnvId, c.getChrId());
+            cfs = mysql.all(CnvFragment.class, new Query().where(where));
+        } catch (SQLException e) {
+            logger.error("Failed to load bedFragment.");
+            e.printStackTrace();
+        }
+
+        if (cfs == null) return new CnvFragment[0];
+
+        return cfs;
+    }
+
+    public CnvFragment[] loadCnvFragment(long cnvId, Chromosome c, long start, long end) {
+        CnvFragment[] cfs = null;
+        try {
+            String where = String.format("cnv_id=%d AND chr_id=%d AND chr_end>=%d AND chr_start<=%d",
+                cnvId, c.getChrId(), start, end);
+            cfs = mysql.all(CnvFragment.class, new Query().where(where));
+        } catch (SQLException e) {
+            logger.error("Failed to load bedFragment.");
+            e.printStackTrace();
+        }
+        return cfs;
     }
 }

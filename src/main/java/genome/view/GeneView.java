@@ -23,6 +23,7 @@ import genome.data.Bed;
 import genome.data.BedFragment;
 import genome.data.Chromosome;
 import genome.data.Cnv;
+import genome.data.CnvFragment;
 import genome.data.CytoBand;
 import genome.data.Sam;
 import genome.data.SamHistogram;
@@ -41,7 +42,7 @@ import genome.view.element.HistogramBinElement;
 import genome.view.element.RulerElement;
 import genome.view.element.ShortReadElement;
 import genome.view.group.BedFragmentGroup;
-import genome.view.group.CnvGroup;
+import genome.view.group.CnvFragmentGroup;
 import genome.view.group.CytobandGroup;
 import genome.view.group.GeneGroup;
 import genome.view.group.HistogramBinGroup;
@@ -79,9 +80,9 @@ import casmi.parser.JSON;
 
 /**
  * Class for Gene View
- * 
+ *
  * @author K. Nishimura
- * 
+ *
  */
 public class GeneView extends Applet implements SamSelectionDialongBoxListener, DataSelectionListener {
 
@@ -89,9 +90,9 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
     static Logger logger = LoggerFactory.getLogger(GeneView.class);
     static String[] args;
-    
+
     private static final String DEFAULT_CONFIG_PATH = "./config/config.properties";
-    
+
     // position of elements
     // origin is left-bottom corner
     private static final double CYTOBAND_POS_Y      = 100.0;
@@ -99,11 +100,11 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private static final double BED_FRAGMENT_POS_Y  = 700.0;
     private static final double SHORTREAD_POS_Y     = 400.0;
     private static final double HISTOGRAM_BIN_POS_Y = 500.0;
-    private static final double CNV_POS_Y           = 400.0;
+    private static final double CNV_FRAGMENT_POS_Y  = 400.0;
 
     private static final double TEXT_OFFSET_POS_X =  15.0;
     private static final double TEXT_OFFSET_POS_Y = -30.0;
-    
+
     private static final double MIN_SCALE = 0.000004;
     private static final double WHEEL_SCALE_FACTOR = 0.007;
 
@@ -122,9 +123,9 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
     private double scroll      = 0.0;
     private double scrollSpeed = 0.0;
-    
+
     private long leftValue = 0, rightValue = 0;
-    
+
     private long loadBinSize = 0;
     private long dispBinSize = 0;
     private long start = 0, end = 0;
@@ -137,20 +138,20 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private List<HistogramBinGroup> histogramBinGroupList = new ArrayList<HistogramBinGroup>();
     private CytobandGroup           cytobandGroup;
     private List<BedFragmentGroup>  bedFragmentGroupList  = new ArrayList<BedFragmentGroup>();
-    private CnvGroup                cnvGroup;
+    private List<CnvFragmentGroup>  cnvFragmentGroupList  = new ArrayList<CnvFragmentGroup>();
 
     private RulerGroup rulerGroup;
     private List<Text> explanationTextList = new ArrayList<Text>();
 
     private Text annotationText;
-    
+
     private Indicator indicator;
- 
+
     private static final Font EXPLANATION_F;
     static {
         EXPLANATION_F = new Font("Sans-Serif", FontStyle.PLAIN, 14.0);
     }
-    
+
     // ref genes
     private ViewScale viewScale;
 
@@ -159,14 +160,15 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private List<Sam> selectedSamList = new ArrayList<Sam>();
 
     private Bed[]     bedFiles;
-    private List<Bed> selectedBedList = new ArrayList<Bed>();  
+    private List<Bed> selectedBedList = new ArrayList<Bed>();
 
     private Chromosome[] chromosomes;
     private Chromosome   selectedChromosome;
 
     private CytoBand[] cytobands;
-    
-    private Cnv[] cnvs;
+
+    private Cnv[] cnvFiles;
+    private List<Cnv>selectedCnvList = new ArrayList<Cnv>();
 
     private SQLLoader sqlLoader;
 
@@ -174,33 +176,33 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private SamSelectionDialogBox dbox;
 
     private boolean isFinishedInitialSelection;
-    
+
     // trackball
     private Trackball trackball;
     private int prvMouseX = 0, prvMouseY = 0;
-    
+
 //    private ShortReadUpdater shortReadUpdater;
     private HistogramUpdater histogramUpdater;
     private BedUpdater       bedUpdater;
     private GeneUpdater      geneUpdater;
     private CnvUpdater       cnvUpdater;
-    
+
     private WebSocket webSocket;
 
     @Override
     public void setup() {
-        
+
         // initialize global settings
         setFPS(FPS);
         setSize(1024, 768);
         setBackGroundColor(ColorSet.BLACK);
-        
+
         // Load configuration
         if (args.length > 0)
             Config.getInstance().load(args[0]);
         else
             Config.getInstance().load(DEFAULT_CONFIG_PATH);
-        
+
         // load data
         // -----------------------------------------
 
@@ -219,50 +221,54 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         // load bed files
         bedFiles = sqlLoader.loadBedFiles();
 
+        // load cnv files
+        cnvFiles = sqlLoader.loadCnvFiles();
+
         // load chromosome
         chromosomes = sqlLoader.loadChromosome();
 
         logger.info("Read " + samFiles.length + " sam files.");
         logger.info("Read " + bedFiles.length + " bed files.");
+        logger.info("Read " + cnvFiles.length + " cnv files.");
 
         // load cytoband
         cytobands = sqlLoader.loadCytoBand();
         Map<String, Long> chrLengthMap = calcCytoBandLength(cytobands, chromosomes);
-        
+
         // WebSocket
         try {
             webSocket = new WebSocket(this);
         } catch (URISyntaxException e) {
             e.printStackTrace();
             System.exit(-1);
-        }        
+        }
         webSocket.connect();
-        
+
         // set dialog box for sam
         dbox = new SamSelectionDialogBox(samFiles, bedFiles, chrLengthMap, sqlLoader, this);
     }
-    
-    public void initViews(String chrName, long start, long end) {        
+
+    public void initViews(String chrName, long start, long end) {
         // initialize view scale (region)
         viewScale = new ViewScale(chrName, start, end);
 
         // load data for view related to viewScale.getChr()
         reloadViewData(viewScale.getChr(), viewScale.getStart(), viewScale.getEnd());
-        
+
         trackball = new Trackball(getWidth(), getHeight());
-        
+
         Font f = new Font("Sans-Serif", FontStyle.PLAIN, 12.0);
         annotationText = new Text("", f);
         annotationText.setStrokeColor(new GrayColor(0.75));
 
         indicator = new Indicator(getWidth() - 40, getHeight() - 40);
-        
+
 //        shortReadUpdater = new ShortReadUpdater(sqlLoader, annotationText, getMouse());
         histogramUpdater = new HistogramUpdater(sqlLoader, annotationText, getMouse());
         bedUpdater       = new BedUpdater(sqlLoader, annotationText, getMouse());
         geneUpdater      = new GeneUpdater(sqlLoader, annotationText, getMouse());
         cnvUpdater       = new CnvUpdater(sqlLoader, annotationText, getMouse());
-        
+
         rebuildViewData(viewScale.getChr(), viewScale.getStart(), viewScale.getEnd());
 
         addObject(baseObject);
@@ -278,7 +284,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             String chrName = findChromosome(b.getChrId(), chromosomes).getChromosome();
             b.setChrName(chrName);
             Long curr = map.get(b.getChrId());
-            
+
             if (curr != null) {
                 if (curr < b.getEnd()) {
                     map.put(chrName, b.getEnd());
@@ -287,10 +293,10 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
                 map.put(chrName, b.getEnd());
             }
         }
-                    
+
         return map;
     }
-    
+
     private Chromosome findChromosome(long chrId, Chromosome[] chromosomes) {
         for (Chromosome c : chromosomes) {
             if (chrId == c.getChrId()) {
@@ -299,7 +305,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         }
         return null;
     }
-    
+
     private Chromosome findChromosome(String chr, Chromosome[] chromosomes) {
         for(Chromosome c : chromosomes) {
             if (c.getChromosome().equalsIgnoreCase(chr) ||
@@ -313,6 +319,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private void reloadViewData(String chr, long start, long end) {
         selectedSamList.clear();
         selectedBedList.clear();
+        selectedCnvList.clear();
 
         selectedChromosome = findChromosome(chr, chromosomes);
         if (selectedChromosome == null) {
@@ -325,9 +332,9 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
                 // Load histograms
                 SamHistogram[] shs = sqlLoader.loadSamHistogram(sam.getSamId());
                 sam.setSamHistograms(shs);
-                
+
                 logger.info("Loaded " + shs.length + " SamHistograms.");
-                
+
                 selectedSamList.add(sam);
             }
         }
@@ -339,39 +346,48 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
                 selectedBedList.add(bed);
             }
         }
+
+        for (Cnv cnv : cnvFiles) {
+            if (cnv.isSelected()) {
+                CnvFragment[] cnvFragments = sqlLoader.loadCnvFragment(cnv.getCnvId(), selectedChromosome);
+                cnv.setCnvFragments(cnvFragments);
+                selectedCnvList.add(cnv);
+            }
+        }
     }
 
     private void rebuildViewData(String chr, long start, long end) {
-        
+
         baseObject.clear();
-        
+
         shortReadGroupList.clear();
         histogramBinGroupList.clear();
         bedFragmentGroupList.clear();
+        cnvFragmentGroupList.clear();
 
         Chromosome c = findChromosome(chr, chromosomes);
         if (c == null) {
             return;
         }
-        
+
         scroll = - (start + end) / 2.0;
         scale = INITIAL_SCALE;
 
         setupRuler(start, end);
 
         for (Sam sam : selectedSamList) {
-            setupShortRead(sam); 
+            setupShortRead(sam);
         }
-        
+
         int i = 0;
         for (ShortReadGroup g : shortReadGroupList) {
             g.setY(g.getY() + 30.0 * i++);
         }
 
         for (Sam sam : selectedSamList) {
-            setupHistogramBin(sam); 
+            setupHistogramBin(sam);
         }
-        
+
         i = 0;
         for (HistogramBinGroup g : histogramBinGroupList) {
             g.setY(g.getY() + (HistogramBinElement.MAX_HEIGHT + 10.0) * i++);
@@ -383,7 +399,10 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
         setupCytoband(c.getChromosome());
         setupGene();
-        setupCnv();
+
+        for (Cnv cnv : selectedCnvList) {
+            setupCnvFragment(cnv);
+        }
     }
 
     private void setupRuler(long start, long end) {
@@ -396,71 +415,73 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
         ShortReadGroup g = new ShortReadGroup(sam, scale);
         g.setY(SHORTREAD_POS_Y);
-        
+
         for (ShortReadElement e : g.getShortReadElementList()) {
             e.addMouseEventCallback(new AnnotationMouseOverCallback(e.getName(), annotationText, getMouse()));
         }
-        
+
         shortReadGroupList.add(g);
-        baseObject.add(g);   
+        baseObject.add(g);
     }
 
     private void setupHistogramBin(Sam sam) {
 
         HistogramBinGroup g = new HistogramBinGroup(sam, scale);
         g.setY(HISTOGRAM_BIN_POS_Y);
-        
+
         histogramBinGroupList.add(g);
         baseObject.add(g);
-        
+
     }
 
     private void setupBedFragment(Bed bed) {
-        
+
         BedFragmentGroup g = new BedFragmentGroup(bed, scale);
         g.setY(BED_FRAGMENT_POS_Y);
-        
+
         bedFragmentGroupList.add(g);
         baseObject.add(g);
-        
+
     }
 
     private void setupCytoband(String chr) {
-        
+
         cytobandGroup = new CytobandGroup(cytobands, chr, CHROMOSOME_HEIGHT, scale);
-    
+
         for (CytobandElement e : cytobandGroup.getCytobandElementList()) {
-            e.addMouseEventCallback(new AnnotationMouseOverCallback(e.getName(), annotationText, getMouse()));            
+            e.addMouseEventCallback(new AnnotationMouseOverCallback(e.getName(), annotationText, getMouse()));
         }
-        
-        baseObject.add(cytobandGroup);        
+
+        baseObject.add(cytobandGroup);
     }
-    
+
     private void setupGene() {
-        
+
         geneGroup = new GeneGroup(scale);
-        
+
         baseObject.add(geneGroup);
-        
+
     }
-    
-    private void setupCnv() {
-        cnvGroup = new CnvGroup(scale);
-        baseObject.add(cnvGroup);
+
+    private void setupCnvFragment(Cnv cnv) {
+        CnvFragmentGroup g = new CnvFragmentGroup(cnv, scale);
+        g.setY(CNV_FRAGMENT_POS_Y);
+        cnvFragmentGroupList.add(g);
+        baseObject.add(g);
     }
 
     private class ExplanationTextData {
-        
+
         private double x;
         private double y;
         private String name;
-        
+
         public ExplanationTextData(double x, double y, String s) {
             this.x = x;
             this.y = y;
             this.name = s;
         }
-        
+
         public double getX() {
             return x;
         }
@@ -473,7 +494,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             return name;
         }
     }
-    
+
     private void setupExplanationText() {
         ExplanationTextData[] explanationTextData = {
             new ExplanationTextData(TEXT_OFFSET_POS_X, CYTOBAND_POS_Y      + TEXT_OFFSET_POS_Y, "chromosome"),
@@ -481,9 +502,9 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 //            new ExplanationTextData(TEXT_OFFSET_POS_X, SHORTREAD_POS_Y     + TEXT_OFFSET_POS_Y, "short read"),
             new ExplanationTextData(TEXT_OFFSET_POS_X, RULER_POS_Y         + TEXT_OFFSET_POS_Y, "known gene"),
             new ExplanationTextData(TEXT_OFFSET_POS_X, HISTOGRAM_BIN_POS_Y + TEXT_OFFSET_POS_Y, "histogram"),
-            new ExplanationTextData(TEXT_OFFSET_POS_X, CNV_POS_Y + TEXT_OFFSET_POS_Y, "cnv") 
+            new ExplanationTextData(TEXT_OFFSET_POS_X, CNV_FRAGMENT_POS_Y  + TEXT_OFFSET_POS_Y, "cnv")
         };
-        
+
         for (ExplanationTextData e: explanationTextData) {
             Text t = new Text(e.getName(), EXPLANATION_F, e.getX(), e.getY());
             t.setStrokeColor(ColorSet.LIGHT_GRAY);
@@ -496,20 +517,20 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     public void update() {
         if (!isFinishedInitialSelection)
             return;
-        
+
         // Update horizontal scroll.
         updateScroll();
-        
+
         leftValue  = (long)(-scroll - 550.0 / scale);
         rightValue = (long)(-scroll + 550.0 / scale);
-        
+
         // Update data.
         updateData();
-        
+
         // Update graphics objects.
         updateElements();
     }
-    
+
     private void updateScroll() {
         scroll += scrollSpeed / FPS / Math.pow(scale, SCROLL_POWER_FACTOR);
         scrollSpeed *= SCROLL_SPEED_DAMPING_FACTOR;
@@ -517,12 +538,12 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             scrollSpeed = 0.0;
         }
     }
-    
+
     private void updateData() {
         // Select appropriate binSize.
         long newDispBinSize = 100;
-        long newLoadBinSize = 100; 
-        
+        long newLoadBinSize = 100;
+
         double base = 0.2;
         if (scale < base * 0.0001) {
             newDispBinSize = 10000000;
@@ -576,7 +597,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             newDispBinSize = 200;
             newLoadBinSize = 100;
         }
-        
+
         boolean showRefGene = true;
         if (scale < 0.0015) {
             showRefGene = false;
@@ -586,11 +607,11 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             geneGroup.setVisible(true);
             explanationTextList.get(2).setStrokeColor(ColorSet.LIGHT_GRAY);
         }
-        
+
         // Calculate appropriate range.
         long newStart = leftValue  - (long)(700.0 / scale);
         long newEnd   = rightValue + (long)(700.0 / scale);
-        
+
         if (leftValue < start + (long)(500.0 / scale) || end - (long)(500.0 / scale) < rightValue) {
             // Update shortRead data.
 //            updateShortRead(newStart, newEnd);
@@ -600,36 +621,36 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
             // Update bed data
             updateBed(newStart, newEnd);
-            
+
             // Update refGene.
             if (showRefGene) {
                 updateRefGene(newStart, newEnd);
             }
-            
+
             // Update cnv data
             updateCnv(newStart, newEnd);
-            
+
             loadBinSize = newLoadBinSize;
             dispBinSize = newDispBinSize;
             start = newStart;
             end   = newEnd;
         } else if (newLoadBinSize != loadBinSize) {
             updateHistogram(newDispBinSize, newLoadBinSize, newStart, newEnd, true);
-            
+
             loadBinSize = newLoadBinSize;
             dispBinSize = newDispBinSize;
             start = newStart;
             end   = newEnd;
         } else if (newDispBinSize != dispBinSize) {
             updateHistogram(newDispBinSize, newLoadBinSize, newStart, newEnd, false);
-            
+
             loadBinSize = newLoadBinSize;
             dispBinSize = newDispBinSize;
             start = newStart;
             end   = newEnd;
         }
     }
-    
+
 //    private void updateShortRead(long newStart, long newEnd) {
 //        for (Sam sam : selectedSamList) {
 //            for (ShortReadGroup srg : shortReadGroupList) {
@@ -640,12 +661,12 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 //            }
 //        }
 //    }
-    
+
     private void updateHistogram(long newBinSize, long newLoadBinSize, long newStart, long newEnd, boolean loadDB) {
 
         for (Sam sam : selectedSamList) {
-            SamHistogram  sh = getLoadingSamHistogram(sam.getSamHistograms(), newLoadBinSize);            
-            
+            SamHistogram  sh = getLoadingSamHistogram(sam.getSamHistograms(), newLoadBinSize);
+
             if (sh != null) {
                 for (HistogramBinGroup hbg : histogramBinGroupList) {
                     if (hbg.getSam().getSamId() == sam.getSamId()) {
@@ -658,17 +679,17 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             }
         }
     }
-    
+
     private SamHistogram getLoadingSamHistogram(SamHistogram[] samHistograms, long newLoadBinSize) {
         for (SamHistogram sh : samHistograms) {
             if (sh.getBinSize() == newLoadBinSize) {
                 return sh;
             }
         }
-        
+
         return null;
     }
-    
+
     private void updateBed(long newStart, long newEnd) {
         for (Bed bed : selectedBedList) {
             for (BedFragmentGroup bfg : bedFragmentGroupList) {
@@ -678,21 +699,29 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
                 }
             }
         }
-    }    
-    
+    }
+
     private void updateRefGene(long newStart, long newEnd) {
         geneUpdater.start(selectedChromosome, newStart, newEnd, geneGroup, scale);
     }
-    
+
     private void updateCnv(long newStart, long newEnd) {
-        cnvUpdater.start(cnvs, selectedChromosome, newStart, newEnd, cnvGroup, scale);
+        for (Cnv cnv : selectedCnvList) {
+            System.out.println(cnv);
+            for (CnvFragmentGroup g : cnvFragmentGroupList) {
+                if (cnv.getCnvId() == g.getCnv().getCnvId()) {
+                    cnvUpdater.start(cnv, selectedChromosome, newStart, newEnd, g, scale);
+                    break;
+                }
+            }
+        }
     }
-    
+
     private void updateElements() {
 
         // Horizontal offset of scroll
         double offset = scroll * scale + getWidth() / 2.0;
-        
+
         // Update ruler
         updateRuler(offset);
 
@@ -733,12 +762,13 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             e.setScale(scale);
             e.setPosition(offset + e.getBaseX(), RULER_POS_Y + e.getBaseY(), 0);
         }
-        
-        for (CnvElement e : cnvGroup.getCnvElementList()) {
-            e.setScale(scale);
-            e.setPosition(offset + e.getBaseX(), e.getBaseY(), 0);
+
+        for (CnvFragmentGroup g : cnvFragmentGroupList) {
+            for (CnvElement e : g.getCnvElementList()) {
+                e.setScale(scale);
+                e.setPosition(offset + e.getBaseX(), e.getBaseY(), 0);
+            }
         }
-        cnvGroup.setY(CNV_POS_Y);
     }
 
     private void updateRuler(double offset) {
@@ -747,7 +777,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         if (end < 0) end = 0;
         rulerGroup.setStart(start);
         rulerGroup.setEnd(end);
-        
+
         Line mainLine = rulerGroup.getMainLine();
         mainLine.setScale(scale);
         mainLine.setPosition(offset + (viewScale.getStart() + viewScale.getEnd()) / 2.0 * scale, RULER_POS_Y, 0);
@@ -785,26 +815,26 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
             idx++;
         }
-        
+
         for (int i = idx; i < rulerGroup.getRulerElementList().size(); i++) {
             RulerElement e = rulerGroup.getRulerElementList().get(i);
             e.getLine().setVisible(false);
             e.getText().setVisible(false);
         }
     }
-    
+
     @Override
     public void keyEvent(KeyEvent e) {
         if (e == KeyEvent.PRESSED) {
             int keycode = getKeyCode();
             char key = getKey();
-            
+
             // ESC to quit the application.
             if (keycode == 27) {
                 sqlLoader.close();
                 System.exit(0);
             }
-            
+
             if (key == 'c'){
                 dbox.setVisible(true);
             } else if (key == 'r') {
@@ -813,7 +843,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             }
         }
     }
-    
+
     @Override
     public void mouseEvent(MouseEvent e, MouseButton b) {
         switch (e) {
@@ -821,7 +851,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             prvMouseX = getMouseX();
             prvMouseY = getMouseY();
             break;
-            
+
         case DRAGGED:
             switch (b) {
             case LEFT:
@@ -840,10 +870,10 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
                     double diffX = getMouseX() - getPreMouseX();
                     scrollSpeed += diffX * MOUSE_SCROLL_SPEED_FACTOR;
                 }
-                
+
                 break;
             }
-            
+
             case RIGHT:
             {
                 int mouseX = getMouseX();
@@ -857,13 +887,13 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
                 prvMouseY = mouseY;
                 break;
             }
-                
+
             default:
                 break;
             }
-            
+
             break;
-            
+
         case WHEEL_ROTATED:
         {
             double diff = getMouseWheelRotation();
@@ -872,17 +902,18 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             if (scale < MIN_SCALE) scale = MIN_SCALE;
             break;
         }
-            
+
         default:
             break;
         }
     }
 
+    @Override
     public void finishedSamSelection() {
         logger.debug("Finished selecting sam data.");
-        
+
         dbox.setVisible(false);
-        
+
         if (!isFinishedInitialSelection) {
             initViews(dbox.getChrName(), dbox.getStart(), dbox.getEnd());
             webSocket.connect();
@@ -899,18 +930,23 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             }
         }
     }
-    
-    public void finishedDataSelection(String jsonText) {                
-        Selection s = new JSON().decode(jsonText, Selection.class);                
-                
+
+    @Override
+    public void finishedDataSelection(String jsonText) {
+        Selection s = new JSON().decode(jsonText, Selection.class);
+
         for (Sam sam : samFiles) {
-            sam.setSelected(s.hasBam(sam.getSamId()));                
+            sam.setSelected(s.hasBam(sam.getSamId()));
         }
-        
+
         for (Bed bed : bedFiles) {
-            bed.setSelected(s.hasBed(bed.getBedId()));                
+            bed.setSelected(s.hasBed(bed.getBedId()));
         }
-        
+
+        for (Cnv cnv : cnvFiles) {
+            cnv.setSelected(s.hasCnv(cnv.getCnvId()));
+        }
+
         if (!isFinishedInitialSelection) {
             initViews(s.chromosome.name, s.chromosome.start, s.chromosome.end);
             isFinishedInitialSelection = true;
@@ -923,19 +959,19 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
             synchronized (this.getListener()) {
                 rebuildViewData(s.chromosome.name, s.chromosome.start, s.chromosome.end);
-            }            
+            }
         }
     }
-    
+
     @Override
     public void exit() {
         webSocket.close();
     }
-    
-    public static void main(String[] args) {        
+
+    public static void main(String[] args) {
         logger.info("Start NGSV");
-        
+
         GeneView.args = args;
-        AppletRunner.run("genome.view.GeneView", "NGSV: Next-Generation DNA Sequencing Viewer");        
+        AppletRunner.run("genome.view.GeneView", "NGSV: Next-Generation DNA Sequencing Viewer");
     }
 }

@@ -20,12 +20,13 @@ package genome.data;
 
 import casmi.sql.Entity;
 import casmi.sql.annotation.Fieldname;
+import casmi.sql.annotation.Ignore;
 import casmi.sql.annotation.PrimaryKey;
 import casmi.sql.annotation.Tablename;
 
 /**
  * CNV O/R mapping class.
- * 
+ *
  * @author T. Takeuchi
  */
 @Tablename("cnv")
@@ -34,120 +35,57 @@ public class Cnv extends Entity {
     @PrimaryKey
     @Fieldname("cnv_id")
     private long cnvId;
-    
+
     @Fieldname("file_name")
     private String filename;
-    
-    @Fieldname("chr_id")
-    private long chrId;
-    
-    @Fieldname("chr_start")
-    private long chrStart;
-    
-    @Fieldname("chr_end")
-    private long chrEnd;
-    
-    private String lengths;
-    
-    private String state;
-    
-    @Fieldname("copy_number")
-    private long copyNumber;
-    
-    @Fieldname("num_snp")
-    private long numSnp;
-    
-    @Fieldname("snp_start")
-    private String snpStart;
-    
-    @Fieldname("snp_end")
-    private String snpEnd;
-    
+
+    @Fieldname("created_date")
+    private long createdDate;
+
+    @Ignore
+    private boolean selected;
+
+    @Ignore
+    private CnvFragment[] cnvFragments;
+
     public long getCnvId() {
         return cnvId;
     }
-    
+
     public void setCnvId(long cnvId) {
         this.cnvId = cnvId;
     }
-    
+
     public String getFilename() {
         return filename;
     }
-    
+
     public void setFilename(String filename) {
         this.filename = filename;
     }
-    
-    public long getChrId() {
-        return chrId;
-    }
-    
-    public void setChrId(long chrId) {
-        this.chrId = chrId;
-    }
-    
-    public long getChrStart() {
-        return chrStart;
+
+    public long getCreatedDate() {
+        return createdDate;
     }
 
-    public void setChrStart(long chrStart) {
-        this.chrStart = chrStart;
+    public void setCreatedDate(long createdDate) {
+        this.createdDate = createdDate;
     }
-    
-    public long getChrEnd() {
-        return chrEnd;
+
+    public boolean isSelected() {
+        return selected;
     }
-    
-    public void setChrEnd(long chrEnd) {
-        this.chrEnd = chrEnd;
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
-    
-    public String getLengths() {
-        return lengths;
+
+    public CnvFragment[] getCnvFragments() {
+        return cnvFragments;
     }
-    
-    public void setLengths(String lengths) {
-        this.lengths = lengths;
+
+    public void setCnvFragments(CnvFragment[] cnvFragments) {
+        this.cnvFragments = cnvFragments;
     }
-    
-    public String getState() {
-        return state;
-    }
-    
-    public void setState(String state) {
-        this.state = state;
-    }
-    
-    public long getCopyNumber() {
-        return copyNumber;
-    }
-    
-    public void setCopyNumber(long copyNumber) {
-        this.copyNumber = copyNumber;
-    }
-    
-    public long getNumSnp() {
-        return numSnp;
-    }
-    
-    public void setNumSnp(long numSnp) {
-        this.numSnp = numSnp;
-    }
-    
-    public String getSnpStart() {
-        return snpStart;
-    }
-    
-    public void setSnpStart(String snpStart) {
-        this.snpStart = snpStart;
-    }
-    
-    public String getSnpEnd() {
-        return snpEnd;
-    }
-    
-    public void setSnpEnd(String snpEnd) {
-        this.snpEnd = snpEnd;
-    }        
+
 }

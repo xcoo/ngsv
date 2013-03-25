@@ -20,10 +20,11 @@ package genome.view.thread;
 
 import genome.data.Chromosome;
 import genome.data.Cnv;
+import genome.data.CnvFragment;
 import genome.db.SQLLoader;
 import genome.view.AnnotationMouseOverCallback;
 import genome.view.element.CnvElement;
-import genome.view.group.CnvGroup;
+import genome.view.group.CnvFragmentGroup;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,65 +34,64 @@ import casmi.graphics.element.Text;
 
 /**
  * Cnv update manager.
- * 
+ *
  * @author T. Takeuchi
  */
 public class CnvUpdater {
 
     static Logger logger = LoggerFactory.getLogger(CnvUpdater.class);
-    
+
     private final SQLLoader sqlLoader;
     private final Text annotationText;
     private final Mouse mouse;
-    
-    private Cnv[] cnvs;
+
+    private Cnv cnv;
     private Chromosome chromosome;
     private long start, end;
-    private CnvGroup cnvGroup;
+    private CnvFragmentGroup cnvFragmentGroup;
     private double scale;
-    
+
     private CnvUpdateThread currentThread;
-    
+
     private class CnvUpdateThread extends Thread {
-        
+
         boolean stopFlag = false;
-        
+
         @Override
         public void run() {
             logger.debug("Loading Cnv from DB...");
-            cnvs = sqlLoader.loadCnv(chromosome, start, end);
+            CnvFragment[] cfs = sqlLoader.loadCnvFragment(cnv.getCnvId(), chromosome, start, end);
             if (stopFlag) return;
-            cnvGroup.setup(cnvs);
-            for (CnvElement e : cnvGroup.getCnvElementList()) {
+            cnvFragmentGroup.setup(cfs);
+            for (CnvElement e : cnvFragmentGroup.getCnvElementList()) {
                 e.setScale(scale);
-                e.addMouseEventCallback(
-                    new AnnotationMouseOverCallback(e.getName(), annotationText, mouse));
+                e.addMouseEventCallback(new AnnotationMouseOverCallback(e.getName(),
+                    annotationText, mouse));
                 if (stopFlag) return;
             }
             logger.debug("Finished updating Cnv");
         }
     }
-    
-    public CnvUpdater(SQLLoader sqlLoader, Text annotationText, Mouse mouse) { 
+
+    public CnvUpdater(SQLLoader sqlLoader, Text annotationText, Mouse mouse) {
         this.sqlLoader = sqlLoader;
         this.annotationText = annotationText;
         this.mouse = mouse;
     }
-    
-    public void start(Cnv[] cnvs, Chromosome chromosome, long start, long end, CnvGroup cnvGroup, double scale) {
-        this.cnvs = cnvs;
+
+    public void start(Cnv cnv, Chromosome chromosome, long start, long end, CnvFragmentGroup cnvFragmentGroup, double scale) {
+        this.cnv = cnv;
         this.chromosome = chromosome;
         this.start = start;
         this.end = end;
-        this.cnvGroup = cnvGroup;
+        this.cnvFragmentGroup = cnvFragmentGroup;
         this.scale = scale;
-        
-        if (currentThread != null && currentThread.isAlive())
-            stop();
+
+        if (currentThread != null && currentThread.isAlive()) stop();
         currentThread = new CnvUpdateThread();
         currentThread.start();
     }
-    
+
     public void stop() {
         if (currentThread != null) {
             currentThread.stopFlag = true;

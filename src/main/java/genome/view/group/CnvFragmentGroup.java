@@ -19,6 +19,7 @@
 package genome.view.group;
 
 import genome.data.Cnv;
+import genome.data.CnvFragment;
 import genome.view.element.CnvElement;
 
 import java.util.ArrayList;
@@ -29,40 +30,46 @@ import casmi.util.GraphicsUtil;
 
 /**
  * CnvGroup.
- * 
+ *
  * @author T. Takeuchi
  */
-public class CnvGroup extends Group {    
-    
+public class CnvFragmentGroup extends Group {
+
+    private final Cnv cnv;
     private double scale;
-    
+
     private List<CnvElement> cnvElementList = new ArrayList<CnvElement>();
-    
-    public CnvGroup(double scale) {
-        super();        
-        this.scale = scale;        
+
+    public CnvFragmentGroup(Cnv cnv, double scale) {
+        super();
+        this.cnv = cnv;
+        this.scale = scale;
     }
-    
-    public void setup(Cnv[] cnvs) {
-        List<CnvElement> list = new ArrayList<CnvElement>();        
-        for (Cnv cnv : cnvs) {
-            CnvElement e = new CnvElement(cnv.getCopyNumber(),
-                cnv.getChrStart(), cnv.getChrEnd(), scale);
+
+    public void setup(CnvFragment[] cnvFragments) {
+        List<CnvElement> list = new ArrayList<CnvElement>();
+        for (CnvFragment cf : cnvFragments) {
+            CnvElement e =
+                new CnvElement(cf.getCopyNumber(), cf.getChrStart(), cf.getChrEnd(), scale);
             list.add(e);
         }
         addAll(list);
         GraphicsUtil.removeAll(cnvElementList);
         cnvElementList = list;
     }
-    
+
     @Override
-    public void update() {}    
-    
+    public void update() {}
+
+    public Cnv getCnv() {
+        return cnv;
+    }
+
     public double getScale() {
         return scale;
     }
-    
+
     public List<CnvElement> getCnvElementList() {
         return cnvElementList;
-    }    
+    }
 }
