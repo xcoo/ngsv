@@ -19,9 +19,7 @@
 package genome.net;
 
 /**
- * 
  * @author T. Takeuchi
- *
  */
 public interface DataSelectionListener {
 

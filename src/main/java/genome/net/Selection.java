@@ -1,28 +1,48 @@
+/*
+ *   ngsv
+ *   https://github.com/xcoo/ngsv
+ *   Copyright (C) 2012, Xcoo, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package genome.net;
 
-
+/**
+ * @author T. Takeuchi
+ */
 public class Selection {
-    
-    public class JsonBam {    
+
+    public class JsonBam {
         public String name;
         public long id;
     }
-    
+
     public class JsonBed {
         public String name;
         public long id;
     }
-    
+
     public class JsonChromosome {
         public String name;
         public long start;
         public long end;
     }
-    
+
     public JsonBam[] bam;
     public JsonBed[] bed;
     public JsonChromosome chromosome;
-    
+
     public boolean hasBam(long id) {
         for (JsonBam b : bam) {
             if (b.id == id)
@@ -30,7 +50,7 @@ public class Selection {
         }
         return false;
     }
-    
+
     public boolean hasBed(long id) {
         for (JsonBed b : bed) {
             if (b.id == id)
@@ -38,9 +58,9 @@ public class Selection {
         }
         return false;
     }
-    
+
     @Override
-    public String toString() {        
+    public String toString() {
         return String.format("chr: %s, %s, %s", chromosome.name, chromosome.start, chromosome.end);
     }
 }
