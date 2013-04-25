@@ -26,29 +26,29 @@ import genome.view.element.GeneElement;
 import java.util.ArrayList;
 import java.util.List;
 
-import casmi.graphics.group.Group;
+import casmi.Mouse;
 import casmi.util.GraphicsUtil;
 
 /**
  * @author T. Takeuchi
  */
-public class GeneGroup extends Group {
+public class GeneGroup extends ChartGroup {
 
     private double scale;
-    
+
     private List<GeneElement> geneElementList = new ArrayList<GeneElement>();
     private List<ExonElement> exonElementList = new ArrayList<ExonElement>();
-    
-    public GeneGroup(double scale) {
-        super();
-        
+
+    public GeneGroup(double scale, Mouse mouse) {
+        super("known gene", mouse, false);
+
         this.scale = scale;
     }
-    
+
     public void setup(List<Gene> geneList, List<Exon> exonList) {
         List<GeneElement> geList = new ArrayList<GeneElement>();
-        List<ExonElement> eeList = new ArrayList<ExonElement>();              
-        
+        List<ExonElement> eeList = new ArrayList<ExonElement>();
+
         for (Gene gene : geneList) {
             final GeneElement e = new GeneElement(gene, scale);
             geList.add(e);
@@ -58,15 +58,15 @@ public class GeneGroup extends Group {
             ExonElement e = new ExonElement(exon, scale);
             eeList.add(e);
         }
-        
-        addAll(geList);        
+
+        addAll(geList);
         GraphicsUtil.removeAll(geneElementList);
         geneElementList = geList;
-        
+
         addAll(eeList);
         GraphicsUtil.removeAll(exonElementList);
         exonElementList = eeList;
-        
+
     }
 
     @Override
@@ -75,7 +75,7 @@ public class GeneGroup extends Group {
     public List<GeneElement> getGeneElementList() {
         return geneElementList;
     }
-    
+
     public List<ExonElement> getExonElementList() {
         return exonElementList;
     }

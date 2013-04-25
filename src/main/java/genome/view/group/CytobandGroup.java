@@ -24,31 +24,31 @@ import genome.view.element.CytobandElement;
 import java.util.ArrayList;
 import java.util.List;
 
-import casmi.graphics.group.Group;
+import casmi.Mouse;
 
 /**
  * @author T. Takeuchi
  */
-public class CytobandGroup extends Group {
+public class CytobandGroup extends ChartGroup {
 
     private final CytoBand[] cytobands;
 
     private final String chr;
-    
+
     private double height;
-    
+
     private double scale;
 
     private final List<CytobandElement> cytobandElementList = new ArrayList<CytobandElement>();
 
-    public CytobandGroup(CytoBand[] cytobands, String chr, double height, double scale) {
-        super();
-        
+    public CytobandGroup(CytoBand[] cytobands, String chr, double height, double scale, Mouse mouse) {
+        super("chromosome", mouse);
+
         this.cytobands = cytobands;
         this.chr       = chr;
         this.height    = height;
         this.scale     = scale;
-        
+
         setup();
     }
 
@@ -65,7 +65,7 @@ public class CytobandGroup extends Group {
 
     @Override
     public void update() {}
-    
+
     public List<CytobandElement> getCytobandElementList() {
         return cytobandElementList;
     }
