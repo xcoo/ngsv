@@ -38,14 +38,12 @@ import genome.view.element.ExonElement;
 import genome.view.element.GeneElement;
 import genome.view.element.HistogramBinElement;
 import genome.view.element.RulerElement;
-import genome.view.element.ShortReadElement;
 import genome.view.group.BedFragmentGroup;
 import genome.view.group.CytobandGroup;
 import genome.view.group.GeneGroup;
 import genome.view.group.HistogramBinGroup;
 import genome.view.group.Indicator;
 import genome.view.group.RulerGroup;
-import genome.view.group.ShortReadGroup;
 import genome.view.thread.BedUpdater;
 import genome.view.thread.GeneUpdater;
 import genome.view.thread.HistogramUpdater;
@@ -90,10 +88,6 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private static final String CONFIG_PATH = "./config/config.properties";
     private static final String DEFAULT_PATH = "./config/default.ini";
 
-    // position of elements
-    // origin is left-bottom corner
-    private static final double SHORTREAD_POS_Y     = 400.0;
-
     private static final double MIN_SCALE = 0.000004;
     private static final double WHEEL_SCALE_FACTOR = 0.007;
 
@@ -120,7 +114,6 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private GraphicsObject baseObject = new GraphicsObject();
 
     private GeneGroup               geneGroup;
-    private List<ShortReadGroup>    shortReadGroupList    = new ArrayList<ShortReadGroup>();
     private List<HistogramBinGroup> histogramBinGroupList = new ArrayList<HistogramBinGroup>();
     private CytobandGroup           cytobandGroup;
     private List<BedFragmentGroup>  bedFragmentGroupList  = new ArrayList<BedFragmentGroup>();
@@ -134,7 +127,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     // ref genes
     private ViewScale viewScale;
 
-    // sam, shortRead, histogram, bed, and chromosome data
+    // sam, histogram, bed, and chromosome data
     private Sam[]     samFiles;
     private List<Sam> selectedSamList = new ArrayList<Sam>();
 
@@ -157,7 +150,6 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private Trackball trackball;
     private int prvMouseX = 0, prvMouseY = 0;
 
-//    private ShortReadUpdater shortReadUpdater;
     private HistogramUpdater histogramUpdater;
     private BedUpdater       bedUpdater;
     private GeneUpdater      geneUpdater;
@@ -236,7 +228,6 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
         indicator = new Indicator(getWidth() - 40, getHeight() - 40);
 
-//        shortReadUpdater = new ShortReadUpdater(sqlLoader, annotationText, getMouse());
         histogramUpdater = new HistogramUpdater(sqlLoader, annotationText, getMouse());
         bedUpdater       = new BedUpdater(sqlLoader, annotationText, getMouse());
         geneUpdater      = new GeneUpdater(sqlLoader, annotationText, getMouse());
@@ -244,7 +235,6 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         rebuildViewData(viewScale.getChr(), viewScale.getStart(), viewScale.getEnd());
 
         addObject(baseObject);
-//        setupExplanationText();
         addObject(annotationText);
         addObject(indicator);
     }
@@ -323,7 +313,6 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
         baseObject.clear();
 
-        shortReadGroupList.clear();
         histogramBinGroupList.clear();
         bedFragmentGroupList.clear();
 
@@ -338,19 +327,10 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         setupRuler(start, end);
 
         for (Sam sam : selectedSamList) {
-            setupShortRead(sam);
-        }
-
-        int i = 0;
-        for (ShortReadGroup g : shortReadGroupList) {
-            g.setY(g.getY() + 30.0 * i++);
-        }
-
-        for (Sam sam : selectedSamList) {
             setupHistogramBin(sam);
         }
 
-        i = 0;
+        int i = 0;
         for (HistogramBinGroup g : histogramBinGroupList) {
             g.setY(g.getY() + (HistogramBinElement.MAX_HEIGHT + 10.0) * i++);
         }
@@ -367,19 +347,6 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         rulerGroup = new RulerGroup(start, end, scale);
         rulerGroup.getMainLine().set(viewScale.getStart(), 0, viewScale.getEnd(), 0);
         baseObject.add(rulerGroup);
-    }
-
-    private void setupShortRead(Sam sam) {
-
-        ShortReadGroup g = new ShortReadGroup(sam, scale);
-        g.setY(SHORTREAD_POS_Y);
-
-        for (ShortReadElement e : g.getShortReadElementList()) {
-            e.addMouseEventCallback(new AnnotationMouseOverCallback(e.getName(), annotationText, getMouse()));
-        }
-
-        shortReadGroupList.add(g);
-        baseObject.add(g);
     }
 
     private void setupHistogramBin(Sam sam) {
@@ -518,9 +485,6 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         long newEnd   = rightValue + (long)(700.0 / scale);
 
         if (leftValue < start + (long)(500.0 / scale) || end - (long)(500.0 / scale) < rightValue) {
-            // Update shortRead data.
-//            updateShortRead(newStart, newEnd);
-
             // Update histogram data.
             updateHistogram(newDispBinSize, newLoadBinSize, newStart, newEnd, true);
 
@@ -552,17 +516,6 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             end   = newEnd;
         }
     }
-
-//    private void updateShortRead(long newStart, long newEnd) {
-//        for (Sam sam : selectedSamList) {
-//            for (ShortReadGroup srg : shortReadGroupList) {
-//                if (srg.getSam().getSamId() == sam.getSamId()) {
-//                    shortReadUpdater.start(sam, selectedChromosome, newStart, newEnd, srg, scale);
-//                    break;
-//                }
-//            }
-//        }
-//    }
 
     private void updateHistogram(long newBinSize, long newLoadBinSize, long newStart, long newEnd, boolean loadDB) {
 
@@ -617,13 +570,6 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
         // Update other groups.
         // ---------------------------------------------------------------------
-//        for (ShortReadGroup g : shortReadGroupList) {
-//            for (ShortReadElement e : g.getShortReadElementList()) {
-//                e.setScale(scale);
-//                e.setX(offset + e.getBaseX());
-//            }
-//        }
-
         for (HistogramBinGroup g : histogramBinGroupList) {
             for (HistogramBinElement e : g.getHistogramBinElementList()) {
                 e.setScale(scale);
