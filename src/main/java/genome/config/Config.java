@@ -36,33 +36,30 @@ import org.slf4j.LoggerFactory;
  * <code>
  * Config.getInstance().getHost()
  * </code>
- * 
+ *
  * @author T. Takeuchi
  */
 public class Config {
 
     static Logger logger = LoggerFactory.getLogger(Config.class);
-    
+
     private static final String DB_HOST_KEY     = "db.host";
     private static final String DB_DATABASE_KEY = "db.database";
     private static final String DB_USER_KEY     = "db.user";
     private static final String DB_PASSWORD_KEY = "db.password";
-  
-//    private static final String CYTOBAND_DATA_URL_KEY = "cytoband.data_url";
-//    private static final String GENE_DATA_URL_KEY     = "gene.data_url";
-    
+
     private static final String CONSOLE_HOST_KEY     = "console.host";
-    
+
     private static Config instance = new Config();
-    
+
     private Properties properties = new Properties();
-    
+
     private Config() {}
-    
+
     public static Config getInstance() {
         return instance;
     }
-    
+
     public void load(String path) {
         InputStream is = null;
         try {
@@ -77,33 +74,33 @@ public class Config {
             } catch (IOException e) {
                 // ignore
             }
-        }        
+        }
     }
-    
+
     public String getHost() {
         return properties.getProperty(DB_HOST_KEY);
     }
-    
+
     public String getDatabase() {
         return properties.getProperty(DB_DATABASE_KEY);
     }
-    
+
     public String getUser() {
         return properties.getProperty(DB_USER_KEY);
     }
-    
+
     public String getPassword() {
         return properties.getProperty(DB_PASSWORD_KEY);
     }
-    
+
 //    public String getCytobandDataURL() {
 //        return properties.getProperty(CYTOBAND_DATA_URL_KEY);
 //    }
-//    
+//
 //    public String getGeneDataURL() {
 //        return properties.getProperty(GENE_DATA_URL_KEY);
 //    }
-    
+
     public String getConsoleHost() {
     	return properties.getProperty(CONSOLE_HOST_KEY);
     }

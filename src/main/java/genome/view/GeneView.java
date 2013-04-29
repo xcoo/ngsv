@@ -19,6 +19,7 @@
 package genome.view;
 
 import genome.config.Config;
+import genome.config.Default;
 import genome.data.Bed;
 import genome.data.BedFragment;
 import genome.data.Chromosome;
@@ -86,21 +87,15 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     static Logger logger = LoggerFactory.getLogger(GeneView.class);
     static String[] args;
 
-    private static final String DEFAULT_CONFIG_PATH = "./config/config.properties";
+    private static final String CONFIG_PATH = "./config/config.properties";
+    private static final String DEFAULT_PATH = "./config/default.ini";
 
     // position of elements
     // origin is left-bottom corner
-    private static final double CYTOBAND_POS_Y      = 100.0;
-    private static final double RULER_POS_Y         = 200.0;
-    private static final double BED_FRAGMENT_POS_Y  = 700.0;
     private static final double SHORTREAD_POS_Y     = 400.0;
-    private static final double HISTOGRAM_BIN_POS_Y = 500.0;
 
     private static final double MIN_SCALE = 0.000004;
     private static final double WHEEL_SCALE_FACTOR = 0.007;
-
-    // parameter for cytoband
-    private static final double CHROMOSOME_HEIGHT = 20;
 
     private static final double SCROLL_SPEED_EPS = 0.01;
     private static final double MOUSE_SCROLL_SPEED_FACTOR = 15.0;
@@ -181,7 +176,9 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         if (args.length > 0)
             Config.getInstance().load(args[0]);
         else
-            Config.getInstance().load(DEFAULT_CONFIG_PATH);
+            Config.getInstance().load(CONFIG_PATH);
+
+        Default.getInstance().load(DEFAULT_PATH);
 
         // load data
         // -----------------------------------------
@@ -388,7 +385,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private void setupHistogramBin(Sam sam) {
 
         HistogramBinGroup g = new HistogramBinGroup(sam, scale, getMouse());
-        g.setY(HISTOGRAM_BIN_POS_Y);
+        g.setY(Default.getInstance().getHistogramPosY());
 
         histogramBinGroupList.add(g);
         baseObject.add(g);
@@ -398,7 +395,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private void setupBedFragment(Bed bed) {
 
         BedFragmentGroup g = new BedFragmentGroup(bed, scale, getMouse());
-        g.setY(BED_FRAGMENT_POS_Y);
+        g.setY(Default.getInstance().getBedPosY());
 
         bedFragmentGroupList.add(g);
         baseObject.add(g);
@@ -406,8 +403,9 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     }
 
     private void setupCytoband(String chr) {
-        cytobandGroup = new CytobandGroup(cytobands, chr, CHROMOSOME_HEIGHT, scale, getMouse());
-        cytobandGroup.setY(CYTOBAND_POS_Y);
+        cytobandGroup = new CytobandGroup(cytobands, chr,
+            Default.getInstance().getCytobandHeight(), scale, getMouse());
+        cytobandGroup.setY(Default.getInstance().getCytobandPosY());
 
         for (CytobandElement e : cytobandGroup.getCytobandElementList()) {
             e.addMouseEventCallback(new AnnotationMouseOverCallback(e.getName(), annotationText, getMouse()));
@@ -418,7 +416,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
     private void setupGene() {
         geneGroup = new GeneGroup(scale, getMouse());
-        geneGroup.setY(RULER_POS_Y);
+        geneGroup.setY(Default.getInstance().getRulerPosY());
         baseObject.add(geneGroup);
     }
 
@@ -665,7 +663,9 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
         Line mainLine = rulerGroup.getMainLine();
         mainLine.setScale(scale);
-        mainLine.setPosition(offset + (viewScale.getStart() + viewScale.getEnd()) / 2.0 * scale, RULER_POS_Y, 0);
+        mainLine.setPosition(offset + (viewScale.getStart() + viewScale.getEnd()) / 2.0 * scale,
+            Default.getInstance().getRulerPosY(),
+            0);
 
         long step = 100;
         if (scale < 0.000005) {
@@ -692,8 +692,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             e.getText().setText(Long.toString(x));
 
             e.setScale(scale);
-            e.getLine().setPosition(offset + e.getBaseX(), RULER_POS_Y, 0);
-            e.getText().setPosition(offset + e.getBaseX() + 3, RULER_POS_Y + 3, 0);
+            e.getLine().setPosition(offset + e.getBaseX(), Default.getInstance().getRulerPosY(), 0);
+            e.getText().setPosition(offset + e.getBaseX() + 3, Default.getInstance().getRulerPosY() + 3, 0);
 
             e.getLine().setVisible(true);
             e.getText().setVisible(true);
