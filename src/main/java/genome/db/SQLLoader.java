@@ -47,10 +47,10 @@ public class SQLLoader {
     public SQLLoader() throws SQLException {
         // create instance
         Config config = Config.getInstance();
-        mysql = new MySQL(config.getHost(), 
-                config.getDatabase(),
-                config.getUser(),
-                config.getPassword());
+        mysql = new MySQL(config.getDatabaseHost(), 
+                config.getDatabaseName(),
+                config.getDatabaseUser(),
+                config.getDatabasePassword());
 
         // connect database
         mysql.connect();

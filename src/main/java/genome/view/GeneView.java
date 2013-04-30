@@ -85,7 +85,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     static Logger logger = LoggerFactory.getLogger(GeneView.class);
     static String[] args;
 
-    private static final String CONFIG_PATH = "./config/config.properties";
+    private static final String CONFIG_PATH = "./config/config.ini";
     private static final String DEFAULT_PATH = "./config/default.ini";
 
     private static final double MIN_SCALE = 0.000004;
