@@ -10,18 +10,21 @@ It has a database inside the system and uses OpenGL for rendering.
     * casmi (ver. 0.3.2)
     * logback
     * Java-WebSocket (by TooTallNate)
+    * ini4j
 * MySQL
 * NGSV Console
 
 # Setup viewer configulation
 
-Setup database settings in `config/config.properties`.
+Setup database settings.
 
 ```
+$ cp config/config.ini.example config/config.ini
+
 db.host     = [hostname]
 db.database = ngsv
-db.user     = [user]
-db.password = [password]
+db.user     = [db_user]
+db.password = [db_password]
 ```
 
 # Usage

@@ -1,0 +1,8 @@
+[database]
+host = example.com
+database = ngsv
+user = db_user
+password = db_password
+
+[console]
+host = example.com
