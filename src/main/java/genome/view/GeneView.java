@@ -85,8 +85,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     static Logger logger = LoggerFactory.getLogger(GeneView.class);
     static String[] args;
 
-    private static final String CONFIG_PATH = "./config/config.ini";
-    private static final String DEFAULT_PATH = "./config/default.ini";
+    private static final String CONFIG_INI_PATH = "./config/config.ini";
+    private static final String DEFAULT_INI_PATH = "./config/default.ini";
 
     private static final double MIN_SCALE = 0.000004;
     private static final double WHEEL_SCALE_FACTOR = 0.007;
@@ -95,8 +95,6 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private static final double MOUSE_SCROLL_SPEED_FACTOR = 15.0;
     private static final double SCROLL_SPEED_DAMPING_FACTOR = 0.8;
     private static final double SCROLL_POWER_FACTOR = 0.8;
-
-    private static final double FPS = 20.0;
 
     private static final double INITIAL_SCALE = 1.0;
     private double scale = INITIAL_SCALE;
@@ -158,19 +156,23 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
     @Override
     public void setup() {
+        // Load configuration
+        // -----------------------------------------
+        Config conf = Config.getInstance();
+        if (args.length > 0)
+            conf.load(args[0]);
+        else
+            conf.load(CONFIG_INI_PATH);
 
-        // initialize global settings
-        setFPS(FPS);
-        setSize(1024, 768);
+        Default dflt = Default.getInstance();
+        dflt.load(DEFAULT_INI_PATH);
+
+        // Initialize global settings
+        // -----------------------------------------
+        setFPS(dflt.getFPS());
+        setSize(dflt.getWindowWidth(), dflt.getWindowHeight());
         setBackGroundColor(ColorSet.BLACK);
 
-        // Load configuration
-        if (args.length > 0)
-            Config.getInstance().load(args[0]);
-        else
-            Config.getInstance().load(CONFIG_PATH);
-
-        Default.getInstance().load(DEFAULT_PATH);
 
         // load data
         // -----------------------------------------
@@ -406,7 +408,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     }
 
     private void updateScroll() {
-        scroll += scrollSpeed / FPS / Math.pow(scale, SCROLL_POWER_FACTOR);
+        scroll += scrollSpeed / getFPS() / Math.pow(scale, SCROLL_POWER_FACTOR);
         scrollSpeed *= SCROLL_SPEED_DAMPING_FACTOR;
         if (Math.abs(scrollSpeed) < SCROLL_SPEED_EPS) {
             scrollSpeed = 0.0;

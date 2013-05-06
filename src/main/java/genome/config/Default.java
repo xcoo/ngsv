@@ -26,6 +26,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Configuration manager class for default.ini.
+ *
  * @author T. Takeuchi
  */
 public class Default {
@@ -49,6 +51,22 @@ public class Default {
             e.printStackTrace();
             logger.error(e.getMessage());
         }
+    }
+
+    public double getFPS() {
+        return ini.get("general", "fps", double.class);
+    }
+
+    public int getWindowWidth() {
+        return ini.get("general", "window_width", int.class);
+    }
+
+    public int getWindowHeight() {
+        return ini.get("general", "window_height", int.class);
+    }
+
+    public boolean isFullScreen() {
+        return ini.get("general", "fullscreen", boolean.class);
     }
 
     public double getCytobandPosY() {
