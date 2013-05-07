@@ -42,11 +42,13 @@ import genome.view.group.BedFragmentGroup;
 import genome.view.group.CytobandGroup;
 import genome.view.group.GeneGroup;
 import genome.view.group.HistogramBinGroup;
-import genome.view.group.Indicator;
 import genome.view.group.RulerGroup;
 import genome.view.thread.BedUpdater;
 import genome.view.thread.GeneUpdater;
 import genome.view.thread.HistogramUpdater;
+import genome.view.ui.Indicator;
+import genome.view.ui.ScaleController;
+import genome.view.ui.ScaleControllerCallback;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -89,6 +91,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private static final String DEFAULT_INI_PATH = "./config/default.ini";
 
     private static final double MIN_SCALE = 0.000004;
+    private static final double MAX_SCALE = 2.0;
     private static final double WHEEL_SCALE_FACTOR = 0.007;
 
     private static final double SCROLL_SPEED_EPS = 0.01;
@@ -120,6 +123,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
     private Text annotationText;
 
+    private ScaleController scaleController;
     private Indicator indicator;
 
     // ref genes
@@ -228,6 +232,16 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         annotationText = new Text("", f);
         annotationText.setStrokeColor(new GrayColor(0.75));
 
+        scaleController = new ScaleController(MIN_SCALE, MAX_SCALE, scale, getMouse());
+        scaleController.setPosition(getWidth() - 30, getHeight() / 2);
+        scaleController.addCallback(new ScaleControllerCallback() {
+
+            @Override
+            public void run(double value) {
+                scale = value;
+            }
+        });
+
         indicator = new Indicator(getWidth() - 40, getHeight() - 40);
 
         histogramUpdater = new HistogramUpdater(sqlLoader, annotationText, getMouse());
@@ -238,6 +252,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
         addObject(baseObject);
         addObject(annotationText);
+        addObject(scaleController);
         addObject(indicator);
     }
 
@@ -733,6 +748,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             double scaleDiff = Math.abs(diff) * scale * WHEEL_SCALE_FACTOR;
             scale += 0 < diff ? scaleDiff : -scaleDiff;
             if (scale < MIN_SCALE) scale = MIN_SCALE;
+            else if (scale > MAX_SCALE) scale = MAX_SCALE;
+            scaleController.setValue(scale);
             break;
         }
 
