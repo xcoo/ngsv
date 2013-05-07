@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package genome.view.group;
+package genome.view.chart;
 
 import casmi.Mouse;
 import casmi.graphics.color.ColorSet;
@@ -37,7 +37,7 @@ import casmi.graphics.group.Group;
  *
  * @author T. Takeuchi
  */
-public class ChartGroup extends Group {
+public class Chart extends Group {
 
     private static final Font TITLE_FONT;
     static {
@@ -49,13 +49,14 @@ public class ChartGroup extends Group {
     private boolean draggable;
 
     protected Rect dragRect;
+    protected Rect backgroundRect;
     protected Text titleText;
 
-    public ChartGroup(String title, final Mouse mouse){
+    public Chart(String title, final Mouse mouse) {
         this(title, mouse, true);
     }
 
-    public ChartGroup(String title, final Mouse mouse, boolean draggable) {
+    public Chart(String title, final Mouse mouse, boolean draggable) {
         this.title = title;
         this.mouse = mouse;
         this.draggable = draggable;
@@ -65,11 +66,17 @@ public class ChartGroup extends Group {
     }
 
     private void setupDragRect() {
-        dragRect = new Rect(50, 100);
-        dragRect.setPosition(0.0, 0.0);
+        dragRect = new Rect(30, 100);
+        dragRect.setPosition(dragRect.getWidth() / 2.0, 0.0);
         dragRect.setStroke(false);
         dragRect.setFill(true);
         dragRect.setFillColor(new RGBColor(ColorSet.RED, 0.0));
+
+        backgroundRect = new Rect(1024, 100);
+        backgroundRect.setPosition(backgroundRect.getWidth() / 2.0, 0.0);
+        backgroundRect.setStroke(false);
+        backgroundRect.setFill(true);
+        backgroundRect.setFillColor(new RGBColor(ColorSet.RED, 0.0));
 
         if (draggable) {
             dragRect.addMouseEventCallback(new MouseClickCallback() {
@@ -78,6 +85,9 @@ public class ChartGroup extends Group {
                 public void run(MouseClickTypes eventtype, Element element) {
                     if (eventtype == MouseClickTypes.DRAGGED) {
                         setY(getY() + mouse.getY() - mouse.getPrvY());
+                        backgroundRect.setFillColor(new RGBColor(ColorSet.RED, 0.2));
+                    } else {
+                        backgroundRect.setFillColor(new RGBColor(ColorSet.RED, 0.0));
                     }
                 }
             });
@@ -90,11 +100,13 @@ public class ChartGroup extends Group {
                         dragRect.setFillColor(new RGBColor(ColorSet.RED, 0.5));
                     } else {
                         dragRect.setFillColor(new RGBColor(ColorSet.RED, 0.0));
+                        backgroundRect.setFillColor(new RGBColor(ColorSet.RED, 0.0));
                     }
                 }
             });
         }
 
+        add(backgroundRect);
         add(dragRect);
     }
 

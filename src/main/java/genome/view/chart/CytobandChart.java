@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package genome.view.group;
+package genome.view.chart;
 
 import genome.data.CytoBand;
 import genome.view.element.CytobandElement;
@@ -29,7 +29,7 @@ import casmi.Mouse;
 /**
  * @author T. Takeuchi
  */
-public class CytobandGroup extends ChartGroup {
+public class CytobandChart extends Chart {
 
     private final CytoBand[] cytobands;
 
@@ -41,7 +41,7 @@ public class CytobandGroup extends ChartGroup {
 
     private final List<CytobandElement> cytobandElementList = new ArrayList<CytobandElement>();
 
-    public CytobandGroup(CytoBand[] cytobands, String chr, double height, double scale, Mouse mouse) {
+    public CytobandChart(CytoBand[] cytobands, String chr, double height, double scale, Mouse mouse) {
         super("chromosome", mouse);
 
         this.cytobands = cytobands;

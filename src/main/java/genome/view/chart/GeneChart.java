@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package genome.view.group;
+package genome.view.chart;
 
 import genome.data.Exon;
 import genome.data.Gene;
@@ -32,14 +32,14 @@ import casmi.util.GraphicsUtil;
 /**
  * @author T. Takeuchi
  */
-public class GeneGroup extends ChartGroup {
+public class GeneChart extends Chart {
 
     private double scale;
 
     private List<GeneElement> geneElementList = new ArrayList<GeneElement>();
     private List<ExonElement> exonElementList = new ArrayList<ExonElement>();
 
-    public GeneGroup(double scale, Mouse mouse) {
+    public GeneChart(double scale, Mouse mouse) {
         super("known gene", mouse, false);
 
         this.scale = scale;

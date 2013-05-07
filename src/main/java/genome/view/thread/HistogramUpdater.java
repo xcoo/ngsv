@@ -23,8 +23,8 @@ import genome.data.HistogramBin;
 import genome.data.SamHistogram;
 import genome.db.SQLLoader;
 import genome.view.AnnotationMouseOverCallback;
+import genome.view.chart.HistogramChart;
 import genome.view.element.HistogramBinElement;
-import genome.view.group.HistogramBinGroup;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +50,7 @@ public class HistogramUpdater {
     private long binSize;
     private long start, end;
     private boolean loadDB;
-    private HistogramBinGroup histogramBinGroup;
+    private HistogramChart histogramChart;
     private double scale;
     private long maxValue;
     
@@ -89,11 +89,11 @@ public class HistogramUpdater {
             
             // Setup HistogramBinGroup.
             // ---------------------------------------------------------------------
-            histogramBinGroup.setup(samHistogram.getHistogramBins(), samHistogram.getBinSize(), binSize, maxValue);
+            histogramChart.setup(samHistogram.getHistogramBins(), samHistogram.getBinSize(), binSize, maxValue);
             
             if (stopFlag) return;
 
-            for (HistogramBinElement e : histogramBinGroup.getHistogramBinElementList()) {
+            for (HistogramBinElement e : histogramChart.getHistogramBinElementList()) {
                 e.setScale(scale);
                 e.addMouseEventCallback(new AnnotationMouseOverCallback(e.getName(), annotationText, mouse));
                 
@@ -114,14 +114,14 @@ public class HistogramUpdater {
     
     public void start(SamHistogram samHistogram, Chromosome chromosome, 
                       long binSize, long start, long end, boolean loadDB,
-                      HistogramBinGroup histogramBinGroup, double scale) {
+                      HistogramChart histogramChart, double scale) {
         this.samHistogram = samHistogram;
         this.chromosome = chromosome;
         this.binSize = binSize;
         this.start = start;
         this.end = end;
         this.loadDB = loadDB;
-        this.histogramBinGroup = histogramBinGroup;
+        this.histogramChart = histogramChart;
         this.scale = scale;
         
         if (currentThread != null && currentThread.isAlive()) {

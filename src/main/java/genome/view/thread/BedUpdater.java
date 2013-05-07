@@ -23,8 +23,8 @@ import genome.data.BedFragment;
 import genome.data.Chromosome;
 import genome.db.SQLLoader;
 import genome.view.AnnotationMouseOverCallback;
+import genome.view.chart.BedChart;
 import genome.view.element.BedFragmentElement;
-import genome.view.group.BedFragmentGroup;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,7 @@ public class BedUpdater {
     private Bed bed;
     private Chromosome chromosome;
     private long start, end;
-    private BedFragmentGroup bedFragmentGroup;
+    private BedChart bedChart;
     private double scale;
 
     private BedUpdateThread currentThread;
@@ -58,7 +58,7 @@ public class BedUpdater {
             // Load BedFragment.
             // ---------------------------------------------------------------------
             // BedFragment[] bfs = sqlLoader.loadBedFragment(bedFragmentGroup.getBed().getBedId(), chromosome);
-            BedFragment[] bfs = sqlLoader.loadBedFragment(bedFragmentGroup.getBed().getBedId(), chromosome, start, end);
+            BedFragment[] bfs = sqlLoader.loadBedFragment(bedChart.getBed().getBedId(), chromosome, start, end);
 
             if (bfs == null || bfs.length == 0) return;
 
@@ -70,11 +70,11 @@ public class BedUpdater {
 
             // Setup BedFragmentGroup.
             // ---------------------------------------------------------------------
-            bedFragmentGroup.setup(bfs);
+            bedChart.setup(bfs);
 
             if (stopFlag) return;
 
-            for (BedFragmentElement e : bedFragmentGroup.getBedFragmentElementList()) {
+            for (BedFragmentElement e : bedChart.getBedFragmentElementList()) {
                 e.setScale(scale);
                 e.addMouseEventCallback(new AnnotationMouseOverCallback(e.getName(), annotationText, mouse));
 
@@ -92,12 +92,12 @@ public class BedUpdater {
     }
 
     public void start(Bed bed, Chromosome chromosome, long start, long end,
-                      BedFragmentGroup bedFragmentGroup, double scale) {
+                      BedChart bedChart, double scale) {
         this.bed = bed;
         this.chromosome = chromosome;
         this.start = start;
         this.end = end;
-        this.bedFragmentGroup = bedFragmentGroup;
+        this.bedChart = bedChart;
         this.scale = scale;
 
         if (currentThread != null && currentThread.isAlive()) {

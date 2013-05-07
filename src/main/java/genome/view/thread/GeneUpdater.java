@@ -24,9 +24,9 @@ import genome.data.Gene;
 import genome.db.GeneLoaderResult;
 import genome.db.SQLLoader;
 import genome.view.AnnotationMouseOverCallback;
+import genome.view.chart.GeneChart;
 import genome.view.element.ExonElement;
 import genome.view.element.GeneElement;
-import genome.view.group.GeneGroup;
 
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class GeneUpdater {
 
     private Chromosome chromosome;
     private long start, end;
-    private GeneGroup geneGroup;
+    private GeneChart geneChart;
     private double scale;
     
     private GeneUpdateThread currentThread; 
@@ -71,18 +71,18 @@ public class GeneUpdater {
 
             // Setup GeneGroup.
             // -----------------------------------------------------------------
-            geneGroup.setup(geneList, exonList);
+            geneChart.setup(geneList, exonList);
             
             if (stopFlag) return;
 
-            for (GeneElement e : geneGroup.getGeneElementList()) {
+            for (GeneElement e : geneChart.getGeneElementList()) {
                 e.setScale(scale);
                 e.addMouseEventCallback(new AnnotationMouseOverCallback(e.getName(), annotationText, mouse));
                 
                 if (stopFlag) return;
             }
         
-            for (ExonElement e : geneGroup.getExonElementList()) {
+            for (ExonElement e : geneChart.getExonElementList()) {
                 e.setScale(scale);
                 e.addMouseEventCallback(new AnnotationMouseOverCallback(e.getName(), annotationText, mouse));
                 
@@ -100,11 +100,11 @@ public class GeneUpdater {
     }
     
     public void start(Chromosome chromosome, long start, long end,
-                      GeneGroup geneGroup, double scale) {
+                      GeneChart geneChart, double scale) {
         this.chromosome = chromosome;
         this.start = start;
         this.end = end;
-        this.geneGroup = geneGroup;
+        this.geneChart = geneChart;
         this.scale = scale;
         
         if (currentThread != null && currentThread.isAlive()) {

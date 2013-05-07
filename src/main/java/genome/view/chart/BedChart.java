@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package genome.view.group;
+package genome.view.chart;
 
 import genome.data.Bed;
 import genome.data.BedFragment;
@@ -31,7 +31,7 @@ import casmi.util.GraphicsUtil;
 /**
  * @author T. Takeuchi
  */
-public class BedFragmentGroup extends ChartGroup {
+public class BedChart extends Chart {
 
     private final Bed bed;
 
@@ -39,7 +39,7 @@ public class BedFragmentGroup extends ChartGroup {
 
     private List<BedFragmentElement> bedFragmentElementList = new ArrayList<BedFragmentElement>();
 
-    public BedFragmentGroup(Bed bed, double scale, Mouse mouse) {
+    public BedChart(Bed bed, double scale, Mouse mouse) {
         super("bed", mouse);
 
         this.bed = bed;

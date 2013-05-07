@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package genome.view.group;
+package genome.view.chart;
 
 import genome.data.HistogramBin;
 import genome.data.Sam;
@@ -36,9 +36,9 @@ import casmi.util.GraphicsUtil;
  * @author T. Takeuchi
  *
  */
-public class HistogramBinGroup extends ChartGroup {
+public class HistogramChart extends Chart {
 
-    static Logger logger = LoggerFactory.getLogger(HistogramBinGroup.class);
+    static Logger logger = LoggerFactory.getLogger(HistogramChart.class);
 
     private List<HistogramBinElement> histogramBinElementList = new ArrayList<HistogramBinElement>();
 
@@ -47,7 +47,7 @@ public class HistogramBinGroup extends ChartGroup {
     private double scale;
 
 
-    public HistogramBinGroup(Sam sam, double scale, Mouse mouse) {
+    public HistogramChart(Sam sam, double scale, Mouse mouse) {
         super("histogram", mouse);
 
         this.sam = sam;
