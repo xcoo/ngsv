@@ -25,7 +25,7 @@ import genome.view.element.CnvElement;
 import java.util.ArrayList;
 import java.util.List;
 
-import casmi.graphics.group.Group;
+import casmi.Mouse;
 import casmi.util.GraphicsUtil;
 
 /**
@@ -33,15 +33,16 @@ import casmi.util.GraphicsUtil;
  *
  * @author T. Takeuchi
  */
-public class CnvChart extends Group {
+public class CnvChart extends Chart {
 
     private final Cnv cnv;
     private double scale;
 
     private List<CnvElement> cnvElementList = new ArrayList<CnvElement>();
 
-    public CnvChart(Cnv cnv, double scale) {
-        super();
+    public CnvChart(Cnv cnv, double scale, Mouse mouse) {
+        super("cnv", mouse);
+
         this.cnv = cnv;
         this.scale = scale;
     }

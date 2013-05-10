@@ -123,7 +123,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private List<HistogramChart> histogramChartList = new ArrayList<HistogramChart>();
     private CytobandChart cytobandChart;
     private List<BedChart> bedChartList  = new ArrayList<BedChart>();
-    private List<CnvChart>  cnvFragmentGroupList  = new ArrayList<CnvChart>();
+    private List<CnvChart> cnvChartList  = new ArrayList<CnvChart>();
 
     private Ruler ruler;
 
@@ -355,7 +355,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
         histogramChartList.clear();
         bedChartList.clear();
-        cnvFragmentGroupList.clear();
+        cnvChartList.clear();
 
         Chromosome c = findChromosome(chr, chromosomes);
         if (c == null) {
@@ -431,9 +431,9 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     }
 
     private void setupCnvFragment(Cnv cnv) {
-        CnvChart g = new CnvChart(cnv, scale);
+        CnvChart g = new CnvChart(cnv, scale, getMouse());
         g.setY(Default.getInstance().getCnvPosY());
-        cnvFragmentGroupList.add(g);
+        cnvChartList.add(g);
         baseObject.add(g);
     }
 
@@ -616,7 +616,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private void updateCnv(long newStart, long newEnd) {
         for (Cnv cnv : selectedCnvList) {
             System.out.println(cnv);
-            for (CnvChart g : cnvFragmentGroupList) {
+            for (CnvChart g : cnvChartList) {
                 if (cnv.getCnvId() == g.getCnv().getCnvId()) {
                     cnvUpdater.start(cnv, selectedChromosome, newStart, newEnd, g, scale);
                     break;
@@ -664,10 +664,10 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             e.setPosition(offset + e.getBaseX(), e.getBaseY(), 0);
         }
 
-        for (CnvChart g : cnvFragmentGroupList) {
+        for (CnvChart g : cnvChartList) {
             for (CnvElement e : g.getCnvElementList()) {
                 e.setScale(scale);
-                e.setPosition(offset + e.getBaseX(), e.getBaseY(), 0);
+                e.setX(offset + e.getBaseX());
             }
         }
     }
