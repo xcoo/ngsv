@@ -29,19 +29,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 
  * @author T. Takeuchi
- *
  */
 public class WebSocket extends WebSocketClient {
 
     static Logger logger = LoggerFactory.getLogger(WebSocket.class);
-    
-//    private static final String WS_HOST = "ws://127.0.0.1:5000/api/ws/connect"; 
-    private static final String WS_HOST = "ws://" + Config.getInstance().getConsoleHost() + ":5000/api/ws/connect"; 
-    
+
+    // private static final String WS_HOST = "ws://127.0.0.1:5000/api/ws/connect";
+    private static final String WS_HOST =
+        String.format("ws://%s:5000/api/ws/connect", Config.getInstance().getConsoleHost());
+
     private DataSelectionListener listener;
-    
+
     public WebSocket(DataSelectionListener listener) throws URISyntaxException {
         super(new URI(WS_HOST));
         this.listener = listener;
@@ -56,7 +55,7 @@ public class WebSocket extends WebSocketClient {
     public void onClose(int i, String str, boolean bool) {
         logger.info("Close WebSocket");
     }
-    
+
     @Override
     public void onMessage(String message) {
         logger.debug("WebSocket Message: " + message);

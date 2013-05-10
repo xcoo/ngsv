@@ -33,11 +33,11 @@ public class AnnotationMouseOverCallback implements MouseOverCallback {
     private Mouse  mouse;
 
     public AnnotationMouseOverCallback(String annotation, Text text, Mouse mouse) {
-        
+
         this.annotation = annotation;
         this.text       = text;
         this.mouse      = mouse;
-        
+
     }
 
     @Override
@@ -52,8 +52,8 @@ public class AnnotationMouseOverCallback implements MouseOverCallback {
             this.text.setText("");
             break;
         }
-        
+
         this.text.setPosition(mouse.getX() + 5, mouse.getY() + 5, 0);
-        
+
     }
 }

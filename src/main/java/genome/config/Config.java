@@ -18,11 +18,10 @@
 
 package genome.config;
 
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
+import org.ini4j.Wini;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,75 +35,49 @@ import org.slf4j.LoggerFactory;
  * <code>
  * Config.getInstance().getHost()
  * </code>
- * 
+ *
  * @author T. Takeuchi
  */
 public class Config {
 
     static Logger logger = LoggerFactory.getLogger(Config.class);
-    
-    private static final String DB_HOST_KEY     = "db.host";
-    private static final String DB_DATABASE_KEY = "db.database";
-    private static final String DB_USER_KEY     = "db.user";
-    private static final String DB_PASSWORD_KEY = "db.password";
-  
-//    private static final String CYTOBAND_DATA_URL_KEY = "cytoband.data_url";
-//    private static final String GENE_DATA_URL_KEY     = "gene.data_url";
-    
-    private static final String CONSOLE_HOST_KEY     = "console.host";
-    
+
     private static Config instance = new Config();
-    
-    private Properties properties = new Properties();
-    
+
+    private Wini ini;
+
     private Config() {}
-    
+
     public static Config getInstance() {
         return instance;
     }
-    
+
     public void load(String path) {
-        InputStream is = null;
         try {
-            is = new FileInputStream(path);
-            properties.load(is);
+            ini = new Wini(new File(path));
         } catch (IOException e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-        } finally {
-            try {
-                is.close();
-            } catch (IOException e) {
-                // ignore
-            }
-        }        
+        }
     }
-    
-    public String getHost() {
-        return properties.getProperty(DB_HOST_KEY);
+
+    public String getDatabaseHost() {
+        return ini.get("database", "host");
     }
-    
-    public String getDatabase() {
-        return properties.getProperty(DB_DATABASE_KEY);
+
+    public String getDatabaseName() {
+        return ini.get("database", "database");
     }
-    
-    public String getUser() {
-        return properties.getProperty(DB_USER_KEY);
+
+    public String getDatabaseUser() {
+        return ini.get("database", "user");
     }
-    
-    public String getPassword() {
-        return properties.getProperty(DB_PASSWORD_KEY);
+
+    public String getDatabasePassword() {
+        return ini.get("database", "password");
     }
-    
-//    public String getCytobandDataURL() {
-//        return properties.getProperty(CYTOBAND_DATA_URL_KEY);
-//    }
-//    
-//    public String getGeneDataURL() {
-//        return properties.getProperty(GENE_DATA_URL_KEY);
-//    }
-    
+
     public String getConsoleHost() {
-    	return properties.getProperty(CONSOLE_HOST_KEY);
+        return ini.get("console", "host");
     }
 }

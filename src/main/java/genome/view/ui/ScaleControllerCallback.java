@@ -1,7 +1,7 @@
 /*
  *   ngsv
  *   https://github.com/xcoo/ngsv
- *   Copyright (C) 2012, Xcoo, Inc.
+ *   Copyright (C) 2012-2013, Xcoo, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,14 @@
  * limitations under the License.
  */
 
-package genome.net;
+package genome.view.ui;
 
 /**
+ *
  * @author T. Takeuchi
+ *
  */
-public interface DataSelectionListener {
+public interface ScaleControllerCallback {
 
-    void finishedDataSelection(String message);
+    void run(double value);
 }

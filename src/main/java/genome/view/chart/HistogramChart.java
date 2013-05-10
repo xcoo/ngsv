@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package genome.view.group;
+package genome.view.chart;
 
 import genome.data.HistogramBin;
 import genome.data.Sam;
@@ -28,36 +28,37 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import casmi.graphics.group.Group;
+import casmi.Mouse;
 import casmi.util.GraphicsUtil;
 
 /**
- * 
+ *
  * @author T. Takeuchi
  *
  */
-public class HistogramBinGroup extends Group {
+public class HistogramChart extends Chart {
 
-    static Logger logger = LoggerFactory.getLogger(HistogramBinGroup.class); 
-    
+    static Logger logger = LoggerFactory.getLogger(HistogramChart.class);
+
     private List<HistogramBinElement> histogramBinElementList = new ArrayList<HistogramBinElement>();
-    
+
     private final Sam sam;
-    
+
     private double scale;
-    
-    public HistogramBinGroup(Sam sam, double scale) {
-        super();
-        
+
+
+    public HistogramChart(Sam sam, double scale, Mouse mouse) {
+        super("histogram", mouse);
+
         this.sam = sam;
         this.scale = scale;
     }
-    
+
     public void setup(HistogramBin[] histogramBins, long binSize, long dispBinSize, long maxValue) {
         List<HistogramBinElement> list = new ArrayList<HistogramBinElement>();
 
-        if (binSize == dispBinSize) {        
-            for (HistogramBin hb : histogramBins) {                
+        if (binSize == dispBinSize) {
+            for (HistogramBin hb : histogramBins) {
                 if (hb.getValue() == 0) continue;
                 HistogramBinElement e = new HistogramBinElement(hb, scale, binSize, maxValue);
                 list.add(e);
@@ -73,13 +74,13 @@ public class HistogramBinGroup extends Group {
                         list.add(e);
                     }
                     sum = 0;
-                    pos = hb.getPosition() / dispBinSize * dispBinSize;            
-                }                               
+                    pos = hb.getPosition() / dispBinSize * dispBinSize;
+                }
 
                 sum += hb.getValue();
             }
-        }        
-                
+        }
+
         addAll(list);
         GraphicsUtil.removeAll(histogramBinElementList);
         histogramBinElementList = list;
@@ -95,6 +96,6 @@ public class HistogramBinGroup extends Group {
     public Sam getSam() {
         return sam;
     }
-    
-    
+
+
 }

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package genome.view.group;
+package genome.view.chart;
 
 import genome.data.Cnv;
 import genome.data.CnvFragment;
@@ -33,14 +33,14 @@ import casmi.util.GraphicsUtil;
  *
  * @author T. Takeuchi
  */
-public class CnvFragmentGroup extends Group {
+public class CnvChart extends Group {
 
     private final Cnv cnv;
     private double scale;
 
     private List<CnvElement> cnvElementList = new ArrayList<CnvElement>();
 
-    public CnvFragmentGroup(Cnv cnv, double scale) {
+    public CnvChart(Cnv cnv, double scale) {
         super();
         this.cnv = cnv;
         this.scale = scale;

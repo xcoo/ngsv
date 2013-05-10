@@ -23,8 +23,8 @@ import genome.data.Cnv;
 import genome.data.CnvFragment;
 import genome.db.SQLLoader;
 import genome.view.AnnotationMouseOverCallback;
+import genome.view.chart.CnvChart;
 import genome.view.element.CnvElement;
-import genome.view.group.CnvFragmentGroup;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +48,7 @@ public class CnvUpdater {
     private Cnv cnv;
     private Chromosome chromosome;
     private long start, end;
-    private CnvFragmentGroup cnvFragmentGroup;
+    private CnvChart cnvChart;
     private double scale;
 
     private CnvUpdateThread currentThread;
@@ -62,8 +62,8 @@ public class CnvUpdater {
             logger.debug("Loading Cnv from DB...");
             CnvFragment[] cfs = sqlLoader.loadCnvFragment(cnv.getCnvId(), chromosome, start, end);
             if (stopFlag) return;
-            cnvFragmentGroup.setup(cfs);
-            for (CnvElement e : cnvFragmentGroup.getCnvElementList()) {
+            cnvChart.setup(cfs);
+            for (CnvElement e : cnvChart.getCnvElementList()) {
                 e.setScale(scale);
                 e.addMouseEventCallback(new AnnotationMouseOverCallback(e.getName(),
                     annotationText, mouse));
@@ -79,12 +79,12 @@ public class CnvUpdater {
         this.mouse = mouse;
     }
 
-    public void start(Cnv cnv, Chromosome chromosome, long start, long end, CnvFragmentGroup cnvFragmentGroup, double scale) {
+    public void start(Cnv cnv, Chromosome chromosome, long start, long end, CnvChart cnvChart, double scale) {
         this.cnv = cnv;
         this.chromosome = chromosome;
         this.start = start;
         this.end = end;
-        this.cnvFragmentGroup = cnvFragmentGroup;
+        this.cnvChart = cnvChart;
         this.scale = scale;
 
         if (currentThread != null && currentThread.isAlive()) stop();

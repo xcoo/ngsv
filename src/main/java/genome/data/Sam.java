@@ -26,126 +26,115 @@ import casmi.sql.annotation.Tablename;
 
 @Tablename("sam")
 public class Sam extends Entity {
-    
-	@PrimaryKey
-	@Fieldname("sam_id")
-	private long samId;
 
-	@Fieldname("file_name")
-	private String fileName;
+    @PrimaryKey
+    @Fieldname("sam_id")
+    private long samId;
 
-	@Fieldname("created_date")
-	private long createdDate;
+    @Fieldname("file_name")
+    private String fileName;
 
-	@Ignore
+    @Fieldname("created_date")
+    private long createdDate;
+
+    @Ignore
     private String header;
-    
+
     @Ignore
     private String length;
-    
+
     @Ignore
     private String mapped;
 
-	@Fieldname("number_of_chromosomes")
-	private int numChromosome;
+    @Fieldname("number_of_chromosomes")
+    private int numChromosome;
 
-	@Fieldname("chromosomes")
-	private String chromosome;
-	
-	@Ignore
-	private boolean selected;
+    @Fieldname("chromosomes")
+    private String chromosome;
 
-	@Ignore
-	private ShortRead[] shortReads;
-	
-	@Ignore
-	private SamHistogram[] samHistograms;
+    @Ignore
+    private boolean selected;
 
-	public ShortRead[] getShortReads() {
-		return shortReads;
-	}
+    @Ignore
+    private SamHistogram[] samHistograms;
 
-	public void setShortReads(ShortRead[] shortReads) {
-		this.shortReads = shortReads;
-	}
-	
     public SamHistogram[] getSamHistograms() {
         return samHistograms;
     }
-    
+
     public void setSamHistograms(SamHistogram[] samHistograms) {
         this.samHistograms = samHistograms;
     }
 
     public long getSamId() {
-		return samId;
-	}
+        return samId;
+    }
 
-	public void setSamId(long samId) {
-		this.samId = samId;
-	}
+    public void setSamId(long samId) {
+        this.samId = samId;
+    }
 
-	public String getFileName() {
-		return fileName;
-	}
+    public String getFileName() {
+        return fileName;
+    }
 
-	public void setFileName(String fileName) {
-		this.fileName = fileName;
-	}
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 
-	public long getCreatedDate() {
-		return createdDate;
-	}
+    public long getCreatedDate() {
+        return createdDate;
+    }
 
-	public void setCreatedDate(long createdDate) {
-		this.createdDate = createdDate;
-	}
+    public void setCreatedDate(long createdDate) {
+        this.createdDate = createdDate;
+    }
 
-	public String getHeader() {
-		return header;
-	}
+    public String getHeader() {
+        return header;
+    }
 
-	public void setHeader(String header) {
-		this.header = header;
-	}
+    public void setHeader(String header) {
+        this.header = header;
+    }
 
-	public String getLength() {
-		return length;
-	}
+    public String getLength() {
+        return length;
+    }
 
-	public void setLength(String length) {
-		this.length = length;
-	}
+    public void setLength(String length) {
+        this.length = length;
+    }
 
-	public String getMapped() {
-		return mapped;
-	}
+    public String getMapped() {
+        return mapped;
+    }
 
-	public void setMapped(String mapped) {
-		this.mapped = mapped;
-	}
+    public void setMapped(String mapped) {
+        this.mapped = mapped;
+    }
 
-	public int getNumChromosome() {
-		return numChromosome;
-	}
+    public int getNumChromosome() {
+        return numChromosome;
+    }
 
-	public void setNumChromosome(int numChr) {
-		this.numChromosome = numChr;
-	}
+    public void setNumChromosome(int numChr) {
+        this.numChromosome = numChr;
+    }
 
-	public String getChromosome() {
-		return chromosome;
-	}
+    public String getChromosome() {
+        return chromosome;
+    }
 
-	public void setChromosome(String chromosome) {
-		this.chromosome = chromosome;
-	}
+    public void setChromosome(String chromosome) {
+        this.chromosome = chromosome;
+    }
 
-	public boolean isSelected() {
-		return selected;
-	}
+    public boolean isSelected() {
+        return selected;
+    }
 
-	public void setSelected(boolean selected) {
-		this.selected = selected;
-	}
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
 }

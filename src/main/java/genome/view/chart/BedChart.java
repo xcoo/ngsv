@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package genome.view.group;
+package genome.view.chart;
 
 import genome.data.Bed;
 import genome.data.BedFragment;
@@ -25,37 +25,37 @@ import genome.view.element.BedFragmentElement;
 import java.util.ArrayList;
 import java.util.List;
 
-import casmi.graphics.group.Group;
+import casmi.Mouse;
 import casmi.util.GraphicsUtil;
 
 /**
  * @author T. Takeuchi
  */
-public class BedFragmentGroup extends Group {
+public class BedChart extends Chart {
 
     private final Bed bed;
-    
+
     private double scale;
-    
+
     private List<BedFragmentElement> bedFragmentElementList = new ArrayList<BedFragmentElement>();
-    
-    public BedFragmentGroup(Bed bed, double scale) {
-        super();
-        
+
+    public BedChart(Bed bed, double scale, Mouse mouse) {
+        super("bed", mouse);
+
         this.bed = bed;
         this.scale = scale;
-        
+
         setup();
     }
-    
+
     public void setup(BedFragment[] bedFragments) {
         List<BedFragmentElement> list = new ArrayList<BedFragmentElement>();
-        
+
         for (BedFragment bf : bedFragments) {
             BedFragmentElement e = new BedFragmentElement(bf, scale);
             list.add(e);
         }
-        
+
         addAll(list);
         GraphicsUtil.removeAll(bedFragmentElementList);
         bedFragmentElementList = list;
@@ -71,5 +71,5 @@ public class BedFragmentGroup extends Group {
     public Bed getBed() {
         return bed;
     }
-    
+
 }

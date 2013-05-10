@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package genome.view.group;
+package genome.view.ui;
 
 import genome.view.element.RulerElement;
 
@@ -30,26 +30,26 @@ import casmi.graphics.group.Group;
 /**
  * @author T. Takeuchi
  */
-public class RulerGroup extends Group {
+public class Ruler extends Group {
 
     private long start, end;
-    
+
     private double scale;
-    
+
     private final List<RulerElement> rulerElementList = new ArrayList<RulerElement>();
-    
+
     private Line mainLine;
     private double mainLineBaseX;
-    
-    public RulerGroup(long start, long end, double scale) {
+
+    public Ruler(long start, long end, double scale) {
         super();
-        
+
         this.start = start;
         this.end   = end;
-        
+
         setup();
     }
-    
+
     @Override
     public void setup() {
         long   length = end - start;
@@ -64,7 +64,7 @@ public class RulerGroup extends Group {
             RulerElement e = new RulerElement(x, 0, scale);
 
             rulerElementList.add(e);
-            
+
             add(e.getLine());
             add(e.getText());
         }
@@ -81,27 +81,27 @@ public class RulerGroup extends Group {
     public List<RulerElement> getRulerElementList() {
         return rulerElementList;
     }
-    
+
     public Line getMainLine() {
         return mainLine;
     }
-    
+
     public double getMainLineBaseX() {
         return mainLineBaseX;
     }
-    
+
     public long getStart() {
         return start;
     }
-    
+
     public void setStart(long start) {
         this.start = start;
     }
-    
+
     public long getEnd() {
         return end;
     }
-    
+
     public void setEnd(long end) {
         this.end = end;
     }
