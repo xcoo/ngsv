@@ -33,6 +33,7 @@ import genome.net.Selection;
 import genome.net.WebSocket;
 import genome.view.SamSelectionDialogBox.SamSelectionDialongBoxListener;
 import genome.view.chart.BedChart;
+import genome.view.chart.ChartManager;
 import genome.view.chart.CytobandChart;
 import genome.view.chart.GeneChart;
 import genome.view.chart.HistogramChart;
@@ -114,6 +115,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     // Graphics objects
     private GraphicsObject baseObject = new GraphicsObject();
 
+    private static ChartManager chartManager;
     private GeneChart geneChart;
     private List<HistogramChart> histogramChartList = new ArrayList<HistogramChart>();
     private CytobandChart cytobandChart;
@@ -210,6 +212,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         try {
             webSocket = new WebSocket(this);
         } catch (URISyntaxException e) {
+            logger.error("Failed to create WebSocket connection");
             e.printStackTrace();
             System.exit(-1);
         }
@@ -330,6 +333,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
         baseObject.clear();
 
+        chartManager = new ChartManager();
+
         histogramChartList.clear();
         bedChartList.clear();
 
@@ -344,7 +349,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         setupRuler(start, end);
 
         for (Sam sam : selectedSamList) {
-            setupHistogramBin(sam);
+            setupHistogramChart(sam);
         }
 
         int i = 0;
@@ -353,11 +358,11 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         }
 
         for (Bed bed : selectedBedList) {
-            setupBedFragment(bed);
+            setupBedChart(bed);
         }
 
-        setupCytoband(c.getChromosome());
-        setupGene();
+        setupCytobandChart(c.getChromosome());
+        setupGeneChart();
     }
 
     private void setupRuler(long start, long end) {
@@ -366,27 +371,25 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         baseObject.add(ruler);
     }
 
-    private void setupHistogramBin(Sam sam) {
+    private void setupHistogramChart(Sam sam) {
+        HistogramChart chart = new HistogramChart(sam, scale, getMouse());
+        chart.setY(Default.getInstance().getHistogramPosY());
 
-        HistogramChart g = new HistogramChart(sam, scale, getMouse());
-        g.setY(Default.getInstance().getHistogramPosY());
-
-        histogramChartList.add(g);
-        baseObject.add(g);
-
+        histogramChartList.add(chart);
+        baseObject.add(chart);
+        chartManager.addChart(chart);
     }
 
-    private void setupBedFragment(Bed bed) {
+    private void setupBedChart(Bed bed) {
+        BedChart chart = new BedChart(bed, scale, getMouse());
+        chart.setY(Default.getInstance().getBedPosY());
 
-        BedChart g = new BedChart(bed, scale, getMouse());
-        g.setY(Default.getInstance().getBedPosY());
-
-        bedChartList.add(g);
-        baseObject.add(g);
-
+        bedChartList.add(chart);
+        baseObject.add(chart);
+        chartManager.addChart(chart);
     }
 
-    private void setupCytoband(String chr) {
+    private void setupCytobandChart(String chr) {
         cytobandChart = new CytobandChart(cytobands, chr,
             Default.getInstance().getCytobandHeight(), scale, getMouse());
         cytobandChart.setY(Default.getInstance().getCytobandPosY());
@@ -396,12 +399,14 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         }
 
         baseObject.add(cytobandChart);
+        chartManager.addChart(cytobandChart);
     }
 
-    private void setupGene() {
+    private void setupGeneChart() {
         geneChart = new GeneChart(scale, getMouse());
         geneChart.setY(Default.getInstance().getRulerPosY());
         baseObject.add(geneChart);
+        chartManager.addChart(geneChart);
     }
 
     @Override
@@ -700,6 +705,11 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             prvMouseY = getMouseY();
             break;
 
+        case RELEASED:
+            if (chartManager.isDragging())
+                chartManager.releaseDragging();
+            break;
+
         case DRAGGED:
             switch (b) {
             case LEFT:
@@ -812,6 +822,10 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     @Override
     public void exit() {
         webSocket.close();
+    }
+
+    public static ChartManager getChartManager() {
+        return chartManager;
     }
 
     public static void main(String[] args) {

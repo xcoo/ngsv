@@ -61,9 +61,6 @@ public class BedChart extends Chart {
         bedFragmentElementList = list;
     }
 
-    @Override
-    public void update() {}
-
     public List<BedFragmentElement> getBedFragmentElementList() {
         return bedFragmentElementList;
     }

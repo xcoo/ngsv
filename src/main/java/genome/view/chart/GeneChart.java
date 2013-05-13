@@ -69,9 +69,6 @@ public class GeneChart extends Chart {
 
     }
 
-    @Override
-    public void update() {}
-
     public List<GeneElement> getGeneElementList() {
         return geneElementList;
     }

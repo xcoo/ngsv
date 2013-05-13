@@ -63,9 +63,6 @@ public class CytobandChart extends Chart {
         }
     }
 
-    @Override
-    public void update() {}
-
     public List<CytobandElement> getCytobandElementList() {
         return cytobandElementList;
     }

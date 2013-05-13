@@ -86,9 +86,6 @@ public class HistogramChart extends Chart {
         histogramBinElementList = list;
     }
 
-    @Override
-    public void update() {}
-
     public List<HistogramBinElement> getHistogramBinElementList() {
         return histogramBinElementList;
     }
@@ -96,6 +93,4 @@ public class HistogramChart extends Chart {
     public Sam getSam() {
         return sam;
     }
-
-
 }

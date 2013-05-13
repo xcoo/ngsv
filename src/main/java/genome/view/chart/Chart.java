@@ -18,6 +18,7 @@
 
 package genome.view.chart;
 
+import genome.view.GeneView;
 import casmi.Mouse;
 import casmi.graphics.color.ColorSet;
 import casmi.graphics.color.GrayColor;
@@ -48,9 +49,12 @@ public class Chart extends Group {
     protected final Mouse mouse;
     private boolean draggable;
 
-    protected Rect dragRect;
-    protected Rect backgroundRect;
-    protected Text titleText;
+    private Rect dragRect;
+    private Text titleText;
+//    protected GraphicsObject contentObject;
+    private Rect backgroundRect;
+
+    private double mouseOffset = 0.0;
 
     public Chart(String title, final Mouse mouse) {
         this(title, mouse, true);
@@ -62,6 +66,7 @@ public class Chart extends Group {
         this.draggable = draggable;
 
         setupDragRect();
+//        setupContentObject();
         setupTitleText();
     }
 
@@ -79,15 +84,20 @@ public class Chart extends Group {
         backgroundRect.setFillColor(new RGBColor(ColorSet.RED, 0.0));
 
         if (draggable) {
+            final Chart chart = this;
+            final ChartManager chartManager = GeneView.getChartManager();
+
             dragRect.addMouseEventCallback(new MouseClickCallback() {
 
                 @Override
                 public void run(MouseClickTypes eventtype, Element element) {
-                    if (eventtype == MouseClickTypes.DRAGGED) {
-                        setY(getY() + mouse.getY() - mouse.getPrvY());
-                        backgroundRect.setFillColor(new RGBColor(ColorSet.RED, 0.2));
-                    } else {
-                        backgroundRect.setFillColor(new RGBColor(ColorSet.RED, 0.0));
+                    if (eventtype == MouseClickTypes.PRESSED) {
+                        if (!chartManager.isDragging()) {
+                            dragRect.setFillColor(new RGBColor(ColorSet.RED, 0.0));
+                            backgroundRect.setFillColor(new RGBColor(ColorSet.RED, 0.2));
+                            mouseOffset = mouse.getY() - getY();
+                            chartManager.setDraggingChart(chart);
+                        }
                     }
                 }
             });
@@ -97,10 +107,10 @@ public class Chart extends Group {
                 @Override
                 public void run(MouseOverTypes eventtype, Element element) {
                     if (eventtype == MouseOverTypes.EXISTED) {
-                        dragRect.setFillColor(new RGBColor(ColorSet.RED, 0.5));
+                        if (!chartManager.isDragging())
+                            dragRect.setFillColor(new RGBColor(ColorSet.RED, 0.5));
                     } else {
                         dragRect.setFillColor(new RGBColor(ColorSet.RED, 0.0));
-                        backgroundRect.setFillColor(new RGBColor(ColorSet.RED, 0.0));
                     }
                 }
             });
@@ -109,6 +119,11 @@ public class Chart extends Group {
         add(backgroundRect);
         add(dragRect);
     }
+
+//    private void setupContentObject() {
+//        contentObject = new GraphicsObject();
+//        add(contentObject);
+//    }
 
     private void setupTitleText() {
         titleText = new Text(title, TITLE_FONT, 5, 15);
@@ -127,6 +142,21 @@ public class Chart extends Group {
     }
 
     @Override
-    public void update() {}
+    public void update() {
+        if (draggable) {
+            ChartManager chartManager = GeneView.getChartManager();
+            if (chartManager.isDraggingChart(this))
+                setY(mouse.getY() - mouseOffset);
+        }
+    }
 
+    public void releaseDragging() {
+        dragRect.setFillColor(new RGBColor(ColorSet.RED, 0.0));
+        backgroundRect.setFillColor(new RGBColor(ColorSet.RED, 0.0));
+    }
+
+    @Override
+    public String toString() {
+        return this.title;
+    }
 }
