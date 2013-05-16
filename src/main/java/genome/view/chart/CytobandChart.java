@@ -58,7 +58,7 @@ public class CytobandChart extends Chart {
             if (c.getChrName().equalsIgnoreCase(chr) || c.getChrName().equalsIgnoreCase("chr" + chr)) {
                 CytobandElement e = new CytobandElement(c, scale, height);
                 cytobandElementList.add(e);
-                add(e);
+                contentObject.add(e);
             }
         }
     }

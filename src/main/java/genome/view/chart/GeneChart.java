@@ -59,11 +59,11 @@ public class GeneChart extends Chart {
             eeList.add(e);
         }
 
-        addAll(geList);
+        contentObject.addAll(geList);
         GraphicsUtil.removeAll(geneElementList);
         geneElementList = geList;
 
-        addAll(eeList);
+        contentObject.addAll(eeList);
         GraphicsUtil.removeAll(exonElementList);
         exonElementList = eeList;
 

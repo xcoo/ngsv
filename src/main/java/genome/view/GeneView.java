@@ -711,6 +711,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             break;
 
         case DRAGGED:
+            if (chartManager.isDragging()) break;
             switch (b) {
             case LEFT:
             {

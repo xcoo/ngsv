@@ -56,7 +56,7 @@ public class BedChart extends Chart {
             list.add(e);
         }
 
-        addAll(list);
+        contentObject.addAll(list);
         GraphicsUtil.removeAll(bedFragmentElementList);
         bedFragmentElementList = list;
     }

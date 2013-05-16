@@ -31,6 +31,7 @@ import casmi.graphics.element.Text;
 import casmi.graphics.font.Font;
 import casmi.graphics.font.FontStyle;
 import casmi.graphics.group.Group;
+import casmi.graphics.object.GraphicsObject;
 
 /**
  * Parent class for each column of data chart.
@@ -51,7 +52,7 @@ public class Chart extends Group {
 
     private Rect dragRect;
     private Text titleText;
-//    protected GraphicsObject contentObject;
+    protected GraphicsObject contentObject;
     private Rect backgroundRect;
 
     private double mouseOffset = 0.0;
@@ -65,9 +66,14 @@ public class Chart extends Group {
         this.mouse = mouse;
         this.draggable = draggable;
 
+        setupContentObject();
         setupDragRect();
-//        setupContentObject();
         setupTitleText();
+    }
+
+    private void setupContentObject() {
+        contentObject = new GraphicsObject();
+        add(contentObject);
     }
 
     private void setupDragRect() {
@@ -119,11 +125,6 @@ public class Chart extends Group {
         add(backgroundRect);
         add(dragRect);
     }
-
-//    private void setupContentObject() {
-//        contentObject = new GraphicsObject();
-//        add(contentObject);
-//    }
 
     private void setupTitleText() {
         titleText = new Text(title, TITLE_FONT, 5, 15);

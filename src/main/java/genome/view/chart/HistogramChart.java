@@ -81,7 +81,7 @@ public class HistogramChart extends Chart {
             }
         }
 
-        addAll(list);
+        contentObject.addAll(list);
         GraphicsUtil.removeAll(histogramBinElementList);
         histogramBinElementList = list;
     }
