@@ -91,20 +91,17 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private static final String CONFIG_INI_PATH = "./config/config.ini";
     private static final String DEFAULT_INI_PATH = "./config/default.ini";
 
-    private static final double INITIAL_SCALE = 1.0;
-    private static final double MIN_SCALE = 0.000004;
-    private static final double MAX_SCALE = 2.0;
-    private static final double WHEEL_SCALE_FACTOR = 0.007;
-
-    private static final double SCROLL_SPEED_EPS = 0.01;
-    private static final double MOUSE_SCROLL_SPEED_FACTOR = 15.0;
-    private static final double SCROLL_SPEED_DAMPING_FACTOR = 0.8;
-    private static final double SCROLL_POWER_FACTOR = 0.8;
-
-    private double scale = INITIAL_SCALE;
+    private double scale = 1.0;
+    private double minScale = 0.000004;
+    private double maxScale = 2.0;
+    private double wheelScaleFactor = 0.007;
 
     private double scroll = 0.0;
     private double scrollSpeed = 0.0;
+    private double scrollSpeedEps = 0.01;
+    private double mouseScrollSpeedFactor = 15.0;
+    private double scrollSpeedDampingFactor = 0.8;
+    private double scrollPowerFactor = 0.8;
 
     private long leftValue = 0, rightValue = 0;
 
@@ -112,7 +109,6 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private long dispBinSize = 0;
     private long start = 0, end = 0;
 
-    // Graphics objects
     private GraphicsObject baseObject = new GraphicsObject();
 
     private static ChartManager chartManager;
@@ -179,6 +175,14 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         setSize(dflt.getWindowWidth(), dflt.getWindowHeight());
         setBackGroundColor(ColorSet.BLACK);
 
+        scale = dflt.getInitialScale();
+        minScale = dflt.getMinScale();
+        maxScale = dflt.getMaxScale();
+        wheelScaleFactor = dflt.getWheelScaleFactor();
+        scrollSpeedEps = dflt.getScrollSpeedEps();
+        mouseScrollSpeedFactor = dflt.getMouseScrollSpeedFactor();
+        scrollSpeedDampingFactor = dflt.getScrollSpeedDampingFactor();
+        scrollPowerFactor = dflt.getScrollPowerFactor();
 
         // load data
         // -----------------------------------------
@@ -235,7 +239,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         annotationText = new Text("", f);
         annotationText.setStrokeColor(new GrayColor(0.75));
 
-        scaleController = new ScaleController(MIN_SCALE, MAX_SCALE, scale, getMouse());
+        scaleController = new ScaleController(minScale, maxScale, scale, getMouse());
         scaleController.setPosition(getWidth() - 30, getHeight() / 2);
         scaleController.addCallback(new ScaleControllerCallback() {
 
@@ -344,7 +348,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         }
 
         scroll = - (start + end) / 2.0;
-        scale = INITIAL_SCALE;
+        scale = Default.getInstance().getInitialScale();
 
         setupRuler(start, end);
 
@@ -428,9 +432,9 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     }
 
     private void updateScroll() {
-        scroll += scrollSpeed / getFPS() / Math.pow(scale, SCROLL_POWER_FACTOR);
-        scrollSpeed *= SCROLL_SPEED_DAMPING_FACTOR;
-        if (Math.abs(scrollSpeed) < SCROLL_SPEED_EPS) {
+        scroll += scrollSpeed / getFPS() / Math.pow(scale, scrollPowerFactor);
+        scrollSpeed *= scrollSpeedDampingFactor;
+        if (Math.abs(scrollSpeed) < scrollSpeedEps) {
             scrollSpeed = 0.0;
         }
     }
@@ -727,7 +731,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
                     prvMouseY = mouseY;
                 } else {
                     double diffX = getMouseX() - getPreMouseX();
-                    scrollSpeed += diffX * MOUSE_SCROLL_SPEED_FACTOR;
+                    scrollSpeed += diffX * mouseScrollSpeedFactor;
                 }
 
                 break;
@@ -756,10 +760,10 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         case WHEEL_ROTATED:
         {
             double diff = getMouseWheelRotation();
-            double scaleDiff = Math.abs(diff) * scale * WHEEL_SCALE_FACTOR;
+            double scaleDiff = Math.abs(diff) * scale * wheelScaleFactor;
             scale += 0 < diff ? scaleDiff : -scaleDiff;
-            if (scale < MIN_SCALE) scale = MIN_SCALE;
-            else if (scale > MAX_SCALE) scale = MAX_SCALE;
+            if (scale < minScale) scale = minScale;
+            else if (scale > maxScale) scale = maxScale;
             scaleController.setValue(scale);
             break;
         }

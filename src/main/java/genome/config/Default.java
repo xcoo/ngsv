@@ -69,6 +69,38 @@ public class Default {
         return ini.get("general", "fullscreen", boolean.class);
     }
 
+    public double getInitialScale() {
+        return ini.get("general", "initial_scale", double.class);
+    }
+
+    public double getMinScale() {
+        return ini.get("general", "min_scale", double.class);
+    }
+
+    public double getMaxScale() {
+        return ini.get("general", "max_scale", double.class);
+    }
+
+    public double getWheelScaleFactor() {
+        return ini.get("general", "wheel_scale_factor", double.class);
+    }
+
+    public double getScrollSpeedEps() {
+        return ini.get("general", "scroll_speed_eps", double.class);
+    }
+
+    public double getMouseScrollSpeedFactor() {
+        return ini.get("general", "mouse_scroll_speed_factor", double.class);
+    }
+
+    public double getScrollSpeedDampingFactor() {
+        return ini.get("general", "scroll_speed_damping_factor", double.class);
+    }
+
+    public double getScrollPowerFactor() {
+        return ini.get("general", "scroll_power_factor", double.class);
+    }
+
     public double getCytobandPosY() {
         return ini.get("cytoband", "pos_y", double.class);
     }
