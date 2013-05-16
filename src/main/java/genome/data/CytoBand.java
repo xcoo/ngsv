@@ -24,16 +24,21 @@ import casmi.sql.annotation.Ignore;
 import casmi.sql.annotation.PrimaryKey;
 import casmi.sql.annotation.Tablename;
 
+/**
+ * Cytoband entity.
+ *
+ * @author T. Takeuchi
+ */
 @Tablename("cytoband")
 public class CytoBand extends Entity {
-    
+
     @PrimaryKey
     @Fieldname("cytoband_id")
     private long cytobandId;
 
     @Fieldname("chr_id")
     private long chrId;
-    
+
     @Fieldname("chr_start")
     private long start;
 
@@ -45,10 +50,10 @@ public class CytoBand extends Entity {
 
     @Fieldname("gie_stain")
     private String color;
-    
+
     @Ignore
     private String chrName;
-    
+
 
     public long getCytobandId() {
         return cytobandId;
@@ -105,10 +110,8 @@ public class CytoBand extends Entity {
     public void setChrName(String chrName) {
         this.chrName = chrName;
     }
-    
+
     public long getLength() {
         return Math.abs(this.start - this.end);
     }
-    
-
 }

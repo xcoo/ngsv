@@ -18,62 +18,62 @@
 
 package genome.view.element;
 
+import genome.config.Default;
 import genome.data.BedFragment;
-import casmi.graphics.color.Color;
 import casmi.graphics.color.RGBColor;
 import casmi.graphics.element.Rect;
 
 public class BedFragmentElement extends Rect implements ScalableElement {
-	
-	private String name;
-	private double scale;
-	private double initialScale;
-	
-	private final double initialBaseX;
-	private double baseX;
-	
-	private static final double HEIGHT = 12;
-	
-    private static final Color DEFAULT_COLOR = new RGBColor(171.0/255.0, 39.0/255.0, 74.0/255.0);
 
+    private String name;
+    private double scale;
+    private double initialScale;
 
-	public BedFragmentElement (BedFragment bf, double scale) {
-		super( bf.getChrStart() + (bf.getChrEnd() - bf.getChrStart())/ 2.0, 0.0,
-				scale * (bf.getChrEnd() - bf.getChrStart()), HEIGHT);
-		
-		this.baseX = bf.getChrStart() + (bf.getChrEnd() - bf.getChrStart())/ 2.0;
+    private final double initialBaseX;
+    private double baseX;
 
-		this.initialBaseX = this.baseX;
-		
-		this.setStroke(false);
-		this.setFillColor(DEFAULT_COLOR);    	
+    private static final double HEIGHT = 12;
 
-		this.scale = scale;
-		this.initialScale = this.scale;
-		
-		this.name = bf.getName();
-	}
+    public BedFragmentElement(BedFragment bf, double scale) {
+        super(bf.getChrStart() + (bf.getChrEnd() - bf.getChrStart()) / 2.0, 0.0, scale
+            * (bf.getChrEnd() - bf.getChrStart()), HEIGHT);
 
-	public String getName() {
-		return name;
-	}
+        this.baseX = bf.getChrStart() + (bf.getChrEnd() - bf.getChrStart()) / 2.0;
 
-	public double getScale() {
-		return scale;
-	}
+        this.initialBaseX = this.baseX;
 
-	public double getBaseX() {
-		return baseX;
-	}
+        this.setStroke(false);
+        this.setFillColor(new RGBColor(Default.getInstance().getBedFillColor()));
 
-	public void setScale(double scale) {
-		this.scale = scale;
-		this.setScaleX(this.scale/this.initialScale);
-		
-		this.baseX = this.initialBaseX * scale;
-	}
+        this.scale = scale;
+        this.initialScale = this.scale;
 
-	public double getBaseY() {
-		return 0;
-	}
+        this.name = bf.getName();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getScale() {
+        return scale;
+    }
+
+    @Override
+    public double getBaseX() {
+        return baseX;
+    }
+
+    @Override
+    public void setScale(double scale) {
+        this.scale = scale;
+        this.setScaleX(this.scale / this.initialScale);
+
+        this.baseX = this.initialBaseX * scale;
+    }
+
+    @Override
+    public double getBaseY() {
+        return 0.0;
+    }
 }

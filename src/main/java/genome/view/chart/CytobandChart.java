@@ -27,6 +27,8 @@ import java.util.List;
 import casmi.Mouse;
 
 /**
+ * Cytoband chart.
+ *
  * @author T. Takeuchi
  */
 public class CytobandChart extends Chart {

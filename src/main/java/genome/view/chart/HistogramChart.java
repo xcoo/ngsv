@@ -46,7 +46,6 @@ public class HistogramChart extends Chart {
 
     private double scale;
 
-
     public HistogramChart(Sam sam, double scale, Mouse mouse) {
         super("histogram", mouse);
 
