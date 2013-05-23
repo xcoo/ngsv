@@ -18,7 +18,7 @@
 
 package genome.view.element;
 
-import genome.config.Default;
+import genome.config.ViewerConfig;
 import genome.data.BedFragment;
 import casmi.graphics.color.RGBColor;
 import casmi.graphics.element.Rect;
@@ -43,7 +43,7 @@ public class BedFragmentElement extends Rect implements ScalableElement {
         this.initialBaseX = this.baseX;
 
         this.setStroke(false);
-        this.setFillColor(new RGBColor(Default.getInstance().getBedFillColor()));
+        this.setFillColor(new RGBColor(ViewerConfig.getInstance().getBedFillColor()));
 
         this.scale = scale;
         this.initialScale = this.scale;

@@ -19,7 +19,7 @@
 package genome.view;
 
 import genome.config.Config;
-import genome.config.Default;
+import genome.config.ViewerConfig;
 import genome.data.Bed;
 import genome.data.BedFragment;
 import genome.data.Chromosome;
@@ -89,8 +89,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     static Logger logger = LoggerFactory.getLogger(GeneView.class);
     static String[] args;
 
-    private static final String CONFIG_INI_PATH = "./config/config.ini";
-    private static final String DEFAULT_INI_PATH = "./config/default.ini";
+    private static final String CONFIG_INI_PATH = "./config/ngsv.ini";
+    private static final String VIEWER_INI_PATH = "./config/viewer.ini";
 
     private double scale = 1.0;
     private double minScale = 0.000004;
@@ -168,23 +168,23 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         else
             conf.load(CONFIG_INI_PATH);
 
-        Default dflt = Default.getInstance();
-        dflt.load(DEFAULT_INI_PATH);
+        ViewerConfig vconf = ViewerConfig.getInstance();
+        vconf.load(VIEWER_INI_PATH);
 
         // Initialize global settings
         // -----------------------------------------
-        setFPS(dflt.getFPS());
-        setSize(dflt.getWindowWidth(), dflt.getWindowHeight());
+        setFPS(vconf.getFPS());
+        setSize(vconf.getWindowWidth(), vconf.getWindowHeight());
         setBackGroundColor(ColorSet.BLACK);
 
-        scale = dflt.getInitialScale();
-        minScale = dflt.getMinScale();
-        maxScale = dflt.getMaxScale();
-        wheelScaleFactor = dflt.getWheelScaleFactor();
-        scrollSpeedEps = dflt.getScrollSpeedEps();
-        mouseScrollSpeedFactor = dflt.getMouseScrollSpeedFactor();
-        scrollSpeedDampingFactor = dflt.getScrollSpeedDampingFactor();
-        scrollPowerFactor = dflt.getScrollPowerFactor();
+        scale = vconf.getInitialScale();
+        minScale = vconf.getMinScale();
+        maxScale = vconf.getMaxScale();
+        wheelScaleFactor = vconf.getWheelScaleFactor();
+        scrollSpeedEps = vconf.getScrollSpeedEps();
+        mouseScrollSpeedFactor = vconf.getMouseScrollSpeedFactor();
+        scrollSpeedDampingFactor = vconf.getScrollSpeedDampingFactor();
+        scrollPowerFactor = vconf.getScrollPowerFactor();
 
         // load data
         // -----------------------------------------
@@ -355,7 +355,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         }
 
         scroll = - (start + end) / 2.0;
-        scale = Default.getInstance().getInitialScale();
+        scale = ViewerConfig.getInstance().getInitialScale();
 
         setupRuler(start, end);
 
@@ -384,7 +384,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
     private void setupHistogramChart(Sam sam) {
         HistogramChart chart = new HistogramChart(sam, scale, getMouse());
-        chart.setY(Default.getInstance().getHistogramPosY());
+        chart.setY(ViewerConfig.getInstance().getHistogramPosY());
 
         histogramChartList.add(chart);
         baseObject.add(chart);
@@ -393,7 +393,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
     private void setupBedChart(Bed bed) {
         BedChart chart = new BedChart(bed, scale, getMouse());
-        chart.setY(Default.getInstance().getBedPosY());
+        chart.setY(ViewerConfig.getInstance().getBedPosY());
 
         bedChartList.add(chart);
         baseObject.add(chart);
@@ -402,8 +402,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
     private void setupCytobandChart(String chr) {
         cytobandChart = new CytobandChart(cytobands, chr,
-            Default.getInstance().getCytobandHeight(), scale, getMouse());
-        cytobandChart.setY(Default.getInstance().getCytobandPosY());
+            ViewerConfig.getInstance().getCytobandHeight(), scale, getMouse());
+        cytobandChart.setY(ViewerConfig.getInstance().getCytobandPosY());
 
         for (CytobandElement e : cytobandChart.getCytobandElementList()) {
             e.addMouseEventCallback(new AnnotationMouseOverCallback(e.getName(), annotationText, getMouse()));
@@ -415,7 +415,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
     private void setupGeneChart() {
         geneChart = new GeneChart(scale, getMouse());
-        geneChart.setY(Default.getInstance().getRulerPosY());
+        geneChart.setY(ViewerConfig.getInstance().getRulerPosY());
         baseObject.add(geneChart);
         chartManager.addChart(geneChart);
     }
@@ -643,7 +643,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         Line mainLine = ruler.getMainLine();
         mainLine.setScale(scale);
         mainLine.setPosition(offset + (viewScale.getStart() + viewScale.getEnd()) / 2.0 * scale,
-            Default.getInstance().getRulerPosY(),
+            ViewerConfig.getInstance().getRulerPosY(),
             0);
 
         long step = 100;
@@ -671,8 +671,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             e.getText().setText(Long.toString(x));
 
             e.setScale(scale);
-            e.getLine().setPosition(offset + e.getBaseX(), Default.getInstance().getRulerPosY(), 0);
-            e.getText().setPosition(offset + e.getBaseX() + 3, Default.getInstance().getRulerPosY() + 3, 0);
+            e.getLine().setPosition(offset + e.getBaseX(), ViewerConfig.getInstance().getRulerPosY(), 0);
+            e.getText().setPosition(offset + e.getBaseX() + 3, ViewerConfig.getInstance().getRulerPosY() + 3, 0);
 
             e.getLine().setVisible(true);
             e.getText().setVisible(true);

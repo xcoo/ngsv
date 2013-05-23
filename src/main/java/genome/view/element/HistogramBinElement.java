@@ -18,7 +18,7 @@
 
 package genome.view.element;
 
-import genome.config.Default;
+import genome.config.ViewerConfig;
 import genome.data.HistogramBin;
 import casmi.graphics.color.RGBColor;
 import casmi.graphics.element.Box;
@@ -47,8 +47,8 @@ public class HistogramBinElement extends Box implements ScalableElement {
         this.setPosition(position + binSize / 2.0,
             Math.log(value) / Math.log(maxHeight) / 2.0 * MAX_HEIGHT);
         this.setStroke(true);
-        this.setStrokeColor(new RGBColor(Default.getInstance().getHistogramStrokeColor()));
-        this.setFillColor(new RGBColor(Default.getInstance().getHistogramFillColor()));
+        this.setStrokeColor(new RGBColor(ViewerConfig.getInstance().getHistogramStrokeColor()));
+        this.setFillColor(new RGBColor(ViewerConfig.getInstance().getHistogramFillColor()));
 
         this.initialScale = initialScale;
         this.scale = initialScale;

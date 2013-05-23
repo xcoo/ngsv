@@ -6,4 +6,5 @@ target/**
 .settings/
 
 log/**
-config/config.ini
+config/ngsv.ini
+config/viewer.ini
