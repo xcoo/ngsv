@@ -112,16 +112,21 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
     private GraphicsObject baseObject = new GraphicsObject();
 
+    // Charts
     private static ChartManager chartManager;
     private GeneChart geneChart;
-    private List<HistogramChart> histogramChartList = new ArrayList<HistogramChart>();
+    private Map<Long, HistogramChart> histogramChartMap = new HashMap<Long, HistogramChart>();
     private CytobandChart cytobandChart;
-    private List<BedChart> bedChartList = new ArrayList<BedChart>();
+    private Map<Long, BedChart> bedChartMap = new HashMap<Long, BedChart>();
 
+    // Updaters
+    private Map<Long, HistogramUpdater> histogramUpdaterMap = new HashMap<Long, HistogramUpdater>();
+    private Map<Long, BedUpdater> bedUpdaterMap = new HashMap<Long, BedUpdater>();
+    private GeneUpdater geneUpdater;
+
+    // UI
     private Ruler ruler;
-
     private Text annotationText;
-
     private ScaleController scaleController;
     private Indicator indicator;
     private DebugView debugView;
@@ -130,14 +135,14 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private ViewScale viewScale;
 
     // sam, histogram, bed, and chromosome data
-    private Sam[]     samFiles;
+    private Sam[] samFiles;
     private List<Sam> selectedSamList = new ArrayList<Sam>();
 
-    private Bed[]     bedFiles;
+    private Bed[] bedFiles;
     private List<Bed> selectedBedList = new ArrayList<Bed>();
 
     private Chromosome[] chromosomes;
-    private Chromosome   selectedChromosome;
+    private Chromosome selectedChromosome;
 
     private CytoBand[] cytobands;
 
@@ -151,10 +156,6 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     // trackball
     private Trackball trackball;
     private int prvMouseX = 0, prvMouseY = 0;
-
-    private HistogramUpdater histogramUpdater;
-    private BedUpdater bedUpdater;
-    private GeneUpdater geneUpdater;
 
     private WebSocket webSocket;
 
@@ -257,9 +258,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         debugView.setPosition(getWidth() - 70, 20);
         debugView.setVisible(false);
 
-        histogramUpdater = new HistogramUpdater(sqlLoader, annotationText, getMouse());
-        bedUpdater       = new BedUpdater(sqlLoader, annotationText, getMouse());
-        geneUpdater      = new GeneUpdater(sqlLoader, annotationText, getMouse());
+        geneUpdater = new GeneUpdater(sqlLoader, annotationText, getMouse());
 
         rebuildViewData(viewScale.getChr(), viewScale.getStart(), viewScale.getEnd());
 
@@ -270,7 +269,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         addObject(debugView);
     }
 
-    public Map<String, Long> calcCytoBandLength(CytoBand[] cytoBands, Chromosome[] chromosomes) {
+    private Map<String, Long> calcCytoBandLength(CytoBand[] cytoBands, Chromosome[] chromosomes) {
         Map<String, Long> map = new HashMap<String, Long>();
 
         for (CytoBand b : cytoBands) {
@@ -342,12 +341,15 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
     private void rebuildViewData(String chr, long start, long end) {
 
+        // Clear data
         baseObject.clear();
 
         chartManager = new ChartManager();
 
-        histogramChartList.clear();
-        bedChartList.clear();
+        histogramChartMap.clear();
+        histogramUpdaterMap.clear();
+        bedChartMap.clear();
+        bedUpdaterMap.clear();
 
         Chromosome c = findChromosome(chr, chromosomes);
         if (c == null) {
@@ -358,20 +360,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         scale = ViewerConfig.getInstance().getInitialScale();
 
         setupRuler(start, end);
-
-        for (Sam sam : selectedSamList) {
-            setupHistogramChart(sam);
-        }
-
-        int i = 0;
-        for (HistogramChart g : histogramChartList) {
-            g.setY(g.getY() + (HistogramBinElement.MAX_HEIGHT + 10.0) * i++);
-        }
-
-        for (Bed bed : selectedBedList) {
-            setupBedChart(bed);
-        }
-
+        setupHistogramCharts(selectedSamList);
+        setupBedCharts(selectedBedList);
         setupCytobandChart(c.getChromosome());
         setupGeneChart();
     }
@@ -382,20 +372,47 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         baseObject.add(ruler);
     }
 
+    private void setupHistogramCharts(List<Sam> sams) {
+        for (Sam sam : sams) {
+            setupHistogramChart(sam);
+            histogramUpdaterMap.put(sam.getSamId(),
+                new HistogramUpdater(sqlLoader, annotationText, getMouse()));
+        }
+
+        int i = 0;
+        for (Map.Entry<Long, HistogramChart> e : histogramChartMap.entrySet()) {
+            HistogramChart chart = e.getValue();
+            chart.setY(chart.getY() + (HistogramBinElement.MAX_HEIGHT + 10.0) * i++);
+        }
+    }
+
     private void setupHistogramChart(Sam sam) {
         HistogramChart chart = new HistogramChart(sam, scale, getMouse());
         chart.setY(ViewerConfig.getInstance().getHistogramPosY());
 
-        histogramChartList.add(chart);
+        histogramChartMap.put(sam.getSamId(), chart);
         baseObject.add(chart);
         chartManager.addChart(chart);
+    }
+
+    private void setupBedCharts(List<Bed> beds) {
+        for (Bed bed : selectedBedList) {
+            setupBedChart(bed);
+            bedUpdaterMap.put(bed.getBedId(), new BedUpdater(sqlLoader, annotationText, getMouse()));
+        }
+
+        int i = 0;
+        for (Map.Entry<Long, BedChart> e : bedChartMap.entrySet()) {
+            BedChart chart = e.getValue();
+            chart.setY(chart.getY() + (100.0 + 10.0) * i++);
+        }
     }
 
     private void setupBedChart(Bed bed) {
         BedChart chart = new BedChart(bed, scale, getMouse());
         chart.setY(ViewerConfig.getInstance().getBedPosY());
 
-        bedChartList.add(chart);
+        bedChartMap.put(bed.getBedId(), chart);
         baseObject.add(chart);
         chartManager.addChart(chart);
     }
@@ -518,16 +535,10 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         long newEnd   = rightValue + (long)(700.0 / scale);
 
         if (leftValue < start + (long)(500.0 / scale) || end - (long)(500.0 / scale) < rightValue) {
-            // Update histogram data.
             updateHistogram(newDispBinSize, newLoadBinSize, newStart, newEnd, true);
-
-            // Update bed data
             updateBed(newStart, newEnd);
-
-            // Update refGene.
-            if (showRefGene) {
+            if (showRefGene)
                 updateRefGene(newStart, newEnd);
-            }
 
             loadBinSize = newLoadBinSize;
             dispBinSize = newDispBinSize;
@@ -551,20 +562,12 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     }
 
     private void updateHistogram(long newBinSize, long newLoadBinSize, long newStart, long newEnd, boolean loadDB) {
-
         for (Sam sam : selectedSamList) {
-            SamHistogram  sh = getLoadingSamHistogram(sam.getSamHistograms(), newLoadBinSize);
-
-            if (sh != null) {
-                for (HistogramChart hbg : histogramChartList) {
-                    if (hbg.getSam().getSamId() == sam.getSamId()) {
-
-                        // Update HistogramBin data and elements in background.
-                        histogramUpdater.start(sh, selectedChromosome, newBinSize, newStart, newEnd, loadDB, hbg, scale);
-                        break;
-                    }
-                }
-            }
+            SamHistogram sh = getLoadingSamHistogram(sam.getSamHistograms(), newLoadBinSize);
+            if (sh == null) continue;
+            HistogramUpdater updater = histogramUpdaterMap.get(sam.getSamId());
+            HistogramChart chart = histogramChartMap.get(sam.getSamId());
+            updater.start(sh, selectedChromosome, newBinSize, newStart, newEnd, loadDB, chart, scale);
         }
     }
 
@@ -574,18 +577,14 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
                 return sh;
             }
         }
-
         return null;
     }
 
     private void updateBed(long newStart, long newEnd) {
         for (Bed bed : selectedBedList) {
-            for (BedChart bfg : bedChartList) {
-                if (bed.getBedId() == bfg.getBed().getBedId()) {
-                    bedUpdater.start(bed, selectedChromosome, newStart, newEnd, bfg, scale);
-                    break;
-                }
-            }
+            BedUpdater updater = bedUpdaterMap.get(bed.getBedId());
+            BedChart chart = bedChartMap.get(bed.getBedId());
+            updater.start(bed, selectedChromosome, newStart, newEnd, chart, scale);
         }
     }
 
@@ -594,34 +593,45 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     }
 
     private void updateElements() {
-
         // Horizontal offset of scroll
         double offset = scroll * scale + getWidth() / 2.0;
 
         // Update ruler
         updateRuler(offset);
 
-        // Update other groups.
-        // ---------------------------------------------------------------------
-        for (HistogramChart g : histogramChartList) {
-            for (HistogramBinElement e : g.getHistogramBinElementList()) {
+        // Update charts
+        updateHistogramElements(offset);
+        updateBedElements(offset);
+        updateCytobandElements(offset);
+        updateRefGeneElements(offset);
+    }
+
+    private void updateHistogramElements(double offset) {
+        for (HistogramChart chart : histogramChartMap.values()) {
+            for (HistogramBinElement e : chart.getHistogramBinElementList()) {
                 e.setScale(scale);
                 e.setPosition(offset + e.getBaseX(), e.getBaseY(), 0);
             }
         }
+    }
 
-        for (BedChart g : bedChartList) {
-            for (BedFragmentElement e : g.getBedFragmentElementList()) {
+    private void updateBedElements(double offset) {
+        for (BedChart chart : bedChartMap.values()) {
+            for (BedFragmentElement e : chart.getBedFragmentElementList()) {
                 e.setScale(scale);
                 e.setX(offset + e.getBaseX());
             }
         }
+    }
 
+    private void updateCytobandElements(double offset) {
         for (CytobandElement e : cytobandChart.getCytobandElementList()) {
             e.setScale(scale);
             e.setX(offset + e.getBaseX());
         }
+    }
 
+    private void updateRefGeneElements(double offset) {
         for (ExonElement e : geneChart.getExonElementList()) {
             e.setScale(scale);
             e.setPosition(offset + e.getBaseX(), e.getBaseY(), 0);
