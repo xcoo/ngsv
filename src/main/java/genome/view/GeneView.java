@@ -152,6 +152,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private SamSelectionDialogBox dbox;
 
     private boolean initializing = true;
+    private boolean rotating = false;
 
     // trackball
     private Trackball trackball;
@@ -436,7 +437,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
         if (initializing) return;
 
-        leftValue  = (long)(-scroll - 550.0 / scale);
+        leftValue = (long)(-scroll - 550.0 / scale);
         rightValue = (long)(-scroll + 550.0 / scale);
 
         // Update data.
@@ -690,25 +691,29 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
     @Override
     public void keyEvent(KeyEvent e) {
-        if (e == KeyEvent.PRESSED) {
-            int keycode = getKeyCode();
-            char key = getKey();
-
-            // ESC to quit the application.
-            if (keycode == 27) {
-                sqlLoader.close();
+        int keyCode = getKeyCode();
+        switch (e) {
+        case PRESSED:
+            switch (keyCode) {
+            case java.awt.event.KeyEvent.VK_ESCAPE:
+                // ESC to quit the application.
                 System.exit(0);
-            }
-
-            switch (key) {
-            case 'c':
+                break;
+            case java.awt.event.KeyEvent.VK_SPACE:
+                // Toggle scrolling and rotation mode
+                rotating = !rotating;
+                break;
+            case java.awt.event.KeyEvent.VK_C:
+                // Show selection dialog box
                 dbox.setVisible(true);
                 break;
-            case 'r':
+            case java.awt.event.KeyEvent.VK_R:
+                // Reset rotation
                 trackball.reset();
                 trackball.rotate(baseObject);
                 break;
-            case 'd':
+            case java.awt.event.KeyEvent.VK_D:
+                // Toggle showing debug view
                 debugView.setVisible(!debugView.isVisible());
                 if (debugView.isVisible())
                     logger.info("Show DebugView");
@@ -718,6 +723,9 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             default:
                 break;
             }
+            break;
+        default:
+            break;
         }
     }
 
@@ -739,7 +747,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             switch (b) {
             case LEFT:
             {
-                if (getKeyCode() == java.awt.event.KeyEvent.VK_SPACE) {
+                if (rotating) {
                     int mouseX = getMouseX();
                     int mouseY = getMouseY();
 
@@ -799,17 +807,16 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
         dbox.setVisible(false);
 
-        if (initializing) {
+        if (initializing)
             viewScale = new ViewScale(dbox.getChrName(), dbox.getStart(), dbox.getEnd());
-            initializing = false;
-        } else {
+        else
             viewScale.setViewScale(dbox.getChrName(), dbox.getStart(), dbox.getEnd());
-        }
 
         reloadViewData(viewScale.getChr(), viewScale.getStart(), viewScale.getEnd());
 
         synchronized (this.getListener()) {
             rebuildViewData(viewScale.getChr(), viewScale.getStart(), viewScale.getEnd());
+            if (initializing) initializing = false;
         }
     }
 
@@ -825,22 +832,22 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             bed.setSelected(s.hasBed(bed.getBedId()));
         }
 
-        if (initializing) {
+        if (initializing)
             viewScale = new ViewScale(s.chromosome.name, s.chromosome.start, s.chromosome.end);
-            initializing = false;
-        } else {
+        else
             viewScale.setViewScale(s.chromosome.name, s.chromosome.start, s.chromosome.end);
-        }
 
         reloadViewData(s.chromosome.name, s.chromosome.start, s.chromosome.end);
 
         synchronized (this.getListener()) {
             rebuildViewData(s.chromosome.name, s.chromosome.start, s.chromosome.end);
+            if (initializing) initializing = false;
         }
     }
 
     @Override
     public void exit() {
+        sqlLoader.close();
         webSocket.close();
     }
 
