@@ -46,6 +46,7 @@ import genome.view.element.RulerElement;
 import genome.view.thread.BedUpdater;
 import genome.view.thread.GeneUpdater;
 import genome.view.thread.HistogramUpdater;
+import genome.view.ui.DebugView;
 import genome.view.ui.Indicator;
 import genome.view.ui.Ruler;
 import genome.view.ui.ScaleController;
@@ -115,7 +116,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private GeneChart geneChart;
     private List<HistogramChart> histogramChartList = new ArrayList<HistogramChart>();
     private CytobandChart cytobandChart;
-    private List<BedChart> bedChartList  = new ArrayList<BedChart>();
+    private List<BedChart> bedChartList = new ArrayList<BedChart>();
 
     private Ruler ruler;
 
@@ -123,6 +124,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
     private ScaleController scaleController;
     private Indicator indicator;
+    private DebugView debugView;
 
     // ref genes
     private ViewScale viewScale;
@@ -251,6 +253,10 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
         indicator = new Indicator(getWidth() - 40, getHeight() - 40);
 
+        debugView = new DebugView(this);
+        debugView.setPosition(getWidth() - 70, 20);
+        debugView.setVisible(false);
+
         histogramUpdater = new HistogramUpdater(sqlLoader, annotationText, getMouse());
         bedUpdater       = new BedUpdater(sqlLoader, annotationText, getMouse());
         geneUpdater      = new GeneUpdater(sqlLoader, annotationText, getMouse());
@@ -261,6 +267,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         addObject(annotationText);
         addObject(scaleController);
         addObject(indicator);
+        addObject(debugView);
     }
 
     public Map<String, Long> calcCytoBandLength(CytoBand[] cytoBands, Chromosome[] chromosomes) {
@@ -692,11 +699,23 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
                 System.exit(0);
             }
 
-            if (key == 'c'){
+            switch (key) {
+            case 'c':
                 dbox.setVisible(true);
-            } else if (key == 'r') {
+                break;
+            case 'r':
                 trackball.reset();
                 trackball.rotate(baseObject);
+                break;
+            case 'd':
+                debugView.setVisible(!debugView.isVisible());
+                if (debugView.isVisible())
+                    logger.info("Show DebugView");
+                else
+                    logger.info("Hide DebugView");
+                break;
+            default:
+                break;
             }
         }
     }
