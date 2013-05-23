@@ -19,12 +19,12 @@
 package genome.data;
 
 /**
- * Scale for sequence
- * 
- * @author K. Nishimura
+ * Scale for sequence.
  *
+ * @author K. Nishimura
  */
 public class ViewScale {
+
     private String chr;
     private long start;
     private long end;
@@ -37,11 +37,11 @@ public class ViewScale {
         this.length = Math.abs(end - start);
     }
 
-    public void setViewScale(String chr, long start, long end){
+    public void setViewScale(String chr, long start, long end) {
         this.chr = chr;
         this.start = start;
         this.end = end;
-        this.length = Math.abs(end - start);  
+        this.length = Math.abs(end - start);
     }
 
     public String getChr() {

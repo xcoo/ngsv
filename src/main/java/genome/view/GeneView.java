@@ -151,7 +151,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     // dialog box
     private SamSelectionDialogBox dbox;
 
-    private boolean isFinishedInitialSelection;
+    private boolean initializing = true;
 
     // trackball
     private Trackball trackball;
@@ -199,19 +199,18 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             System.exit(-1);
         }
 
-        // load sam files
+        // Load sam files
         samFiles = sqlLoader.loadSamFiles();
-
-        // load bed files
-        bedFiles = sqlLoader.loadBedFiles();
-
-        // load chromosome
-        chromosomes = sqlLoader.loadChromosome();
-
         logger.info("Read " + samFiles.length + " sam files.");
+
+        // Load bed files
+        bedFiles = sqlLoader.loadBedFiles();
         logger.info("Read " + bedFiles.length + " bed files.");
 
-        // load cytoband
+        // Load chromosome
+        chromosomes = sqlLoader.loadChromosome();
+
+        // Load cytoband
         cytobands = sqlLoader.loadCytoBand();
         Map<String, Long> chrLengthMap = calcCytoBandLength(cytobands, chromosomes);
 
@@ -225,17 +224,13 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         }
         webSocket.connect();
 
-        // set dialog box for sam
+        // Dialog box for data selection
         dbox = new SamSelectionDialogBox(samFiles, bedFiles, chrLengthMap, sqlLoader, this);
+
+        initUI();
     }
 
-    public void initViews(String chrName, long start, long end) {
-        // initialize view scale (region)
-        viewScale = new ViewScale(chrName, start, end);
-
-        // load data for view related to viewScale.getChr()
-        reloadViewData(viewScale.getChr(), viewScale.getStart(), viewScale.getEnd());
-
+    public void initUI() {
         trackball = new Trackball(getWidth(), getHeight());
 
         Font f = new Font("Sans-Serif", FontStyle.PLAIN, 12.0);
@@ -257,10 +252,6 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         debugView = new DebugView(this);
         debugView.setPosition(getWidth() - 70, 20);
         debugView.setVisible(false);
-
-        geneUpdater = new GeneUpdater(sqlLoader, annotationText, getMouse());
-
-        rebuildViewData(viewScale.getChr(), viewScale.getStart(), viewScale.getEnd());
 
         addObject(baseObject);
         addObject(annotationText);
@@ -309,6 +300,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     }
 
     private void reloadViewData(String chr, long start, long end) {
+        logger.debug("Reloading view data...");
+
         selectedSamList.clear();
         selectedBedList.clear();
 
@@ -340,21 +333,19 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     }
 
     private void rebuildViewData(String chr, long start, long end) {
+        logger.debug("Rebuilding view data...");
 
-        // Clear data
+        // Clear existing objects
         baseObject.clear();
-
-        chartManager = new ChartManager();
-
         histogramChartMap.clear();
         histogramUpdaterMap.clear();
         bedChartMap.clear();
         bedUpdaterMap.clear();
 
+        chartManager = new ChartManager();
+
         Chromosome c = findChromosome(chr, chromosomes);
-        if (c == null) {
-            return;
-        }
+        if (c == null) return;
 
         scroll = - (start + end) / 2.0;
         scale = ViewerConfig.getInstance().getInitialScale();
@@ -368,7 +359,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
     private void setupRuler(long start, long end) {
         ruler = new Ruler(start, end, scale);
-        ruler.getMainLine().set(viewScale.getStart(), 0, viewScale.getEnd(), 0);
+        ruler.getMainLine().set(start, 0, end, 0);
         baseObject.add(ruler);
     }
 
@@ -435,15 +426,15 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         geneChart.setY(ViewerConfig.getInstance().getRulerPosY());
         baseObject.add(geneChart);
         chartManager.addChart(geneChart);
+        geneUpdater = new GeneUpdater(sqlLoader, annotationText, getMouse());
     }
 
     @Override
     public void update() {
-        if (!isFinishedInitialSelection)
-            return;
-
         // Update horizontal scroll.
         updateScroll();
+
+        if (initializing) return;
 
         leftValue  = (long)(-scroll - 550.0 / scale);
         rightValue = (long)(-scroll + 550.0 / scale);
@@ -808,20 +799,17 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
         dbox.setVisible(false);
 
-        if (!isFinishedInitialSelection) {
-            initViews(dbox.getChrName(), dbox.getStart(), dbox.getEnd());
-            webSocket.connect();
-            isFinishedInitialSelection = true;
+        if (initializing) {
+            viewScale = new ViewScale(dbox.getChrName(), dbox.getStart(), dbox.getEnd());
+            initializing = false;
         } else {
-            // initialize view scale (region)
             viewScale.setViewScale(dbox.getChrName(), dbox.getStart(), dbox.getEnd());
+        }
 
-            // load data for view related to viewScale.getChr()
-            reloadViewData(viewScale.getChr(), viewScale.getStart(), viewScale.getEnd());
+        reloadViewData(viewScale.getChr(), viewScale.getStart(), viewScale.getEnd());
 
-            synchronized (this.getListener()) {
-                rebuildViewData(viewScale.getChr(), viewScale.getStart(), viewScale.getEnd());
-            }
+        synchronized (this.getListener()) {
+            rebuildViewData(viewScale.getChr(), viewScale.getStart(), viewScale.getEnd());
         }
     }
 
@@ -837,19 +825,17 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             bed.setSelected(s.hasBed(bed.getBedId()));
         }
 
-        if (!isFinishedInitialSelection) {
-            initViews(s.chromosome.name, s.chromosome.start, s.chromosome.end);
-            isFinishedInitialSelection = true;
+        if (initializing) {
+            viewScale = new ViewScale(s.chromosome.name, s.chromosome.start, s.chromosome.end);
+            initializing = false;
         } else {
-            // initialize view scale (region)
             viewScale.setViewScale(s.chromosome.name, s.chromosome.start, s.chromosome.end);
+        }
 
-            // load data for view related to viewScale.getChr()
-            reloadViewData(s.chromosome.name, s.chromosome.start, s.chromosome.end);
+        reloadViewData(s.chromosome.name, s.chromosome.start, s.chromosome.end);
 
-            synchronized (this.getListener()) {
-                rebuildViewData(s.chromosome.name, s.chromosome.start, s.chromosome.end);
-            }
+        synchronized (this.getListener()) {
+            rebuildViewData(s.chromosome.name, s.chromosome.start, s.chromosome.end);
         }
     }
 
