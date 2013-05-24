@@ -43,14 +43,14 @@ import genome.view.element.ExonElement;
 import genome.view.element.GeneElement;
 import genome.view.element.HistogramBinElement;
 import genome.view.element.RulerElement;
-import genome.view.thread.BedUpdater;
-import genome.view.thread.GeneUpdater;
-import genome.view.thread.HistogramUpdater;
 import genome.view.ui.DebugView;
 import genome.view.ui.Indicator;
 import genome.view.ui.Ruler;
 import genome.view.ui.ScaleController;
 import genome.view.ui.ScaleControllerCallback;
+import genome.view.updater.BedUpdater;
+import genome.view.updater.GeneUpdater;
+import genome.view.updater.HistogramUpdater;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -535,21 +535,21 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             loadBinSize = newLoadBinSize;
             dispBinSize = newDispBinSize;
             start = newStart;
-            end   = newEnd;
+            end = newEnd;
         } else if (newLoadBinSize != loadBinSize) {
             updateHistogram(newDispBinSize, newLoadBinSize, newStart, newEnd, true);
 
             loadBinSize = newLoadBinSize;
             dispBinSize = newDispBinSize;
             start = newStart;
-            end   = newEnd;
+            end = newEnd;
         } else if (newDispBinSize != dispBinSize) {
             updateHistogram(newDispBinSize, newLoadBinSize, newStart, newEnd, false);
 
             loadBinSize = newLoadBinSize;
             dispBinSize = newDispBinSize;
             start = newStart;
-            end   = newEnd;
+            end = newEnd;
         }
     }
 
@@ -559,7 +559,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
             if (sh == null) continue;
             HistogramUpdater updater = histogramUpdaterMap.get(sam.getSamId());
             HistogramChart chart = histogramChartMap.get(sam.getSamId());
-            updater.start(sh, selectedChromosome, newBinSize, newStart, newEnd, loadDB, chart, scale);
+            updater.setup(sh, selectedChromosome, newBinSize, newStart, newEnd, loadDB, chart, scale);
+            updater.start();
         }
     }
 
@@ -576,12 +577,14 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         for (Bed bed : selectedBedList) {
             BedUpdater updater = bedUpdaterMap.get(bed.getBedId());
             BedChart chart = bedChartMap.get(bed.getBedId());
-            updater.start(bed, selectedChromosome, newStart, newEnd, chart, scale);
+            updater.setup(bed, selectedChromosome, newStart, newEnd, chart, scale);
+            updater.start();
         }
     }
 
     private void updateRefGene(long newStart, long newEnd) {
-        geneUpdater.start(selectedChromosome, newStart, newEnd, geneChart, scale);
+        geneUpdater.setup(selectedChromosome, newStart, newEnd, geneChart, scale);
+        geneUpdater.start();
     }
 
     private void updateElements() {
@@ -853,6 +856,10 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
     public static ChartManager getChartManager() {
         return chartManager;
+    }
+
+    public Indicator getIndicator() {
+        return indicator;
     }
 
     public static void main(String[] args) {
