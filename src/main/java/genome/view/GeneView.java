@@ -97,12 +97,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     private double maxScale = 2.0;
     private double wheelScaleFactor = 0.007;
 
-    private double scroll = 0.0;
-    private double scrollSpeed = 0.0;
-    private double scrollSpeedEps = 0.01;
+    private Scroll scroll;
     private double mouseScrollSpeedFactor = 15.0;
-    private double scrollSpeedDampingFactor = 0.8;
-    private double scrollPowerFactor = 0.8;
 
     private long leftValue = 0, rightValue = 0;
 
@@ -183,10 +179,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         minScale = vconf.getMinScale();
         maxScale = vconf.getMaxScale();
         wheelScaleFactor = vconf.getWheelScaleFactor();
-        scrollSpeedEps = vconf.getScrollSpeedEps();
         mouseScrollSpeedFactor = vconf.getMouseScrollSpeedFactor();
-        scrollSpeedDampingFactor = vconf.getScrollSpeedDampingFactor();
-        scrollPowerFactor = vconf.getScrollPowerFactor();
 
         // load data
         // -----------------------------------------
@@ -232,6 +225,10 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     }
 
     public void initUI() {
+        ViewerConfig vconf = ViewerConfig.getInstance();
+        scroll = new Scroll(vconf.getScrollSpeedEps(), vconf.getScrollPowerFactor(),
+            vconf.getScrollSpeedDampingFactor());
+
         trackball = new Trackball(getWidth(), getHeight());
 
         Font f = new Font("Sans-Serif", FontStyle.PLAIN, 12.0);
@@ -348,7 +345,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         Chromosome c = findChromosome(chr, chromosomes);
         if (c == null) return;
 
-        scroll = - (start + end) / 2.0;
+        scroll.setX(-(start + end)/ 2.0);
         scale = ViewerConfig.getInstance().getInitialScale();
 
         setupRuler(start, end);
@@ -432,27 +429,19 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
     @Override
     public void update() {
-        // Update horizontal scroll.
-        updateScroll();
+        // Update scroll
+        scroll.update(getFPS(), scale);
 
         if (initializing) return;
 
-        leftValue = (long)(-scroll - 550.0 / scale);
-        rightValue = (long)(-scroll + 550.0 / scale);
+        leftValue = (long)(-scroll.getX() - 550.0 / scale);
+        rightValue = (long)(-scroll.getX() + 550.0 / scale);
 
         // Update data.
         updateData();
 
         // Update graphics objects.
         updateElements();
-    }
-
-    private void updateScroll() {
-        scroll += scrollSpeed / getFPS() / Math.pow(scale, scrollPowerFactor);
-        scrollSpeed *= scrollSpeedDampingFactor;
-        if (Math.abs(scrollSpeed) < scrollSpeedEps) {
-            scrollSpeed = 0.0;
-        }
     }
 
     private void updateData() {
@@ -589,7 +578,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
     private void updateElements() {
         // Horizontal offset of scroll
-        double offset = scroll * scale + getWidth() / 2.0;
+        double offset = scroll.getX() * scale + getWidth() / 2.0;
 
         // Update ruler
         updateRuler(offset);
@@ -762,7 +751,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
                     prvMouseY = mouseY;
                 } else {
                     double diffX = getMouseX() - getPreMouseX();
-                    scrollSpeed += diffX * mouseScrollSpeedFactor;
+                    double diffY = getMouseY() - getPreMouseY();
+                    scroll.setSpeed(scroll.getSpeed() + diffX * mouseScrollSpeedFactor);
                 }
 
                 break;
