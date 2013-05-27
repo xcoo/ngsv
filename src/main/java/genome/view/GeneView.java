@@ -346,6 +346,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         if (c == null) return;
 
         scroll.setX(-(start + end)/ 2.0);
+        scroll.setY(0.0);
         scale = ViewerConfig.getInstance().getInitialScale();
 
         setupRuler(start, end);
@@ -580,6 +581,9 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
         // Horizontal offset of scroll
         double offset = scroll.getX() * scale + getWidth() / 2.0;
 
+        // Vertical offset
+        baseObject.setY(scroll.getY() * 0.5);
+
         // Update ruler
         updateRuler(offset);
 
@@ -752,7 +756,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
                 } else {
                     double diffX = getMouseX() - getPreMouseX();
                     double diffY = getMouseY() - getPreMouseY();
-                    scroll.setSpeed(scroll.getSpeed() + diffX * mouseScrollSpeedFactor);
+                    scroll.setSpeedX(scroll.getSpeedX() + diffX * mouseScrollSpeedFactor);
+                    scroll.setSpeedY(scroll.getSpeedY() + diffY * mouseScrollSpeedFactor);
                 }
 
                 break;

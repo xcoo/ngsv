@@ -30,10 +30,10 @@ public class Scroll {
     private final double powerFactor;
     private final double speedDampingFactor;
 
-    private double x = 0.0, y = 0.0;
-    private double speed = 0.0;
-    private double minX = Double.MIN_VALUE, maxX = Double.MAX_VALUE;
-    private double minY = Double.MIN_VALUE, maxY = Double.MAX_VALUE;
+    private double[] position = {0.0, 0.0};
+    private double[] speed = {0.0, 0.0};
+    private double[] min = {-Double.MAX_VALUE, -Double.MAX_VALUE};
+    private double[] max = {Double.MAX_VALUE, Double.MAX_VALUE};
 
     public Scroll(double scrollSpeedEps, double scrollPowerFactor, double scrollSpeedDampingFactor) {
         this.speedEps = scrollSpeedEps;
@@ -42,76 +42,101 @@ public class Scroll {
     }
 
     public void update(double fps, double scale) {
-        x += speed / fps / Math.pow(scale, powerFactor);
+        updateX(fps, scale);
+        updateY(fps);
+    }
 
-        if (x < minX) {
-            x = minX;
-            speed = 0;
-        } else if (maxX < x) {
-            x = maxX;
-            speed = 0;
+    private void updateX(double fps, double scale) {
+        position[0] += speed[0] / fps / Math.pow(scale, powerFactor);
+        if (position[0] < min[0]) {
+            position[0] = min[0];
+            speed[0] = 0;
+        } else if (max[0] < position[0]) {
+            position[0] = max[0];
+            speed[0] = 0;
         }
 
-        speed *= speedDampingFactor;
-        if (Math.abs(speed) < speedEps) {
-            speed = 0.0;
+        speed[0] *= speedDampingFactor;
+        if (Math.abs(speed[0]) < speedEps)
+            speed[0] = 0.0;
+    }
+
+    private void updateY(double fps) {
+        position[1] += speed[1] / fps;
+        if (position[1] < min[1]) {
+            position[1] = min[1];
+            speed[1] = 0;
+        } else if (max[1] < position[1]) {
+            position[1] = max[1];
+            speed[1] = 0;
         }
+
+        speed[1] *= speedDampingFactor;
+        if (Math.abs(speed[1]) < speedEps)
+            speed[1] = 0.0;
     }
 
     public double getX() {
-        return x;
+        return position[0];
     }
 
     public void setX(double x) {
-        this.x = x;
+        this.position[0] = x;
     }
 
     public double getY() {
-        return y;
+        return position[1];
     }
 
     public void setY(double y) {
-        this.y = y;
+        this.position[1] = y;
     }
 
-    public double getSpeed() {
-        return speed;
+    public double getSpeedX() {
+        return speed[0];
     }
 
-    public void setSpeed(double speed) {
-        this.speed = speed;
+    public void setSpeedX(double speedX) {
+        this.speed[0] = speedX;
+
+    }
+    public double getSpeedY() {
+        return speed[1];
     }
 
+    public void setSpeedY(double speedY) {
+        this.speed[1] = speedY;
+    }
 
     public double getMinX() {
-        return minX;
+        return min[0];
     }
 
     public void setMinX(double minX) {
-        this.minX = minX;
+        this.min[0] = minX;
     }
 
     public double getMaxX() {
-        return maxX;
+        return max[0];
     }
 
     public void setMaxX(double maxX) {
-        this.maxX = maxX;
+        this.max[0] = maxX;
     }
 
     public double getMinY() {
-        return minY;
+        return min[1];
     }
 
     public void setMinY(double minY) {
-        this.minY = minY;
+        this.min[1] = minY;
     }
 
     public double getMaxY() {
-        return maxY;
+        return max[1];
     }
 
     public void setMaxY(double maxY) {
-        this.maxY = maxY;
+        this.max[1] = maxY;
     }
 }
