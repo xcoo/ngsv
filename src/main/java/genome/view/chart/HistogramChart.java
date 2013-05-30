@@ -29,6 +29,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import casmi.Mouse;
+import casmi.graphics.color.ColorSet;
+import casmi.graphics.element.Text;
+import casmi.graphics.font.Font;
+import casmi.graphics.font.FontStyle;
 import casmi.util.GraphicsUtil;
 
 /**
@@ -40,14 +44,25 @@ public class HistogramChart extends Chart {
 
     static Logger logger = LoggerFactory.getLogger(HistogramChart.class);
 
+    private static final Font SUB_TITLE_FONT;
+    static {
+        SUB_TITLE_FONT = new Font("Sans-Serif", FontStyle.PLAIN, 12.0);
+    }
+
     private List<HistogramBinElement> histogramBinElementList = new ArrayList<HistogramBinElement>();
 
     private final Sam sam;
+    private Text subTitleText;
 
     public HistogramChart(Sam sam, Mouse mouse) {
         super("histogram", mouse);
 
         this.sam = sam;
+
+        subTitleText = new Text("", SUB_TITLE_FONT, 5, 0);
+        subTitleText.setText(String.format("(%s)", sam.getFileName()));
+        subTitleText.setStrokeColor(ColorSet.LIGHT_GRAY);
+        add(subTitleText);
     }
 
     public void setup(HistogramBin[] histogramBins, long binSize, long dispBinSize, long maxValue,
