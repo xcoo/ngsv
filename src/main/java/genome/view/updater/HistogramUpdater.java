@@ -84,7 +84,6 @@ public class HistogramUpdater extends Updater<HistogramUpdateThread> {
         return end;
     }
 
-
     public boolean isLoadDB() {
         return loadDB;
     }
@@ -99,5 +98,9 @@ public class HistogramUpdater extends Updater<HistogramUpdateThread> {
 
     public long getMaxValue() {
         return maxValue;
+    }
+
+    public void setMaxValue(long maxValue) {
+        this.maxValue = maxValue;
     }
 }

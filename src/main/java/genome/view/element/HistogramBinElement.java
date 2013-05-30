@@ -36,16 +36,16 @@ public class HistogramBinElement extends Box implements ScalableElement {
     private double scale;
     private double initialScale;
 
-    public HistogramBinElement(HistogramBin hb, double initialScale, long binSize, double maxHeight) {
-        this(hb.getValue(), hb.getPosition(), initialScale, binSize, maxHeight);
+    public HistogramBinElement(HistogramBin hb, double initialScale, long binSize, long maxValue) {
+        this(hb.getValue(), hb.getPosition(), initialScale, binSize, maxValue);
     }
 
     public HistogramBinElement(long value, long position, double initialScale, long binSize,
-        double maxHeight) {
-        super(binSize * initialScale, Math.log(value) / Math.log(maxHeight) * MAX_HEIGHT, 50.0);
+        long maxValue) {
+        super(binSize * initialScale, Math.log(value) / Math.log(maxValue) * MAX_HEIGHT, 50.0);
 
         this.setPosition(position + binSize / 2.0,
-            Math.log(value) / Math.log(maxHeight) / 2.0 * MAX_HEIGHT);
+            Math.log(value) / Math.log(maxValue) / 2.0 * MAX_HEIGHT);
         this.setStroke(true);
         this.setStrokeColor(new RGBColor(ViewerConfig.getInstance().getHistogramStrokeColor()));
         this.setFillColor(new RGBColor(ViewerConfig.getInstance().getHistogramFillColor()));
@@ -53,12 +53,12 @@ public class HistogramBinElement extends Box implements ScalableElement {
         this.initialScale = initialScale;
         this.scale = initialScale;
 
-        this.name = value + " (" + position + " - " + (position + binSize) + ")";
+        this.name = String.format("%d (%d - %d)", value, position, position + binSize);
 
         this.baseX = position + binSize / 2.0;
         this.initialBaseX = this.baseX;
 
-        this.baseY = Math.log(value) / Math.log(maxHeight) / 2.0 * MAX_HEIGHT;
+        this.baseY = Math.log(value) / Math.log(maxValue) / 2.0 * MAX_HEIGHT;
     }
 
     public String getName() {

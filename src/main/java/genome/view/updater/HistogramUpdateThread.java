@@ -75,6 +75,7 @@ public class HistogramUpdateThread extends UpdateThread {
             // Get max value of histogram.
             // ---------------------------------------------------------------------
             maxValue = sqlLoader.getMaxHistogram(samHistogram.getSamHistogramId(), chromosome.getChrId());
+            histogramUpdater.setMaxValue(maxValue);
 
             logger.info(
                 String.format("Load %d HistogramBins: (samHistogramId: %d, binSize: %d, maxValue: %d)",
@@ -86,12 +87,12 @@ public class HistogramUpdateThread extends UpdateThread {
 
         // Setup HistogramBinGroup.
         // ---------------------------------------------------------------------
-        histogramChart.setup(samHistogram.getHistogramBins(), samHistogram.getBinSize(), binSize, maxValue);
+        histogramChart.setup(samHistogram.getHistogramBins(), samHistogram.getBinSize(), binSize,
+            maxValue, scale);
 
         if (isStopFlag()) return;
 
         for (HistogramBinElement e : histogramChart.getHistogramBinElementList()) {
-            e.setScale(scale);
             e.addMouseEventCallback(new AnnotationMouseOverCallback(e.getName(), annotationText, mouse));
 
             if (isStopFlag()) return;

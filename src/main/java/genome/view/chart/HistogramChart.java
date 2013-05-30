@@ -44,16 +44,14 @@ public class HistogramChart extends Chart {
 
     private final Sam sam;
 
-    private double scale;
-
-    public HistogramChart(Sam sam, double scale, Mouse mouse) {
+    public HistogramChart(Sam sam, Mouse mouse) {
         super("histogram", mouse);
 
         this.sam = sam;
-        this.scale = scale;
     }
 
-    public void setup(HistogramBin[] histogramBins, long binSize, long dispBinSize, long maxValue) {
+    public void setup(HistogramBin[] histogramBins, long binSize, long dispBinSize, long maxValue,
+        double scale) {
         List<HistogramBinElement> list = new ArrayList<HistogramBinElement>();
 
         if (binSize == dispBinSize) {

@@ -377,7 +377,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     }
 
     private void setupHistogramChart(Sam sam) {
-        HistogramChart chart = new HistogramChart(sam, scale, getMouse());
+        HistogramChart chart = new HistogramChart(sam, getMouse());
         chart.setY(ViewerConfig.getInstance().getHistogramPosY());
 
         histogramChartMap.put(sam.getSamId(), chart);
