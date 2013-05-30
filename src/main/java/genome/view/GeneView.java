@@ -152,7 +152,7 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
 
     // trackball
     private Trackball trackball;
-    private int prvMouseX = 0, prvMouseY = 0;
+    private int prevMouseX = 0, prevMouseY = 0;
 
     private WebSocket webSocket;
 
@@ -729,8 +729,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
     public void mouseEvent(MouseEvent e, MouseButton b) {
         switch (e) {
         case PRESSED:
-            prvMouseX = getMouseX();
-            prvMouseY = getMouseY();
+            prevMouseX = getMouseX();
+            prevMouseY = getMouseY();
             break;
 
         case RELEASED:
@@ -747,15 +747,15 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
                     int mouseX = getMouseX();
                     int mouseY = getMouseY();
 
-                    trackball.update(mouseX, mouseY, prvMouseX, prvMouseY);
+                    trackball.update(mouseX, mouseY, prevMouseX, prevMouseY);
 
                     trackball.rotate(baseObject, getWidth() / 2.0, getHeight() / 2.0, 0.0);
 
-                    prvMouseX = mouseX;
-                    prvMouseY = mouseY;
+                    prevMouseX = mouseX;
+                    prevMouseY = mouseY;
                 } else {
-                    double diffX = getMouseX() - getPreMouseX();
-                    double diffY = getMouseY() - getPreMouseY();
+                    double diffX = getMouseX() - getPrevMouseX();
+                    double diffY = getMouseY() - getPrevMouseY();
                     scroll.setSpeedX(scroll.getSpeedX() + diffX * mouseScrollSpeedFactor);
                     scroll.setSpeedY(scroll.getSpeedY() + diffY * mouseScrollSpeedFactor);
                 }
@@ -768,12 +768,12 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
                 int mouseX = getMouseX();
                 int mouseY = getMouseY();
 
-                trackball.update(mouseX, mouseY, prvMouseX, prvMouseY);
+                trackball.update(mouseX, mouseY, prevMouseX, prevMouseY);
 
                 trackball.rotate(baseObject, getWidth() / 2.0, getHeight() / 2.0, 0.0);
 
-                prvMouseX = mouseX;
-                prvMouseY = mouseY;
+                prevMouseX = mouseX;
+                prevMouseY = mouseY;
                 break;
             }
 
