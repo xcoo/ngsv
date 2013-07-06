@@ -754,8 +754,8 @@ public class GeneView extends Applet implements SamSelectionDialongBoxListener, 
                     prevMouseX = mouseX;
                     prevMouseY = mouseY;
                 } else {
-                    double diffX = getMouseX() - getPrevMouseX();
-                    double diffY = getMouseY() - getPrevMouseY();
+                    double diffX = getMouseX() - getMouse().getPrvX();
+                    double diffY = getMouseY() - getMouse().getPrvY();
                     scroll.setSpeedX(scroll.getSpeedX() + diffX * mouseScrollSpeedFactor);
                     scroll.setSpeedY(scroll.getSpeedY() + diffY * mouseScrollSpeedFactor);
                 }

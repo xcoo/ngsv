@@ -77,7 +77,7 @@ public class ScaleController extends Group {
             @Override
             public void run(MouseClickTypes eventtype, Element element) {
                 if (eventtype == MouseClickTypes.DRAGGED) {
-                    double newY = valueCircle.getY() + mouse.getY() - mouse.getPrevY();
+                    double newY = valueCircle.getY() + mouse.getY() - mouse.getPrvX();
                     if (newY > 100)
                         newY = 100;
                     else if (newY < -100)
